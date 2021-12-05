@@ -4,6 +4,7 @@ using IGApi.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IGApi.Migrations
 {
     [DbContext(typeof(IGApiDbContext))]
-    partial class IGApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211204141657_EpicTick_v1.0")]
+    partial class EpicTick_v10
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,7 +24,7 @@ namespace IGApi.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("IGApi.Model.Account", b =>
+            modelBuilder.Entity("IGApiEngine.Model.Account", b =>
                 {
                     b.Property<string>("AccountId")
                         .HasMaxLength(4000)
@@ -115,140 +117,7 @@ namespace IGApi.Migrations
                     b.ToTable("account");
                 });
 
-            modelBuilder.Entity("IGApi.Model.EpicDetail", b =>
-                {
-                    b.Property<string>("Epic")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)")
-                        .HasColumnName("epic");
-
-                    b.Property<string>("ChartCode")
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)")
-                        .HasColumnName("chart_code");
-
-                    b.Property<decimal?>("ContractSize")
-                        .HasPrecision(38, 19)
-                        .HasColumnType("decimal(38,19)")
-                        .HasColumnName("contract_size");
-
-                    b.Property<bool>("ControlledRiskAllowed")
-                        .HasColumnType("bit")
-                        .HasColumnName("controlled_risk_allowed");
-
-                    b.Property<string>("Country")
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)")
-                        .HasColumnName("country");
-
-                    b.Property<string>("Expiry")
-                        .IsRequired()
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)")
-                        .HasColumnName("expiry");
-
-                    b.Property<bool>("ForceOpenAllowed")
-                        .HasColumnType("bit")
-                        .HasColumnName("force_open_allowed");
-
-                    b.Property<decimal?>("LotSize")
-                        .HasPrecision(38, 19)
-                        .HasColumnType("decimal(38,19)")
-                        .HasColumnName("lot_size");
-
-                    b.Property<decimal?>("MarginFactor")
-                        .HasPrecision(38, 19)
-                        .HasColumnType("decimal(38,19)")
-                        .HasColumnName("margin_factor");
-
-                    b.Property<string>("MarginFactorUnit")
-                        .IsRequired()
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)")
-                        .HasColumnName("margin_factor_unit");
-
-                    b.Property<string>("MarketId")
-                        .IsRequired()
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)")
-                        .HasColumnName("market_id");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)")
-                        .HasColumnName("name");
-
-                    b.Property<string>("NewsCode")
-                        .IsRequired()
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)")
-                        .HasColumnName("news_code");
-
-                    b.Property<string>("OnePipMeans")
-                        .IsRequired()
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)")
-                        .HasColumnName("one_pip_means");
-
-                    b.Property<string>("PositionSizeUnit")
-                        .IsRequired()
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)")
-                        .HasColumnName("position_size_unit");
-
-                    b.Property<int>("SprintMarketsMaximumExpiryTime")
-                        .HasColumnType("int")
-                        .HasColumnName("sprintmarket_maximum_expiry_time");
-
-                    b.Property<int>("SprintMarketsMinimumExpiryTime")
-                        .HasColumnType("int")
-                        .HasColumnName("sprintmarket_minimum_expiry_time");
-
-                    b.Property<bool>("StopsLimitsAllowed")
-                        .HasColumnType("bit")
-                        .HasColumnName("stop_limit_allowed");
-
-                    b.Property<bool>("StreamingPricesAvailable")
-                        .HasColumnType("bit")
-                        .HasColumnName("streaming_prices_available");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)")
-                        .HasColumnName("type");
-
-                    b.Property<string>("ValueOfOnePip")
-                        .IsRequired()
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)")
-                        .HasColumnName("value_of_one_pip");
-
-                    b.HasKey("Epic");
-
-                    b.ToTable("epic_detail");
-                });
-
-            modelBuilder.Entity("IGApi.Model.EpicDetail+EpicDetailSpecialInfo", b =>
-                {
-                    b.Property<string>("Epic")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)")
-                        .HasColumnName("epic");
-
-                    b.Property<string>("SpecialInfo")
-                        .IsRequired()
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)")
-                        .HasColumnName("special_info");
-
-                    b.HasKey("Epic");
-
-                    b.ToTable("epic_detail_special_info");
-                });
-
-            modelBuilder.Entity("IGApi.Model.EpicTick", b =>
+            modelBuilder.Entity("IGApiEngine.Model.EpicTick", b =>
                 {
                     b.Property<string>("Epic")
                         .HasMaxLength(128)
@@ -313,7 +182,60 @@ namespace IGApi.Migrations
                     SqlServerEntityTypeBuilderExtensions.IsMemoryOptimized(b);
                 });
 
-            modelBuilder.Entity("IGApi.Model.OpenPosition", b =>
+            modelBuilder.Entity("IGApiEngine.Model.IGRestRequestQueue", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<bool>("ExecuteAsap")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false)
+                        .HasColumnName("execute_asap");
+
+                    b.Property<bool>("IsRecurrent")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_recurrent");
+
+                    b.Property<string>("Parameters")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("parameter");
+
+                    b.Property<string>("RestRequest")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)")
+                        .HasColumnName("rest_request");
+
+                    b.Property<DateTime>("Timestamp")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasColumnName("timestamp")
+                        .HasDefaultValueSql("getutcdate()");
+
+                    b.HasKey("Id");
+
+                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("Id"), false);
+
+                    b.HasIndex("ExecuteAsap", "Timestamp");
+
+                    SqlServerIndexBuilderExtensions.IsClustered(b.HasIndex("ExecuteAsap", "Timestamp"), false);
+
+                    b.ToTable("rest_request_queue");
+
+                    SqlServerEntityTypeBuilderExtensions.IsMemoryOptimized(b);
+
+                    b.HasCheckConstraint("CHK_ig_rest_api_queue_rest_request", "rest_request in ('GetAccountDetails', 'GetOpenPositions', 'CreatePosition')");
+                });
+
+            modelBuilder.Entity("IGApiEngine.Model.OpenPosition", b =>
                 {
                     b.Property<string>("AccountId")
                         .HasMaxLength(4000)
@@ -389,75 +311,6 @@ namespace IGApi.Migrations
                     b.HasKey("AccountId", "DealId");
 
                     b.ToTable("open_position");
-                });
-
-            modelBuilder.Entity("IGApi.Model.RestRequestQueue", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<bool>("ExecuteAsap")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false)
-                        .HasColumnName("execute_asap");
-
-                    b.Property<bool>("IsRecurrent")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false)
-                        .HasColumnName("is_recurrent");
-
-                    b.Property<string>("Parameters")
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)")
-                        .HasColumnName("parameter");
-
-                    b.Property<string>("RestRequest")
-                        .IsRequired()
-                        .HasMaxLength(512)
-                        .HasColumnType("nvarchar(512)")
-                        .HasColumnName("rest_request");
-
-                    b.Property<DateTime>("Timestamp")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasColumnName("timestamp")
-                        .HasDefaultValueSql("getutcdate()");
-
-                    b.HasKey("Id");
-
-                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("Id"), false);
-
-                    b.HasIndex("ExecuteAsap", "Timestamp");
-
-                    SqlServerIndexBuilderExtensions.IsClustered(b.HasIndex("ExecuteAsap", "Timestamp"), false);
-
-                    b.ToTable("rest_request_queue");
-
-                    SqlServerEntityTypeBuilderExtensions.IsMemoryOptimized(b);
-
-                    b.HasCheckConstraint("rest_request", "rest_request in ('GetAccountDetails', 'GetOpenPositions', 'CreatePosition','GetEpicDetails')");
-                });
-
-            modelBuilder.Entity("IGApi.Model.EpicDetail+EpicDetailSpecialInfo", b =>
-                {
-                    b.HasOne("IGApi.Model.EpicDetail", "EpicDetail")
-                        .WithOne("SpecialInfo")
-                        .HasForeignKey("IGApi.Model.EpicDetail+EpicDetailSpecialInfo", "Epic")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("EpicDetail");
-                });
-
-            modelBuilder.Entity("IGApi.Model.EpicDetail", b =>
-                {
-                    b.Navigation("SpecialInfo");
                 });
 #pragma warning restore 612, 618
         }

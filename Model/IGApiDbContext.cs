@@ -7,6 +7,7 @@
 
     public partial class IGApiDbContext : DbContext
     {
+        //TODO: _connectionString
         private static readonly string _connectionString = "Password=96ci^w4XSCP&iy&m;Database=TDBT;User ID=TheDaveTrader;Data Source=LITTLEKICK;";
         
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => base.OnConfiguring(
@@ -23,10 +24,11 @@
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            AccountDetailsOnModelCreating(modelBuilder);
-            AccountBalanceOnModelCreating(modelBuilder);
-            StreamingAccountDataOnModelCreating(modelBuilder);
-            IGRestApiQueueOnModelCreating(modelBuilder);
+            AccountOnModelCreating(modelBuilder);
+            IGRestRequestQueueOnModelCreating(modelBuilder);
+            OpenPositionOnModelCreating(modelBuilder);
+            TickOnModelCreating(modelBuilder);
+            EpicDetailOnModelCreating(modelBuilder);
 
             //  Set default varchar(4000)
             foreach (var property in modelBuilder.Model.GetEntityTypes()

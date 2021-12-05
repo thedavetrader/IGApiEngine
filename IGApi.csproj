@@ -1,0 +1,49 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Model\EpicDetails\Childs\**" />
+    <Compile Remove="Model\IGApiAccountBalance\**" />
+    <Compile Remove="Model\IGApiOpenPositions\**" />
+    <Compile Remove="Model\IGApiStreamingAccountData\**" />
+    <EmbeddedResource Remove="Model\EpicDetails\Childs\**" />
+    <EmbeddedResource Remove="Model\IGApiAccountBalance\**" />
+    <EmbeddedResource Remove="Model\IGApiOpenPositions\**" />
+    <EmbeddedResource Remove="Model\IGApiStreamingAccountData\**" />
+    <None Remove="Model\EpicDetails\Childs\**" />
+    <None Remove="Model\IGApiAccountBalance\**" />
+    <None Remove="Model\IGApiOpenPositions\**" />
+    <None Remove="Model\IGApiStreamingAccountData\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Common\Extensions\ObservableCollectionExtension.cs" />
+    <Compile Remove="Common\ObservableRangeCollection.cs" />
+    <Compile Remove="Model\ModelExtensions.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="6.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.0" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
+    <PackageReference Include="Validation" Version="2.5.42" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ig-webapi-dotnet-sample\IGWebApiClient\IGWebApiClient.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="DotNetClient_N2">
+      <HintPath>..\ig-webapi-dotnet-sample\packages\3rdPartyDlls\DotNetClient_N2.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

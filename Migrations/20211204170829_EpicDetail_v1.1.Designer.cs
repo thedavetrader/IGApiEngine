@@ -4,6 +4,7 @@ using IGApi.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IGApi.Migrations
 {
     [DbContext(typeof(IGApiDbContext))]
-    partial class IGApiDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211204170829_EpicDetail_v1.1")]
+    partial class EpicDetail_v11
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -123,6 +125,7 @@ namespace IGApi.Migrations
                         .HasColumnName("epic");
 
                     b.Property<string>("ChartCode")
+                        .IsRequired()
                         .HasMaxLength(4000)
                         .HasColumnType("nvarchar(4000)")
                         .HasColumnName("chart_code");
@@ -137,6 +140,7 @@ namespace IGApi.Migrations
                         .HasColumnName("controlled_risk_allowed");
 
                     b.Property<string>("Country")
+                        .IsRequired()
                         .HasMaxLength(4000)
                         .HasColumnType("nvarchar(4000)")
                         .HasColumnName("country");
@@ -441,7 +445,7 @@ namespace IGApi.Migrations
 
                     SqlServerEntityTypeBuilderExtensions.IsMemoryOptimized(b);
 
-                    b.HasCheckConstraint("rest_request", "rest_request in ('GetAccountDetails', 'GetOpenPositions', 'CreatePosition','GetEpicDetails')");
+                    b.HasCheckConstraint("CHK_ig_rest_api_queue_rest_request", "rest_request in ('GetAccountDetails', 'GetOpenPositions', 'CreatePosition')");
                 });
 
             modelBuilder.Entity("IGApi.Model.EpicDetail+EpicDetailSpecialInfo", b =>
@@ -457,7 +461,8 @@ namespace IGApi.Migrations
 
             modelBuilder.Entity("IGApi.Model.EpicDetail", b =>
                 {
-                    b.Navigation("SpecialInfo");
+                    b.Navigation("SpecialInfo")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

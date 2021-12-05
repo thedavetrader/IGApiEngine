@@ -5,7 +5,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IGApiEngine.Common
+namespace IGApi.Common
 {
     internal class DBContextNullReferenceException : NullReferenceException
     {
@@ -20,10 +20,20 @@ namespace IGApiEngine.Common
             : base($"The restcall {restCall} failed. Check internet connection or IG api service status.", null, httpStatusCode) { }
     }
 
-    internal class RestCallNullException : NullReferenceException
+    internal class RestCallNullReferenceException : NullReferenceException
     {
-        internal RestCallNullException(string restCall)
-            : base($"The restcall {restCall} succeede, however the response was empty. Check for IG api service status.") { }
+        internal RestCallNullReferenceException(string restCall)
+            : base($"The restcall {restCall} succeeded, however the response was empty. Check for IG api service status.") { }
     }
-    
+
+    internal class PrimaryKeyNullReferenceException : NullReferenceException
+    {
+        internal PrimaryKeyNullReferenceException(string primaryKey)
+            : base($"The primary key {primaryKey} is empty.") { }
+    }
+    internal class EssentialPropertyNullReferenceException : NullReferenceException
+    {
+        internal EssentialPropertyNullReferenceException(string property)
+            : base($"The essential propertie {property} is empty.") { }
+    }
 }
