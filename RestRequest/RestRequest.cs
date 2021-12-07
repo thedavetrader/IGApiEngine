@@ -13,25 +13,26 @@ namespace IGApi.RestRequest
 
         private readonly Task? _restRequestCallTask;
 
-        private readonly ApiEngine _iGApiEngine = ApiEngine.Instance;
+        private readonly ApiEngine _apiEngine = ApiEngine.Instance;
 
         public RestRequest([NotNullAttribute] RestRequestQueue restRequestQueueItem)
         {
-            _ = _iGApiEngine.LoginSessionInformation ?? throw new Exception("Not, or no longer logged in. Check internet or IG Api service status.");
+            _ = _apiEngine.LoginSessionInformation ?? throw new Exception("Not, or no longer logged in. Check internet or IG Api service status.");
+            
             RestRequestQueueItem = restRequestQueueItem;
 
             switch (RestRequestQueueItem.RestRequest)
             {
-                case "GetAccountDetails":
+                case nameof(GetAccountDetails):
                     {
                         IsTradingRequest = false;
                         _restRequestCallTask = new Task(() => GetAccountDetails());
                         break;
                     }
-                case "GetOpenPositions":
+                case nameof(GetOpenPositions):
                     {
                         IsTradingRequest = false;
-                        _restRequestCallTask = new Task(() => GetOpenPositionDetails());
+                        _restRequestCallTask = new Task(() => GetOpenPositions());
                         break;
                     }
                 case "CreatePosition":
@@ -40,7 +41,7 @@ namespace IGApi.RestRequest
                         //_restRequestCallTask = Task.CompletedTask;
                         break;
                     }
-                case "GetEpicDetails":
+                case nameof(GetEpicDetails):
                     {
                         IsTradingRequest = false;
                         _restRequestCallTask = new Task(() => GetEpicDetails(RestRequestQueueItem.Parameters));

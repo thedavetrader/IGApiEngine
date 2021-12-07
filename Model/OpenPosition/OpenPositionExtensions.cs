@@ -6,7 +6,7 @@ namespace IGApi.Model
 {
     internal static partial class DtoModelExtensions
     {
-        public static IGApiDbContext SaveOpenPosition(
+        public static OpenPosition? SaveOpenPosition(
             [NotNullAttribute] this IGApiDbContext iGApiDbContext,
             [NotNullAttribute] dto.endpoint.positions.get.otc.v2.OpenPositionData openPositionData,
             [NotNullAttribute] string accountId,
@@ -20,12 +20,12 @@ namespace IGApi.Model
             if (openPosition is not null)
                 openPosition.MapProperties(openPositionData, accountId, epic);
             else
-                iGApiDbContext.OpenPositions.Add(new OpenPosition(openPositionData, accountId, epic));
+                openPosition = iGApiDbContext.OpenPositions.Add(new OpenPosition(openPositionData, accountId, epic)).Entity;
 
-            return iGApiDbContext;
+            return openPosition;
         }
 
-        public static IGApiDbContext SaveOpenPosition(
+        public static OpenPosition? SaveOpenPosition(
         [NotNullAttribute] this IGApiDbContext iGApiDbContext,
         [NotNullAttribute] LsTradeSubscriptionData lsTradeSubscriptionData,
         [NotNullAttribute] string accountId
@@ -38,9 +38,9 @@ namespace IGApi.Model
             if (openPosition is not null)
                 openPosition.MapProperties(lsTradeSubscriptionData, accountId);
             else
-                iGApiDbContext.OpenPositions.Add(new OpenPosition(lsTradeSubscriptionData, accountId));
+                openPosition = iGApiDbContext.OpenPositions.Add(new OpenPosition(lsTradeSubscriptionData, accountId)).Entity;
 
-            return iGApiDbContext;
+            return openPosition;
         }
     }
 }

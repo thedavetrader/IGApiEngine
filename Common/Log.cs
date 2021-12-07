@@ -8,7 +8,8 @@ namespace IGApi.Common
 {
     internal static class Log
     {
-        public static string FormatString = "{0, -50} {1, -50} {2, 50} {3, 50}";
+        public static string FormatFourColumns = "{0, -50} {1, -50} {2, 50} {3, 50}";
+        public static string FormatTwoColumns = "{0, -100} {1, 100}";
 
         internal static void WriteLine(string? message)
         {

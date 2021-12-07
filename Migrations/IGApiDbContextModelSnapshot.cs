@@ -122,6 +122,10 @@ namespace IGApi.Migrations
                         .HasColumnType("nvarchar(128)")
                         .HasColumnName("epic");
 
+                    b.Property<DateTime>("ApiLastUpdate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("api_last_update");
+
                     b.Property<string>("ChartCode")
                         .HasMaxLength(4000)
                         .HasColumnType("nvarchar(4000)")
@@ -147,9 +151,22 @@ namespace IGApi.Migrations
                         .HasColumnType("nvarchar(4000)")
                         .HasColumnName("expiry");
 
+                    b.Property<DateTime?>("ExpirylastDealingDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("expiry_last_dealingdate");
+
+                    b.Property<string>("ExpirysettlementInfo")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("expiry_settlement_info");
+
                     b.Property<bool>("ForceOpenAllowed")
                         .HasColumnType("bit")
                         .HasColumnName("force_open_allowed");
+
+                    b.Property<DateTime?>("LastRolloverTime")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("last_rollover_time");
 
                     b.Property<decimal?>("LotSize")
                         .HasPrecision(38, 19)
@@ -180,13 +197,11 @@ namespace IGApi.Migrations
                         .HasColumnName("name");
 
                     b.Property<string>("NewsCode")
-                        .IsRequired()
                         .HasMaxLength(4000)
                         .HasColumnType("nvarchar(4000)")
                         .HasColumnName("news_code");
 
                     b.Property<string>("OnePipMeans")
-                        .IsRequired()
                         .HasMaxLength(4000)
                         .HasColumnType("nvarchar(4000)")
                         .HasColumnName("one_pip_means");
@@ -196,6 +211,21 @@ namespace IGApi.Migrations
                         .HasMaxLength(4000)
                         .HasColumnType("nvarchar(4000)")
                         .HasColumnName("position_size_unit");
+
+                    b.Property<string>("RolloverInfo")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("rollover_info");
+
+                    b.Property<string>("SlippageFactorUnit")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("slippage_factor_unit");
+
+                    b.Property<decimal?>("SlippageFactorValue")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("slippage_factor_value");
 
                     b.Property<int>("SprintMarketsMaximumExpiryTime")
                         .HasColumnType("int")
@@ -220,7 +250,6 @@ namespace IGApi.Migrations
                         .HasColumnName("type");
 
                     b.Property<string>("ValueOfOnePip")
-                        .IsRequired()
                         .HasMaxLength(4000)
                         .HasColumnType("nvarchar(4000)")
                         .HasColumnName("value_of_one_pip");
@@ -230,7 +259,105 @@ namespace IGApi.Migrations
                     b.ToTable("epic_detail");
                 });
 
-            modelBuilder.Entity("IGApi.Model.EpicDetail+EpicDetailSpecialInfo", b =>
+            modelBuilder.Entity("IGApi.Model.EpicDetailCurrency", b =>
+                {
+                    b.Property<string>("Epic")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)")
+                        .HasColumnName("epic");
+
+                    b.Property<string>("Code")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("code");
+
+                    b.Property<DateTime>("ApiLastUpdate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("api_last_update");
+
+                    b.Property<decimal?>("BaseExchangeRate")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("base_exchange_rate");
+
+                    b.Property<bool>("IsDefault")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_default");
+
+                    b.Property<string>("Symbol")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("symbol");
+
+                    b.HasKey("Epic", "Code");
+
+                    b.ToTable("epic_detail_currency");
+                });
+
+            modelBuilder.Entity("IGApi.Model.EpicDetailMarginDepositBand", b =>
+                {
+                    b.Property<string>("Epic")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)")
+                        .HasColumnName("epic");
+
+                    b.Property<string>("Currency")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("currency");
+
+                    b.Property<decimal>("Min")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("min");
+
+                    b.Property<DateTime>("ApiLastUpdate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("api_last_update");
+
+                    b.Property<decimal?>("Margin")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("margin");
+
+                    b.Property<decimal?>("Max")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("max");
+
+                    b.HasKey("Epic", "Currency", "Min");
+
+                    b.ToTable("epic_detail_margin_deposit_band");
+                });
+
+            modelBuilder.Entity("IGApi.Model.EpicDetailOpeningHour", b =>
+                {
+                    b.Property<string>("Epic")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)")
+                        .HasColumnName("epic");
+
+                    b.Property<string>("OpenTime")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("open_time");
+
+                    b.Property<DateTime>("ApiLastUpdate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("api_last_update");
+
+                    b.Property<string>("CloseTime")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("close_time");
+
+                    b.HasKey("Epic", "OpenTime");
+
+                    b.ToTable("epic_detail_opening_hour");
+                });
+
+            modelBuilder.Entity("IGApi.Model.EpicDetailSpecialInfo", b =>
                 {
                     b.Property<string>("Epic")
                         .HasMaxLength(128)
@@ -238,12 +365,15 @@ namespace IGApi.Migrations
                         .HasColumnName("epic");
 
                     b.Property<string>("SpecialInfo")
-                        .IsRequired()
                         .HasMaxLength(4000)
                         .HasColumnType("nvarchar(4000)")
                         .HasColumnName("special_info");
 
-                    b.HasKey("Epic");
+                    b.Property<DateTime>("ApiLastUpdate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("api_last_update");
+
+                    b.HasKey("Epic", "SpecialInfo");
 
                     b.ToTable("epic_detail_special_info");
                 });
@@ -324,6 +454,10 @@ namespace IGApi.Migrations
                         .HasMaxLength(4000)
                         .HasColumnType("nvarchar(4000)")
                         .HasColumnName("deal_id");
+
+                    b.Property<DateTime>("ApiLastUpdate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("api_last_update");
 
                     b.Property<decimal?>("ContractSize")
                         .HasPrecision(38, 19)
@@ -444,11 +578,44 @@ namespace IGApi.Migrations
                     b.HasCheckConstraint("rest_request", "rest_request in ('GetAccountDetails', 'GetOpenPositions', 'CreatePosition','GetEpicDetails')");
                 });
 
-            modelBuilder.Entity("IGApi.Model.EpicDetail+EpicDetailSpecialInfo", b =>
+            modelBuilder.Entity("IGApi.Model.EpicDetailCurrency", b =>
                 {
                     b.HasOne("IGApi.Model.EpicDetail", "EpicDetail")
-                        .WithOne("SpecialInfo")
-                        .HasForeignKey("IGApi.Model.EpicDetail+EpicDetailSpecialInfo", "Epic")
+                        .WithMany("Currencies")
+                        .HasForeignKey("Epic")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EpicDetail");
+                });
+
+            modelBuilder.Entity("IGApi.Model.EpicDetailMarginDepositBand", b =>
+                {
+                    b.HasOne("IGApi.Model.EpicDetail", "EpicDetail")
+                        .WithMany("MarginDepositBands")
+                        .HasForeignKey("Epic")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EpicDetail");
+                });
+
+            modelBuilder.Entity("IGApi.Model.EpicDetailOpeningHour", b =>
+                {
+                    b.HasOne("IGApi.Model.EpicDetail", "EpicDetail")
+                        .WithMany("OpeningHours")
+                        .HasForeignKey("Epic")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EpicDetail");
+                });
+
+            modelBuilder.Entity("IGApi.Model.EpicDetailSpecialInfo", b =>
+                {
+                    b.HasOne("IGApi.Model.EpicDetail", "EpicDetail")
+                        .WithMany("SpecialInfo")
+                        .HasForeignKey("Epic")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -457,6 +624,12 @@ namespace IGApi.Migrations
 
             modelBuilder.Entity("IGApi.Model.EpicDetail", b =>
                 {
+                    b.Navigation("Currencies");
+
+                    b.Navigation("MarginDepositBands");
+
+                    b.Navigation("OpeningHours");
+
                     b.Navigation("SpecialInfo");
                 });
 #pragma warning restore 612, 618

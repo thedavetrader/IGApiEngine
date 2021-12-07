@@ -7,24 +7,24 @@ namespace IGApi.Model
     internal static partial class DtoModelExtensions
     {
         #region Session
-        public static IGApiDbContext SaveAccount(
+        public static Account? SaveAccount(
             [NotNullAttribute] this IGApiDbContext iGApiDbContext,
             [NotNullAttribute] dto.endpoint.auth.session.AccountDetails accountDetails
             )
         {
             _ = iGApiDbContext.Accounts ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.Accounts));
 
-            var account = Task.Run(async ()=> await iGApiDbContext.Accounts.FindAsync(accountDetails.accountId)).Result;
+            var account = Task.Run(async () => await iGApiDbContext.Accounts.FindAsync(accountDetails.accountId)).Result;
 
             if (account is not null)
                 account.MapProperties(accountDetails);
             else
-                iGApiDbContext.Accounts.Add(new Account(accountDetails));
+                account = iGApiDbContext.Accounts.Add(new Account(accountDetails)).Entity;
 
-            return iGApiDbContext;
+            return account;
         }
 
-        public static IGApiDbContext SaveAccount(
+        public static Account? SaveAccount(
             [NotNullAttribute] this IGApiDbContext iGApiDbContext,
             [NotNullAttribute] dto.endpoint.auth.session.AccountDetails accountDetails,
             [NotNullAttribute] dto.endpoint.auth.session.AccountInfo accountBalance
@@ -37,16 +37,16 @@ namespace IGApi.Model
             if (account is not null)
                 account.MapProperties(accountDetails, accountBalance);
             else
-                iGApiDbContext.Accounts.Add(new Account(accountDetails, accountBalance));
+                account = iGApiDbContext.Accounts.Add(new Account(accountDetails, accountBalance)).Entity;
 
-            return iGApiDbContext;
+            return account;
         }
         #endregion
 
         #region AccountBalance
-        public static IGApiDbContext SaveAccount(
+        public static Account? SaveAccount(
            [NotNullAttribute] this IGApiDbContext iGApiDbContext,
-           [NotNullAttribute] dto.endpoint.accountbalance.AccountDetails accountDetails            
+           [NotNullAttribute] dto.endpoint.accountbalance.AccountDetails accountDetails
            )
         {
             _ = iGApiDbContext.Accounts ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.Accounts));
@@ -56,12 +56,12 @@ namespace IGApi.Model
             if (account is not null)
                 account.MapProperties(accountDetails);
             else
-                iGApiDbContext.Accounts.Add(new Account(accountDetails));
+                account = iGApiDbContext.Accounts.Add(new Account(accountDetails)).Entity;
 
-            return iGApiDbContext;
+            return account;
         }
 
-        public static IGApiDbContext SaveAccount(
+        public static Account? SaveAccount(
             [NotNullAttribute] this IGApiDbContext iGApiDbContext,
             [NotNullAttribute] dto.endpoint.accountbalance.AccountDetails accountDetails,
             [NotNullAttribute] dto.endpoint.accountbalance.AccountBalance accountBalance
@@ -74,16 +74,16 @@ namespace IGApi.Model
             if (account is not null)
                 account.MapProperties(accountDetails, accountBalance);
             else
-                iGApiDbContext.Accounts.Add(new Account(accountDetails, accountBalance));
+                account = iGApiDbContext.Accounts.Add(new Account(accountDetails, accountBalance)).Entity;
 
-            return iGApiDbContext;
+            return account;
         }
         #endregion
 
         #region StreamingAccountData
-        public static IGApiDbContext SaveAccount(
+        public static Account? SaveAccount(
            [NotNullAttribute] this IGApiDbContext iGApiDbContext,
-           [NotNullAttribute] IGWebApiClient.StreamingAccountData streamingAccountData, 
+           [NotNullAttribute] IGWebApiClient.StreamingAccountData streamingAccountData,
            [NotNullAttribute] string accountId
            )
         {
@@ -96,9 +96,9 @@ namespace IGApi.Model
                 if (account is not null)
                     account.MapProperties(streamingAccountData, accountId);
                 else
-                    iGApiDbContext.Accounts.Add(new Account(streamingAccountData, accountId));
+                    account = iGApiDbContext.Accounts.Add(new Account(streamingAccountData, accountId)).Entity;
 
-                return iGApiDbContext;
+                return account;
             }
             catch (Exception ex)
             {

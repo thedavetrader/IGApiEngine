@@ -53,6 +53,7 @@ namespace IGApi.Model
 		[Column("trailing_stop_distance")]
 		public decimal? TrailingStopDistance { get; set; }
 
-		//TODO ApiLastUpdate = DateTime.Now;
+		[Column("api_last_update")]
+		public DateTime ApiLastUpdate { get; set; } = DateTime.UtcNow;
 	}
 }

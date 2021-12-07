@@ -17,7 +17,7 @@ namespace IGApi.Model
             Deposit = accountBalance.deposit ?? Deposit;
             ProfitAndLoss = accountBalance.profitLoss ?? ProfitAndLoss;
             AvailableCash = accountBalance.available ?? AvailableCash;
-            ApiLastUpdate = DateTime.Now;
+            ApiLastUpdate = DateTime.UtcNow;
         }
 
         public void MapProperties([NotNullAttribute] dto.endpoint.auth.session.AccountDetails accountDetails)
@@ -28,7 +28,7 @@ namespace IGApi.Model
                 AccountName = accountDetails.accountName ?? AccountName;
                 Preferred = accountDetails.preferred;
                 AccountType = accountDetails.accountType ?? AccountType;
-                ApiLastUpdate = DateTime.Now;
+                ApiLastUpdate = DateTime.UtcNow;
             }
             else
                 throw new PrimaryKeyNullReferenceException(nameof(accountDetails.accountId));
@@ -46,7 +46,7 @@ namespace IGApi.Model
             Deposit = accountBalance.deposit ?? Deposit;
             ProfitAndLoss = accountBalance.profitLoss ?? ProfitAndLoss;
             AvailableCash = accountBalance.available ?? AvailableCash;
-            ApiLastUpdate = DateTime.Now;
+            ApiLastUpdate = DateTime.UtcNow;
         }
 
         public void MapProperties([NotNullAttribute] dto.endpoint.accountbalance.AccountDetails accountDetails)
@@ -62,7 +62,7 @@ namespace IGApi.Model
                 Currency = accountDetails.currency ?? Currency;
                 Preferred = accountDetails.preferred;
                 Status = accountDetails.status ?? Status;
-                ApiLastUpdate = DateTime.Now;
+                ApiLastUpdate = DateTime.UtcNow;
             }
             else
                 throw new PrimaryKeyNullReferenceException(nameof(accountDetails.accountId));
@@ -83,7 +83,7 @@ namespace IGApi.Model
                 UsedMargin = streamingAccountData.UsedMargin ?? UsedMargin;
                 AmountDue = streamingAccountData.AmountDue ?? AmountDue;
                 AvailableCash = streamingAccountData.AvailableCash ?? AvailableCash;
-                ApiLastUpdate = DateTime.Now;
+                ApiLastUpdate = DateTime.UtcNow;
         }
         #endregion
     }

@@ -18,6 +18,9 @@ namespace IGApi
 
         private readonly IGStreamingApiClient _iGStreamApiClient;
 
+        public static readonly int AllowedApiCallsPerMinute = Common.Configuration.GetAllowedApiCallsPerMinute();
+        public static readonly int CycleTime = 60 / AllowedApiCallsPerMinute;
+
         public ApiEngine()
         {
             if (ConfigurationManager.GetSection("IgWebApiConnection") is NameValueCollection igWebApiConnectionConfig)
@@ -47,10 +50,6 @@ namespace IGApi
 
             StreamingTickDataInit();
             StreamingTradeDataInit();
-
-            // TODO Also init default Queue items:
-            //  GetAccountOpenPositions
-            //  GetAccountDetails
 
             Task.Run(()=> IGApi.RestRequest.QueueEngine.Start());
 

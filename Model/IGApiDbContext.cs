@@ -7,7 +7,7 @@
 
     public partial class IGApiDbContext : DbContext
     {
-        //TODO: _connectionString
+        //TODO:     PRIOLOW_connectionString
         private static readonly string _connectionString = "Password=96ci^w4XSCP&iy&m;Database=TDBT;User ID=TheDaveTrader;Data Source=LITTLEKICK;";
         
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) => base.OnConfiguring(
@@ -29,6 +29,10 @@
             OpenPositionOnModelCreating(modelBuilder);
             TickOnModelCreating(modelBuilder);
             EpicDetailOnModelCreating(modelBuilder);
+            EpicDetailSpecialInfoOnModelCreating(modelBuilder);
+            EpicDetailCurrencyOnModelCreating(modelBuilder);
+            EpicDetailDepositBandOnModelCreating(modelBuilder);
+            EpicDetailOpeningHourOnModelCreating(modelBuilder);
 
             //  Set default varchar(4000)
             foreach (var property in modelBuilder.Model.GetEntityTypes()

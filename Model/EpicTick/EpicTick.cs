@@ -24,7 +24,7 @@ namespace IGApi.Model
         public decimal? ChangePct{ get; set; }
         
         [Column("update_time")]
-        public DateTime UpdateTime{ get; set; } = DateTime.Now;
+        public DateTime UpdateTime{ get; set; } = DateTime.UtcNow;
         
         [Column("market_delay")]
         public int? MarketDelay{ get; set; }

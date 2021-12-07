@@ -37,6 +37,7 @@ namespace IGApi.Model
                 StopLevel = openPositionData.stopLevel;
                 TrailingStep = openPositionData.trailingStep;
                 TrailingStopDistance = openPositionData.trailingStopDistance;
+                ApiLastUpdate = DateTime.UtcNow;
             }
         }        
         
@@ -62,22 +63,8 @@ namespace IGApi.Model
 
                 decimal.TryParse(lsTradeSubscriptionData.stopLevel, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out decimal stopLevel);
                 StopLevel = stopLevel;
+                ApiLastUpdate = DateTime.UtcNow;
             }
         }
-
-        //        tsm.DealId = tradeSubUpdate.dealId;
-        //        tsm.AffectedDealId = tradeSubUpdate.affectedDealId;
-        //        tsm.DealReference = tradeSubUpdate.dealReference;
-        //        tsm.DealStatus = tradeSubUpdate.dealStatus.ToString();
-        //        tsm.Direction = tradeSubUpdate.direction.ToString();
-        //        tsm.ItemName = itemName;
-        //        tsm.Epic = tradeSubUpdate.epic;
-        //        tsm.Expiry = tradeSubUpdate.expiry;
-        //        tsm.GuaranteedStop = tradeSubUpdate.guaranteedStop;
-        //        tsm.Level = tradeSubUpdate.level;
-        //        tsm.Limitlevel = tradeSubUpdate.limitLevel;
-        //        tsm.Size = tradeSubUpdate.size;
-        //        tsm.Status = tradeSubUpdate.status.ToString();
-        //        tsm.StopLevel = tradeSubUpdate.stopLevel;
     }
 }

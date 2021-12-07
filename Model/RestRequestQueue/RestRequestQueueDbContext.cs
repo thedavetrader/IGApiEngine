@@ -17,10 +17,10 @@ namespace IGApi.Model
 
             modelBuilder.Entity<RestRequestQueue>().Property(p => p.RestRequest).HasMaxLength(512);
             modelBuilder.Entity<RestRequestQueue>(e => e.HasCheckConstraint("rest_request", "rest_request in (" +
-                "'GetAccountDetails', " +
-                "'GetOpenPositions', " +
-                "'CreatePosition'," +
-                "'GetEpicDetails'" +
+                $"'{nameof(RestRequest.RestRequest.GetAccountDetails)}', " +
+                $"'{nameof(RestRequest.RestRequest.GetOpenPositions)}', " +
+                $"'CreatePosition'," +
+                $"'{nameof(RestRequest.RestRequest.GetEpicDetails)}'" +
                 ")"));
 
             modelBuilder.Entity<RestRequestQueue>().Property(p => p.Timestamp).HasDefaultValueSql("getutcdate()");

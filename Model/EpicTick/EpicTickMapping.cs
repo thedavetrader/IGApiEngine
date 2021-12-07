@@ -22,7 +22,7 @@ namespace IGApi.Model
                 ChangePct = l1LsPriceData.ChangePct;
                 MarketDelay = l1LsPriceData.MarketDelay;
                 MarketState = l1LsPriceData.MarketState;
-                UpdateTime = DateTime.Now;
+                UpdateTime = DateTime.UtcNow;
             }
         }
 
@@ -40,7 +40,7 @@ namespace IGApi.Model
                 ChangePct = marketData.percentageChange;
                 MarketDelay = marketData.delayTime;
                 MarketState = marketData.marketStatus;
-                UpdateTime = DateTime.Now;
+                UpdateTime = DateTime.UtcNow;
             }
         }
 

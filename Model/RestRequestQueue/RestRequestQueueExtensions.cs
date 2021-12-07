@@ -5,7 +5,7 @@ namespace IGApi.Model
 {
     internal static partial class DtoModelExtensions
     {
-        public static IGApiDbContext SaveRestRequestQueue(
+        public static RestRequestQueue? SaveRestRequestQueue(
             [NotNullAttribute] this IGApiDbContext iGApiDbContext,
             [NotNullAttribute] RestRequestQueue restRequestQueueItem
             )
@@ -17,9 +17,9 @@ namespace IGApi.Model
             if (existingrestRequestQueueItem is not null)
                 iGApiDbContext.Entry(existingrestRequestQueueItem).CurrentValues.SetValues(restRequestQueueItem);
             else
-                iGApiDbContext.RestRequestQueue.Add(restRequestQueueItem);
+                existingrestRequestQueueItem = iGApiDbContext.RestRequestQueue.Add(restRequestQueueItem).Entity;
 
-            return iGApiDbContext;
+            return existingrestRequestQueueItem;
         }
     }
 }

@@ -4,27 +4,36 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <BaseIntermediateOutputPath>C:\Users\theda\source\builds\IGApi\obj\</BaseIntermediateOutputPath>
+    <BaseOutputPath>C:\Users\theda\source\builds\IGApi\bin\</BaseOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Model\EpicDetails\Childs\**" />
+    <Compile Remove="bin\**" />
     <Compile Remove="Model\IGApiAccountBalance\**" />
     <Compile Remove="Model\IGApiOpenPositions\**" />
     <Compile Remove="Model\IGApiStreamingAccountData\**" />
-    <EmbeddedResource Remove="Model\EpicDetails\Childs\**" />
+    <Compile Remove="obj\**" />
+    <Compile Remove="RestRequest\RestApi\**" />
+    <EmbeddedResource Remove="bin\**" />
     <EmbeddedResource Remove="Model\IGApiAccountBalance\**" />
     <EmbeddedResource Remove="Model\IGApiOpenPositions\**" />
     <EmbeddedResource Remove="Model\IGApiStreamingAccountData\**" />
-    <None Remove="Model\EpicDetails\Childs\**" />
+    <EmbeddedResource Remove="obj\**" />
+    <EmbeddedResource Remove="RestRequest\RestApi\**" />
+    <None Remove="bin\**" />
     <None Remove="Model\IGApiAccountBalance\**" />
     <None Remove="Model\IGApiOpenPositions\**" />
     <None Remove="Model\IGApiStreamingAccountData\**" />
+    <None Remove="obj\**" />
+    <None Remove="RestRequest\RestApi\**" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Remove="Common\Extensions\ObservableCollectionExtension.cs" />
     <Compile Remove="Common\ObservableRangeCollection.cs" />
     <Compile Remove="Model\ModelExtensions.cs" />
+    <Compile Remove="RestRequest\Queue\QueueItem\QueueQueueItem.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -37,13 +46,20 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ig-webapi-dotnet-sample\IGWebApiClient\IGWebApiClient.csproj" />
+    <ProjectReference Include="..\ig-webapi-dotnet-sample\IGWebApiClient\IGWebApiClient.csproj">
+      <CopyLocal>True</CopyLocal>
+      <CopyLocalSatelliteAssemblies>True</CopyLocalSatelliteAssemblies>
+    </ProjectReference>
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="DotNetClient_N2">
       <HintPath>..\ig-webapi-dotnet-sample\packages\3rdPartyDlls\DotNetClient_N2.dll</HintPath>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Model\Reference\Currency\" />
   </ItemGroup>
 
 </Project>
