@@ -15,7 +15,8 @@ namespace IGApi.Model
         {
             _ = iGApiDbContext.EpicDetailsOpeningHour ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.EpicDetailsOpeningHour));
 
-            var epicDetailOpeningHour = Task.Run(async () => await iGApiDbContext.EpicDetailsOpeningHour.FindAsync(epicDetail.Epic, timeRange.openTime)).Result;
+            var openTime = Utility.ConvertLocalTimeStringToUtcTimespan(timeRange.openTime);
+            var epicDetailOpeningHour = Task.Run(async () => await iGApiDbContext.EpicDetailsOpeningHour.FindAsync(epicDetail.Epic, openTime)).Result;
 
             if (epicDetailOpeningHour is not null)
                 epicDetailOpeningHour.MapProperties(epicDetail, timeRange);

@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
 using dto.endpoint.marketdetails.v2;
+using IGApi.Common;
 
 namespace IGApi.Model
 {
@@ -18,14 +19,11 @@ namespace IGApi.Model
                 EpicDetail = epicDetail;
                 #endregion
 
-                //TODO: Convert from local time to utc time
-                //TimeSpan timeSpan = new TimeSpan(2, 14, 18);
-                //var MinDate = DateTime.Today.to;
-
-
-                OpenTime = timeRange.openTime;
-                CloseTime = timeRange.closeTime;
+                OpenTime = Utility.ConvertLocalTimeStringToUtcTimespan(timeRange.openTime);
+                CloseTime = Utility.ConvertLocalTimeStringToUtcTimespan(timeRange.closeTime);
             }
         }
+
+
     }
 }

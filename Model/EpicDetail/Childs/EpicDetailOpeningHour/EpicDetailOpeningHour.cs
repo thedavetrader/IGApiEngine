@@ -10,10 +10,10 @@ namespace IGApi.Model
         public string Epic { get; set; }
 
 		[Column("open_time")]
-		public string OpenTime { get; set; }
+		public TimeSpan OpenTime { get; set; }
 
 		[Column("close_time")]
-		public string CloseTime { get; set; }
+		public TimeSpan CloseTime { get; set; }
 
 		[Column("api_last_update")]
         public DateTime ApiLastUpdate { get; set; } = DateTime.UtcNow;

@@ -14,5 +14,10 @@ namespace IGApi.Common
             timer.Elapsed += delegate { timer.Stop(); };
             timer.Start();
         }
+
+        public static TimeSpan ConvertLocalTimeStringToUtcTimespan(string time)
+        {
+            return TimeSpan.Parse(time) - DateTimeOffset.Now.Offset;
+        }
     }
 }

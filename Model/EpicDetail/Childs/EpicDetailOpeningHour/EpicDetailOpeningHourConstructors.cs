@@ -17,8 +17,6 @@ namespace IGApi.Model
         public EpicDetailOpeningHour()
         {
             Epic = string.Format(Constants.InvalidEntry, nameof(EpicTick));
-            OpenTime = string.Format(Constants.InvalidEntry, nameof(OpenTime));
-            CloseTime = string.Format(Constants.InvalidEntry, nameof(CloseTime));
         }
 
         public EpicDetailOpeningHour(
@@ -29,8 +27,6 @@ namespace IGApi.Model
             MapProperties(epicDetail, timeRange);
             _ = Epic ?? throw new PrimaryKeyNullReferenceException(nameof(Epic));
             _ = EpicDetail ?? throw new EssentialPropertyNullReferenceException(nameof(EpicDetail));
-            _ = OpenTime ?? throw new EssentialPropertyNullReferenceException(nameof(OpenTime));
-            _ = CloseTime ?? throw new EssentialPropertyNullReferenceException(nameof(CloseTime));
         }
     }
     #endregion

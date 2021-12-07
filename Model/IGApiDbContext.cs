@@ -19,7 +19,7 @@
                             builder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
                             builder.CommandTimeout(600);
                         })
-                    .UseLazyLoadingProxies()
+                    //.UseLazyLoadingProxies() Is prone to create unneccessary db request (n+1 problem)
             );
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
