@@ -23,7 +23,5 @@ namespace IGApi.Model
                 CloseTime = Utility.ConvertLocalTimeStringToUtcTimespan(timeRange.closeTime);
             }
         }
-
-
     }
 }

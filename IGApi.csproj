@@ -32,6 +32,61 @@
   <ItemGroup>
     <Compile Remove="Common\Extensions\ObservableCollectionExtension.cs" />
     <Compile Remove="Common\ObservableRangeCollection.cs" />
+    <Compile Remove="Migrations\20211128100318_Init_v1.0.cs" />
+    <Compile Remove="Migrations\20211128100318_Init_v1.0.Designer.cs" />
+    <Compile Remove="Migrations\20211128101545_Account_v1.1.cs" />
+    <Compile Remove="Migrations\20211128101545_Account_v1.1.Designer.cs" />
+    <Compile Remove="Migrations\20211128192501_Account_v1.2.cs" />
+    <Compile Remove="Migrations\20211128192501_Account_v1.2.Designer.cs" />
+    <Compile Remove="Migrations\20211128193207_OpenPosition_v1.0.cs" />
+    <Compile Remove="Migrations\20211128193207_OpenPosition_v1.0.Designer.cs" />
+    <Compile Remove="Migrations\20211201131428_OpenPosition_v1.1.cs" />
+    <Compile Remove="Migrations\20211201131428_OpenPosition_v1.1.Designer.cs" />
+    <Compile Remove="Migrations\20211201160849_Tick_v1.0.cs" />
+    <Compile Remove="Migrations\20211201160849_Tick_v1.0.Designer.cs" />
+    <Compile Remove="Migrations\20211204141657_EpicTick_v1.0.cs" />
+    <Compile Remove="Migrations\20211204141657_EpicTick_v1.0.Designer.cs" />
+    <Compile Remove="Migrations\20211204153314_EpicDetail_v1.0.cs" />
+    <Compile Remove="Migrations\20211204153314_EpicDetail_v1.0.Designer.cs" />
+    <Compile Remove="Migrations\20211204170829_EpicDetail_v1.1.cs" />
+    <Compile Remove="Migrations\20211204170829_EpicDetail_v1.1.Designer.cs" />
+    <Compile Remove="Migrations\20211204202937_RestRequestQueue_v2.0.cs" />
+    <Compile Remove="Migrations\20211204202937_RestRequestQueue_v2.0.Designer.cs" />
+    <Compile Remove="Migrations\20211204204309_RestRequestQueue_v2.1.cs" />
+    <Compile Remove="Migrations\20211204204309_RestRequestQueue_v2.1.Designer.cs" />
+    <Compile Remove="Migrations\20211204204450_RestRequestQueue_v2.2.cs" />
+    <Compile Remove="Migrations\20211204204450_RestRequestQueue_v2.2.Designer.cs" />
+    <Compile Remove="Migrations\20211204214722_EpicDetail_v1.2.cs" />
+    <Compile Remove="Migrations\20211204214722_EpicDetail_v1.2.Designer.cs" />
+    <Compile Remove="Migrations\20211205122724_EpicDetail_v1.3.cs" />
+    <Compile Remove="Migrations\20211205122724_EpicDetail_v1.3.Designer.cs" />
+    <Compile Remove="Migrations\20211206182638_ApiLastUpdate.cs" />
+    <Compile Remove="Migrations\20211206182638_ApiLastUpdate.Designer.cs" />
+    <Compile Remove="Migrations\20211206192145_EpicDetailSpecialInfo_v1.0.cs" />
+    <Compile Remove="Migrations\20211206192145_EpicDetailSpecialInfo_v1.0.Designer.cs" />
+    <Compile Remove="Migrations\20211206225149_EpicDetailSpecialInfo_v1.1.cs" />
+    <Compile Remove="Migrations\20211206225149_EpicDetailSpecialInfo_v1.1.Designer.cs" />
+    <Compile Remove="Migrations\20211207102506_EpicDetail_v1.4.cs" />
+    <Compile Remove="Migrations\20211207102506_EpicDetail_v1.4.Designer.cs" />
+    <Compile Remove="Migrations\20211207102816_EpicDetail_v1.5.cs" />
+    <Compile Remove="Migrations\20211207102816_EpicDetail_v1.5.Designer.cs" />
+    <Compile Remove="Migrations\20211207105034_EpicDetail_v1.6.cs" />
+    <Compile Remove="Migrations\20211207105034_EpicDetail_v1.6.Designer.cs" />
+    <Compile Remove="Migrations\20211207105328_EpicDetail_v1.6.1.cs" />
+    <Compile Remove="Migrations\20211207105328_EpicDetail_v1.6.1.Designer.cs" />
+    <Compile Remove="Migrations\20211207115244_EpicDetailCurrency_v1.0.cs" />
+    <Compile Remove="Migrations\20211207115244_EpicDetailCurrency_v1.0.Designer.cs" />
+    <Compile Remove="Migrations\20211207130110_EpicDetailMarginDepositBand_v1.0.cs" />
+    <Compile Remove="Migrations\20211207130110_EpicDetailMarginDepositBand_v1.0.Designer.cs" />
+    <Compile Remove="Migrations\20211207141751_RemoveOneToOneRelations.cs" />
+    <Compile Remove="Migrations\20211207141751_RemoveOneToOneRelations.Designer.cs" />
+    <Compile Remove="Migrations\20211207151555_EpicDetailOpeningHour_v1.0.cs" />
+    <Compile Remove="Migrations\20211207151555_EpicDetailOpeningHour_v1.0.Designer.cs" />
+    <Compile Remove="Migrations\20211207183914_EpicDetailOpeningHour_v1.1.cs" />
+    <Compile Remove="Migrations\20211207183914_EpicDetailOpeningHour_v1.1.Designer.cs" />
+    <Compile Remove="Migrations\20211208103723_EpicDetailCurrency_v2.0.cs" />
+    <Compile Remove="Migrations\20211208103723_EpicDetailCurrency_v2.0.Designer.cs" />
+    <Compile Remove="Migrations\IGApiDbContextModelSnapshot.cs" />
     <Compile Remove="Model\ModelExtensions.cs" />
     <Compile Remove="RestRequest\Queue\QueueItem\QueueQueueItem.cs" />
   </ItemGroup>
@@ -59,7 +114,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Model\Reference\Currency\" />
+    <Folder Include="Migrations\" />
   </ItemGroup>
 
 </Project>

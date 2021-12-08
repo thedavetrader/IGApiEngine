@@ -17,7 +17,7 @@ namespace IGApi.Model
         {
             Epic = string.Format(Constants.InvalidEntry, nameof(EpicTick));
             SpecialInfo= string.Format(Constants.InvalidEntry, nameof(SpecialInfo));
-            //TODO: EpicDetail = new EpicDetail();
+            EpicDetail = new EpicDetail();
         }
 
         public EpicDetailSpecialInfo(
@@ -28,7 +28,7 @@ namespace IGApi.Model
             MapProperties(epicDetail, specialInfo);
             _ = Epic ?? throw new PrimaryKeyNullReferenceException(nameof(Epic));
             _ = SpecialInfo ?? throw new PrimaryKeyNullReferenceException(nameof(SpecialInfo));
-            //TODO: _ = EpicDetail ?? throw new EssentialPropertyNullReferenceException(nameof(EpicDetail));
+            _ = EpicDetail ?? throw new EssentialPropertyNullReferenceException(nameof(EpicDetail));
         }
     }
     #endregion

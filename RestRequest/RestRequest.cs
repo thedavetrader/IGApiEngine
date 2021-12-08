@@ -18,7 +18,7 @@ namespace IGApi.RestRequest
         public RestRequest([NotNullAttribute] RestRequestQueue restRequestQueueItem)
         {
             _ = _apiEngine.LoginSessionInformation ?? throw new Exception("Not, or no longer logged in. Check internet or IG Api service status.");
-            
+
             RestRequestQueueItem = restRequestQueueItem;
 
             switch (RestRequestQueueItem.RestRequest)
@@ -44,10 +44,13 @@ namespace IGApi.RestRequest
                 case nameof(GetEpicDetails):
                     {
                         IsTradingRequest = false;
-                        _restRequestCallTask = new Task(() => GetEpicDetails(RestRequestQueueItem.Parameters));
+                        if (RestRequestQueueItem.Parameters is not null)
+                            _restRequestCallTask = new Task(() => GetEpicDetails(RestRequestQueueItem.Parameters));
+                        else
+                            throw new InvalidRestRequestMissingParametersException(nameof(GetEpicDetails));
                         break;
                     }
-                    
+
                 default:
                     {
                         throw new Exception($"The restrequestcall is invalid. The check constraint on column RestRequest of table IGRestRequestQueue is possibly corrupt or missing.");

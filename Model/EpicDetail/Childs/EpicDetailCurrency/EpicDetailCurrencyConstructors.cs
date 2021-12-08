@@ -16,20 +16,22 @@ namespace IGApi.Model
         [Obsolete("Do not use this constructor. It's intended use is for EF-Core only.", true)]
         public EpicDetailCurrency()
         {
-            Epic = string.Format(Constants.InvalidEntry, nameof(EpicTick));
+            Epic = string.Format(Constants.InvalidEntry, nameof(Epic));
             Code = string.Format(Constants.InvalidEntry, nameof(Code));
-            //TODO: EpicDetail = new EpicDetail();
+            EpicDetail = new EpicDetail();
+            Currency = new Currency();
         }
 
         public EpicDetailCurrency(
             [NotNullAttribute] EpicDetail epicDetail,
-            [NotNullAttribute] CurrencyData currencyData
+            [NotNullAttribute] Currency currency
             )
         {
-            MapProperties(epicDetail, currencyData);
+            MapProperties(epicDetail, currency);
             _ = Epic ?? throw new PrimaryKeyNullReferenceException(nameof(Epic));
-            _ = Code ?? throw new PrimaryKeyNullReferenceException(nameof(Epic));
-            //TODO: _ = EpicDetail ?? throw new EssentialPropertyNullReferenceException(nameof(EpicDetail));
+            _ = Code ?? throw new PrimaryKeyNullReferenceException(nameof(Code));
+            _ = EpicDetail ?? throw new EssentialPropertyNullReferenceException(nameof(EpicDetail));
+            _ = Currency ?? throw new EssentialPropertyNullReferenceException(nameof(Currency));
         }
     }
     #endregion

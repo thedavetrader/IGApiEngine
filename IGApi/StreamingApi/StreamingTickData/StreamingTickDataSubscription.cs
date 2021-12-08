@@ -11,9 +11,8 @@ namespace IGApi
 {
     public sealed partial class ApiEngine
     {
-        // LS subscriptions...
+        private SubscribedTableKey? _tickSubscribedTableKey = null;
         private L1PricesSubscription? _tickSubscription;
-        private SubscribedTableKey? __tickSubscribedTableKey = new();
 
         /// <summary>
         /// Init everything for StreamingDataInit. Should only be called by constructor of IGApiEngine.
@@ -23,7 +22,8 @@ namespace IGApi
             EpicStreamList.ListChanged += EpicStreamListChanged;
 
             _tickSubscription = new(this);
-            __tickSubscribedTableKey = null; //TODO: Important to initialise to null (?According to IGWebApi-sample!).
+
+         //   _tickSubscribedTableKey = null;
         }
 
         private void EpicStreamListChanged(object? sender, EventArgs e)
@@ -66,7 +66,7 @@ namespace IGApi
                 {
                     var subscribeEpicList = EpicStreamList.Select(e => e.Epic).Distinct().ToList();
 
-                    __tickSubscribedTableKey = _iGStreamApiClient.SubscribeToMarketDetails(subscribeEpicList, _tickSubscription);
+                    _tickSubscribedTableKey = _iGStreamApiClient.SubscribeToMarketDetails(subscribeEpicList, _tickSubscription);
                     
                     Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatFourColumns, "[StreamingTickData]", "", "", ""));
                     Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatTwoColumns, "[StreamingTickData]", "(Re-)subscribed epics to tick Lightning streamer."));
@@ -91,10 +91,10 @@ namespace IGApi
         {
             if (LoginSessionInformation is not null)
             {
-                if (__tickSubscribedTableKey is not null)
+                if (_tickSubscribedTableKey is not null)
                 {
-                    _iGStreamApiClient.UnsubscribeTableKey(__tickSubscribedTableKey);
-                    __tickSubscribedTableKey = null;
+                    _iGStreamApiClient.UnsubscribeTableKey(_tickSubscribedTableKey);
+                    _tickSubscribedTableKey = null;
 
                     Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatTwoColumns, "[StreamingTickData]", "Unsubscribed all epics from tick Lightning streamer."));
                 }

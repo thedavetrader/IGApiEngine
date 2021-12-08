@@ -15,6 +15,11 @@ namespace IGApi.Common
             timer.Start();
         }
 
+        /// <summary>
+        /// When the source is in string format and represents the local (as is known by IG) client time.
+        /// </summary>
+        /// <param name="time"></param>
+        /// <returns></returns>
         public static TimeSpan ConvertLocalTimeStringToUtcTimespan(string time)
         {
             return TimeSpan.Parse(time) - DateTimeOffset.Now.Offset;

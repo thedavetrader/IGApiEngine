@@ -14,17 +14,16 @@ namespace IGApi.Common
         {
             int allowedApiCallsPerMinute;
 
-            //TODO: Rename IGRestRequestQueueEngine in ConfigurationManager
-            if (ConfigurationManager.GetSection("IGRestRequestQueueEngine") is NameValueCollection IGRestRequestQueueEngine)
+            if (ConfigurationManager.GetSection("QueueEngine") is NameValueCollection QueueEngine)
             {
-                if (!int.TryParse(IGRestRequestQueueEngine["IGAllowedApiCallsPerMinute"], out allowedApiCallsPerMinute))
+                if (!int.TryParse(QueueEngine["IGAllowedApiCallsPerMinute"], out allowedApiCallsPerMinute))
                 {
                     throw new InvalidOperationException("Could not parse the environment setting IGAllowedApiCallsPerMinute. Make sure the environment are set correctly. It should be an integer that represents the amount of api calls allowed to make per minute (typically 30 in live environment).");
                 }
             }
             else
             {
-                throw new InvalidOperationException("No environment settings found for IGRestRequestQueueEngine. Make sure the referencing project has the App.config file with environment settings. You can use App.config from this project as template.");
+                throw new InvalidOperationException("No environment settings found for QueueEngine. Make sure the referencing project has the App.config file with environment settings. You can use App.config from this project as template.");
             }
 
             return allowedApiCallsPerMinute;

@@ -18,7 +18,7 @@ namespace IGApi.Model
         {
             Epic = string.Format(Constants.InvalidEntry, nameof(EpicTick));
             Currency = string.Format(Constants.InvalidEntry, nameof(Currency));
-            //TODO: EpicDetail = new EpicDetail();
+            EpicDetail = new EpicDetail();
         }
 
         public EpicDetailMarginDepositBand(
@@ -29,7 +29,7 @@ namespace IGApi.Model
             MapProperties(epicDetail, DepositBand);
             _ = Epic ?? throw new PrimaryKeyNullReferenceException(nameof(Epic));
             _ = Currency ?? throw new PrimaryKeyNullReferenceException(nameof(Currency));
-            //TODO: _ = EpicDetail ?? throw new EssentialPropertyNullReferenceException(nameof(EpicDetail));
+            _ = EpicDetail ?? throw new EssentialPropertyNullReferenceException(nameof(EpicDetail));
         }
     }
     #endregion

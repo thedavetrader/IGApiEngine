@@ -20,7 +20,6 @@ namespace IGApi
         private void StreamingTradeDataInit()
         {
             _tradeSubscription = new(this);
-            _tradeSubscribedTableKey = null; //TODO: Important to initialise to null (?According to IGWebApi-sample!).
         }
 
         /// <summary>

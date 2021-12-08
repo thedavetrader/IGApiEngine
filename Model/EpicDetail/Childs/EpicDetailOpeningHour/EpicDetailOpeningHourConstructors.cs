@@ -17,6 +17,7 @@ namespace IGApi.Model
         public EpicDetailOpeningHour()
         {
             Epic = string.Format(Constants.InvalidEntry, nameof(EpicTick));
+            EpicDetail = new EpicDetail();
         }
 
         public EpicDetailOpeningHour(

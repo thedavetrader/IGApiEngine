@@ -42,7 +42,6 @@ namespace IGApi
                         });
                     }
 
-                    //  Remove closed epics fom list.
                     //  TODO: Only remove closed epics from list if soucres is openposition update (use reflectoin nameof)
                     EpicStreamList
                         .Where(item => !epics.Where(w => w.Epic == item.Epic).Any()).ToList()
@@ -69,7 +68,6 @@ namespace IGApi
                 if (EpicStreamPriceAvailableCheck(epicStreamListItem.Epic))
                     EpicStreamList.Add(epicStreamListItem);
 
-                // TODO: Notify change is situational.
                 EpicStreamList.NotifyChange();
             }
         }

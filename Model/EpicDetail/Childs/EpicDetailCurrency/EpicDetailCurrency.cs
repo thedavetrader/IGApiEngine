@@ -12,20 +12,12 @@ namespace IGApi.Model
 		[Column("code")]
 		public string Code { get; set; }
 
-		[Column("symbol")]
-		public string? Symbol { get; set; }
-
-		[Column("base_exchange_rate")]
-		public decimal? BaseExchangeRate { get; set; }
-
-		[Column("is_default")]
-		public bool IsDefault { get; set; }
-
 		[Column("api_last_update")]
         public DateTime ApiLastUpdate { get; set; } = DateTime.UtcNow;
 
 		// Navigation property.
 		public EpicDetail EpicDetail { get; set; }
-	}
+        public Currency Currency { get; set; }
+    }
 }
 

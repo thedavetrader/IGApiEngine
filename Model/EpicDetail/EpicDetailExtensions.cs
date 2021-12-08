@@ -24,21 +24,83 @@ namespace IGApi.Model
             if (epicDetail is not null)
             {
                 // TODO: Remove obsolete Childs
-                instrumentData.specialInfo.ForEach(SpecialInfo =>
-                    iGApiDbContext.SaveEpicDetailSpecialInfo(epicDetail, SpecialInfo));
+                /*
+                 * PSEUDO
+                 * - Find all child entries on DB 
+                 *  - which do not exist in instrumentdata.child
+                 * - remove entry
+                 * */
 
-                instrumentData.currencies.ForEach(Currency =>
-                    iGApiDbContext.SaveEpicDetailCurrency(epicDetail, Currency));
+                #region SpecialInfo
+                if (instrumentData.specialInfo is not null)
+                {
+                    //  Remove obsolete
+                    _ = iGApiDbContext.EpicDetailsSpecialInfo ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.EpicDetailsSpecialInfo));
 
-                instrumentData.marginDepositBands.ForEach(depositBand =>
-                    iGApiDbContext.SaveEpicDetailMarginDepositBand(epicDetail, depositBand));
+                    iGApiDbContext.EpicDetailsSpecialInfo.RemoveRange(
+                        iGApiDbContext.EpicDetailsSpecialInfo
+                            .Where(w => w.Epic == epicDetail.Epic).ToList()
+                            .Where(a => !instrumentData.specialInfo.Any(b => b == a.SpecialInfo)));
 
+                    //  Upsert
+                    instrumentData.specialInfo.ForEach(SpecialInfo =>
+                        iGApiDbContext.SaveEpicDetailSpecialInfo(epicDetail, SpecialInfo));
+                }
+                #endregion
+
+                #region Currency
+                if (instrumentData.currencies is not null)
+                {
+                    //  Remove obsolete
+                    _ = iGApiDbContext.EpicDetailsCurrency ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.EpicDetailsCurrency));
+
+                    iGApiDbContext.EpicDetailsCurrency.RemoveRange(
+                        iGApiDbContext.EpicDetailsCurrency
+                        .Where(w => w.Epic == epicDetail.Epic).ToList()
+                        .Where(a => !instrumentData.currencies.Any(b => b.code == a.Code)));
+
+                    //  Upsert
+                    instrumentData.currencies.ForEach(Currency =>
+                        iGApiDbContext.SaveEpicDetailCurrency(epicDetail, Currency));
+                }
+                #endregion
+
+                #region MarginDepositBands
+                if (instrumentData.marginDepositBands is not null)
+                {
+                    //  Remove obsolete
+                    _ = iGApiDbContext.EpicDetailsMarginDepositBand ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.EpicDetailsMarginDepositBand));
+
+                    iGApiDbContext.EpicDetailsMarginDepositBand.RemoveRange(
+                        iGApiDbContext.EpicDetailsMarginDepositBand
+                        .Where(w => w.Epic == epicDetail.Epic).ToList()
+                        .Where(a => !instrumentData.marginDepositBands.Any(b => b.min == a.Min)));
+
+                    //  Upsert
+                    instrumentData.marginDepositBands.ForEach(depositBand =>
+                        iGApiDbContext.SaveEpicDetailMarginDepositBand(epicDetail, depositBand));
+                }
+                #endregion
+
+                #region OpeningHours
                 if (instrumentData.openingHours is not null)
+                {
+                    //  Remove obsolete
+                    _ = iGApiDbContext.EpicDetailsOpeningHour ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.EpicDetailsOpeningHour));
+
+                    iGApiDbContext.EpicDetailsOpeningHour.RemoveRange(
+                        iGApiDbContext.EpicDetailsOpeningHour
+                        .Where(w => w.Epic == epicDetail.Epic).ToList()
+                        .Where(a => !instrumentData.openingHours.marketTimes.Any(b => Utility.ConvertLocalTimeStringToUtcTimespan(b.openTime) == a.OpenTime)));
+
+                    //  Upsert
                     instrumentData.openingHours.marketTimes.ForEach(openingHours =>
                         iGApiDbContext.SaveEpicDetailOpeningHour(epicDetail, openingHours));
+                }
+                #endregion
             }
 
-            //TODO:     PRIOLOW Example of ChangeTracker.DebugView Just for reference.
+            //TODO:     ZEROPRIO Example of ChangeTracker.DebugView Just for reference.
             //iGApiDbContext.ChangeTracker.DetectChanges();
             //Debug.WriteLine(iGApiDbContext.ChangeTracker.DebugView.LongView);
 

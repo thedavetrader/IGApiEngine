@@ -19,6 +19,11 @@ namespace IGApi.Model
             modelBuilder.Entity<EpicDetailCurrency>()
                 .HasOne(p => p.EpicDetail)
                 .WithMany(b => b.Currencies);
+
+            modelBuilder.Entity<EpicDetailCurrency>()
+                .HasOne(p => p.Currency)
+                .WithMany(b => b.Currencies)
+                .OnDelete(DeleteBehavior.Restrict); // Reference entities should can not be deleted while other entities still refer to it.
         }
     }
 }

@@ -8,7 +8,7 @@ namespace IGApi.Model
     {
         public void MapProperties(
             [NotNullAttribute] EpicDetail epicDetail,
-            [NotNullAttribute] CurrencyData currencyData
+            [NotNullAttribute] Currency currency
             )
         {
             {
@@ -16,12 +16,10 @@ namespace IGApi.Model
                 Epic = epicDetail.Epic;
                 ApiLastUpdate = DateTime.UtcNow;
                 EpicDetail = epicDetail;
+                Currency = currency;
                 #endregion
 
-                Code = currencyData.code;
-                Symbol = currencyData.symbol;
-                BaseExchangeRate = currencyData.baseExchangeRate;
-                IsDefault = currencyData.isDefault;
+                Code = currency.Code;
             }
         }
     }

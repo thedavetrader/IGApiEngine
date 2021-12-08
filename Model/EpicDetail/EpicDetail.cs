@@ -91,14 +91,13 @@ namespace IGApi.Model
         public DateTime ApiLastUpdate { get; set; } = DateTime.UtcNow;
 
         #region Childs
-        public virtual List<EpicDetailMarginDepositBand> MarginDepositBands { get; set; }
+        public virtual List<EpicDetailMarginDepositBand>? MarginDepositBands { get; set; }
 
-        public virtual List<EpicDetailOpeningHour> OpeningHours { get; set; }
+        public virtual List<EpicDetailOpeningHour>? OpeningHours { get; set; }
 
-        public virtual List<EpicDetailSpecialInfo> SpecialInfo { get; set; }
+        public virtual List<EpicDetailSpecialInfo>? SpecialInfo { get; set; }
 
-        //TODO: Normalize EpicDetailCurrency Symbol and BaseExchangerate to reference table Currency.
-        public virtual List<EpicDetailCurrency> Currencies { get; set; }
+        public virtual List<EpicDetailCurrency>? Currencies { get; set; }
         #endregion
     }
 }

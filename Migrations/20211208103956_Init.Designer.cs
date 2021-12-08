@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IGApi.Migrations
 {
     [DbContext(typeof(IGApiDbContext))]
-    [Migration("20211207183914_EpicDetailOpeningHour_v1.1")]
-    partial class EpicDetailOpeningHour_v11
+    [Migration("20211208103956_Init")]
+    partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -115,6 +115,36 @@ namespace IGApi.Migrations
                     b.HasKey("AccountId");
 
                     b.ToTable("account");
+                });
+
+            modelBuilder.Entity("IGApi.Model.Currency", b =>
+                {
+                    b.Property<string>("Code")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("code");
+
+                    b.Property<DateTime>("ApiLastUpdate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("api_last_update");
+
+                    b.Property<decimal?>("BaseExchangeRate")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("base_exchange_rate");
+
+                    b.Property<bool>("IsDefault")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_default");
+
+                    b.Property<string>("Symbol")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("symbol");
+
+                    b.HasKey("Code");
+
+                    b.ToTable("currency");
                 });
 
             modelBuilder.Entity("IGApi.Model.EpicDetail", b =>
@@ -277,21 +307,9 @@ namespace IGApi.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("api_last_update");
 
-                    b.Property<decimal?>("BaseExchangeRate")
-                        .HasPrecision(38, 19)
-                        .HasColumnType("decimal(38,19)")
-                        .HasColumnName("base_exchange_rate");
-
-                    b.Property<bool>("IsDefault")
-                        .HasColumnType("bit")
-                        .HasColumnName("is_default");
-
-                    b.Property<string>("Symbol")
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)")
-                        .HasColumnName("symbol");
-
                     b.HasKey("Epic", "Code");
+
+                    b.HasIndex("Code");
 
                     b.ToTable("epic_detail_currency");
                 });
@@ -579,11 +597,19 @@ namespace IGApi.Migrations
 
             modelBuilder.Entity("IGApi.Model.EpicDetailCurrency", b =>
                 {
+                    b.HasOne("IGApi.Model.Currency", "Currency")
+                        .WithMany("Currencies")
+                        .HasForeignKey("Code")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("IGApi.Model.EpicDetail", "EpicDetail")
                         .WithMany("Currencies")
                         .HasForeignKey("Epic")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Currency");
 
                     b.Navigation("EpicDetail");
                 });
@@ -619,6 +645,11 @@ namespace IGApi.Migrations
                         .IsRequired();
 
                     b.Navigation("EpicDetail");
+                });
+
+            modelBuilder.Entity("IGApi.Model.Currency", b =>
+                {
+                    b.Navigation("Currencies");
                 });
 
             modelBuilder.Entity("IGApi.Model.EpicDetail", b =>

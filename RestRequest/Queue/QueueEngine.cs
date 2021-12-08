@@ -9,7 +9,7 @@ namespace IGApi.RestRequest
     internal static class QueueEngine
     {
         private static DateTime _lastExecutionCycleTimestamp = DateTime.UtcNow;
-        
+
         internal static void Start()
         {
             int _cycleTime = 60 / ApiEngine.AllowedApiCallsPerMinute;
@@ -17,67 +17,75 @@ namespace IGApi.RestRequest
 
             InitResQueueItems();
 
-            Log.WriteLine("IGRestRequestQueueEngine is listening for restrequests.");
+            Log.WriteLine("QueueEngine is listening for restrequests.");
 
             while (true)
             {
-                var currentTimestamp = DateTime.UtcNow;
-                bool allowExecution = false;
-                List<RestRequest> queueItemsList = new();
-                RestRequest? restRequestItem = null;
-
-                using IGApiDbContext iGApiDbContext = new();
-
-                _ = iGApiDbContext.RestRequestQueue ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.RestRequestQueue));
-
-                if (iGApiDbContext.RestRequestQueue.Any())
+                try
                 {
-                    foreach (var IGRestRequestQueueItem in iGApiDbContext.RestRequestQueue)
-                    {
-                        queueItemsList.Add(new RestRequest(IGRestRequestQueueItem));
-                    }
+                    var currentTimestamp = DateTime.UtcNow;
+                    bool allowExecution = false;
+                    List<RestRequest> queueItemsList = new();
+                    RestRequest? restRequestItem = null;
 
-                    if (queueItemsList.Any())
-                    {
-                        restRequestItem = queueItemsList.OrderByDescending(o => o.IsTradingRequest).ThenByDescending(o => o.RestRequestQueueItem.ExecuteAsap).ThenBy(o => o.RestRequestQueueItem.Timestamp).FirstOrDefault();
-                    }
+                    using IGApiDbContext iGApiDbContext = new();
 
-                    if (restRequestItem is not null)
+                    _ = iGApiDbContext.RestRequestQueue ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.RestRequestQueue));
+
+                    if (iGApiDbContext.RestRequestQueue.Any())
                     {
-                        if (restRequestItem.IsTradingRequest)
+                        foreach (var IGRestRequestQueueItem in iGApiDbContext.RestRequestQueue)
                         {
-                            allowExecution = true;  // Trading request always have the highest priorty, will be executed immediately and do not affect the IG api call limit.
+                            queueItemsList.Add(new RestRequest(IGRestRequestQueueItem));
                         }
-                        else if (currentTimestamp.CompareTo(_lastExecutionCycleTimestamp.AddSeconds(_cycleTime)) > 0)
+
+                        if (queueItemsList.Any())
                         {
-                            allowExecution = true;
-                            _lastExecutionCycleTimestamp = currentTimestamp;
+                            restRequestItem = queueItemsList.OrderByDescending(o => o.IsTradingRequest).ThenByDescending(o => o.RestRequestQueueItem.ExecuteAsap).ThenBy(o => o.RestRequestQueueItem.Timestamp).FirstOrDefault();
                         }
-                        else
-                            allowExecution = false;
 
-                        if (allowExecution)
+                        if (restRequestItem is not null)
                         {
-                            _cycleCount = queueItemsList.Where(w => !w.IsTradingRequest).Count();
-
-                            Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatFourColumns, "[IGRestRequestQueue]", "", "", ""));
-                            Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatTwoColumns, "[IGRestRequestQueue]", $"Executing \"{restRequestItem.RestRequestQueueItem.RestRequest}\""));
-                            Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatFourColumns, "[IGRestRequestQueue]", "", "", ""));
-                            Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatFourColumns, "[IGRestRequestQueue]", "", "Queuesize", "Cycletime(*s)"));
-                            Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatFourColumns, "[IGRestRequestQueue]", "", new string('_', 40), new string('_', 40)));
-                            Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatFourColumns, "[IGRestRequestQueue]", "", $"{_cycleCount}", $"{_cycleCount * _cycleTime}"));
-                            Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatFourColumns, "[IGRestRequestQueue]", "", "", ""));
-
-                            restRequestItem.Execute();
-
-                            if (restRequestItem.RestRequestQueueItem.IsRecurrent && !restRequestItem.IsTradingRequest && !restRequestItem.RestRequestQueueItem.ExecuteAsap)
-                                restRequestItem.RestRequestQueueItem.Timestamp = currentTimestamp;
+                            if (restRequestItem.IsTradingRequest)
+                            {
+                                allowExecution = true;  // Trading request always have the highest priorty, will be executed immediately and do not affect the IG api call limit.
+                            }
+                            else if (currentTimestamp.CompareTo(_lastExecutionCycleTimestamp.AddSeconds(_cycleTime)) > 0)
+                            {
+                                allowExecution = true;
+                                _lastExecutionCycleTimestamp = currentTimestamp;
+                            }
                             else
-                                iGApiDbContext.RestRequestQueue.Remove(restRequestItem.RestRequestQueueItem);
+                                allowExecution = false;
 
-                            iGApiDbContext.SaveChangesAsync().Wait();   // Use Wait, preventing the loop from popping the same queue item, while the current is beeing deleted.
+                            if (allowExecution)
+                            {
+                                _cycleCount = queueItemsList.Where(w => !w.IsTradingRequest).Count();
+
+                                Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatFourColumns, "[IGRestRequestQueue]", "", "", ""));
+                                Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatTwoColumns, "[IGRestRequestQueue]", $"Executing \"{restRequestItem.RestRequestQueueItem.RestRequest}\""));
+                                Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatFourColumns, "[IGRestRequestQueue]", "", "", ""));
+                                Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatFourColumns, "[IGRestRequestQueue]", "", "Queuesize", "Cycletime(*s)"));
+                                Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatFourColumns, "[IGRestRequestQueue]", "", new string('_', 40), new string('_', 40)));
+                                Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatFourColumns, "[IGRestRequestQueue]", "", $"{_cycleCount}", $"{_cycleCount * _cycleTime}"));
+                                Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatFourColumns, "[IGRestRequestQueue]", "", "", ""));
+
+                                restRequestItem.Execute();
+
+                                if (restRequestItem.RestRequestQueueItem.IsRecurrent && !restRequestItem.IsTradingRequest && !restRequestItem.RestRequestQueueItem.ExecuteAsap)
+                                    restRequestItem.RestRequestQueueItem.Timestamp = currentTimestamp;
+                                else
+                                    iGApiDbContext.RestRequestQueue.Remove(restRequestItem.RestRequestQueueItem);
+
+                                iGApiDbContext.SaveChangesAsync().Wait();   // Use Wait, preventing the loop from popping the same queue item, while the current is beeing deleted.
+                            }
                         }
                     }
+                }
+                catch (Exception ex)
+                {
+                    Log.WriteException(ex, nameof(Start));
+                    throw;
                 }
             }
         }

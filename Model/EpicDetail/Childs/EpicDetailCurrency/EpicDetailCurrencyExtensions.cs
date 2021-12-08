@@ -14,13 +14,23 @@ namespace IGApi.Model
             )
         {
             _ = iGApiDbContext.EpicDetailsCurrency ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.EpicDetailsCurrency));
+            _ = iGApiDbContext.Currencies ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.Currencies));
 
-            var epicDetailCurrency = Task.Run(async () => await iGApiDbContext.EpicDetailsCurrency.FindAsync(epicDetail.Epic, currencyData.code)).Result;
+            #region SyncToDb Referencing entity
+            var currency = iGApiDbContext.SaveCurrency(currencyData);
+            #endregion
 
-            if (epicDetailCurrency is not null)
-                epicDetailCurrency.MapProperties(epicDetail, currencyData);
-            else
-                epicDetailCurrency = iGApiDbContext.EpicDetailsCurrency.Add(new EpicDetailCurrency(epicDetail, currencyData)).Entity;
+            EpicDetailCurrency? epicDetailCurrency = null;
+
+            if (currency is not null)
+            {
+                epicDetailCurrency = Task.Run(async () => await iGApiDbContext.EpicDetailsCurrency.FindAsync(epicDetail.Epic, currencyData.code)).Result;
+
+                if (epicDetailCurrency is not null)
+                    epicDetailCurrency.MapProperties(epicDetail, currency);
+                else
+                    epicDetailCurrency = iGApiDbContext.EpicDetailsCurrency.Add(new EpicDetailCurrency(epicDetail, currency)).Entity;
+            }
 
             return epicDetailCurrency;
         }
