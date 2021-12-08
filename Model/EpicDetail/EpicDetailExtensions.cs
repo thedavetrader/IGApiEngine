@@ -23,14 +23,6 @@ namespace IGApi.Model
             // Save childs
             if (epicDetail is not null)
             {
-                // TODO: Remove obsolete Childs
-                /*
-                 * PSEUDO
-                 * - Find all child entries on DB 
-                 *  - which do not exist in instrumentdata.child
-                 * - remove entry
-                 * */
-
                 #region SpecialInfo
                 if (instrumentData.specialInfo is not null)
                 {

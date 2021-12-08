@@ -84,7 +84,7 @@ namespace IGApi
 
         public static bool EpicStreamPriceAvailableCheck(string epic)
         {
-            bool StreamingPricesAvailable = true;
+            bool StreamingPricesAvailable;
 
             IGApiDbContext iGApiDbContext = new();
             _ = iGApiDbContext.EpicDetails ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.EpicDetails));

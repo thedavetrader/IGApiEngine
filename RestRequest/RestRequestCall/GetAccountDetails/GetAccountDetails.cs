@@ -15,15 +15,18 @@ namespace IGApi.RestRequest
 
                 var response = GetAccountDetailsResponse();
 
-                response.Response.accounts.ForEach(account =>
+                if (response is not null)
                 {
-                    if (account is not null)
+                    response.Response.accounts.ForEach(account =>
                     {
-                        iGApiDbContext.SaveAccount(account, account.balance);
-                    }
-                });
+                        if (account is not null)
+                        {
+                            iGApiDbContext.SaveAccount(account, account.balance);
+                        }
+                    });
 
-                Task.Run(async () => await iGApiDbContext.SaveChangesAsync()).Wait();  // Use wait to prevent the Task object is disposed while still saving the changes.
+                    Task.Run(async () => await iGApiDbContext.SaveChangesAsync()).Wait();  // Use wait to prevent the Task object is disposed while still saving the changes.
+                }
             }
             catch (Exception ex)
             {
