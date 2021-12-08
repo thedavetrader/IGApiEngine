@@ -17,7 +17,7 @@ namespace IGApi
                 {
                     UnsubscribeFromAccountDetails();
                     UnsubscribeFromTradeDetails();
-                    UnsubscribeFromEpicTick();
+                    UnsubscribeFromAllEpicTick();
                     IGRestApiClient.logout();
 
                     Log.WriteLine("Logged out");

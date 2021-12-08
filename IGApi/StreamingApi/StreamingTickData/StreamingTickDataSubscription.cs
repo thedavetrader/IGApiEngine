@@ -28,35 +28,35 @@ namespace IGApi
 
         private void EpicStreamListChanged(object? sender, EventArgs e)
         {
-            Task.Run(() => ReSubscribeToEpicTick());
+            Task.Run(() => ReSubscribeToAllEpicTick());
         }
 
         /// <summary>
         /// The list of epics to subscribe to has changed: An epic has been added or has been removed (with RemoveAll), in which case the CollectionChanged event is triggered.
         /// All current subscriptions should be cancelled and the epics in the curren up-to-date list should be registered.
         /// </summary>
-        private void ReSubscribeToEpicTick()
+        private void ReSubscribeToAllEpicTick()
         {
             try
             {
                 lock (EpicStreamList)
                 {
-                    UnsubscribeFromEpicTick();
+                    UnsubscribeFromAllEpicTick();
 
                     if (EpicStreamList.Any())
                     {
-                        SubscribeToEpicTick();
+                        SubscribeToAllEpicTick();
                     }
                 }
             }
             catch (Exception ex)
             {
-                Log.WriteException(ex, nameof(ReSubscribeToEpicTick));
+                Log.WriteException(ex, nameof(ReSubscribeToAllEpicTick));
                 throw;
             }
         }
 
-        private void SubscribeToEpicTick()
+        private void SubscribeToAllEpicTick()
         {
             try
             {
@@ -82,12 +82,12 @@ namespace IGApi
             }
             catch (Exception ex)
             {
-                Log.WriteException(ex, nameof(SubscribeToEpicTick));
+                Log.WriteException(ex, nameof(SubscribeToAllEpicTick));
                 throw;
             }
         }
 
-        private void UnsubscribeFromEpicTick()
+        private void UnsubscribeFromAllEpicTick()
         {
             if (LoginSessionInformation is not null)
             {
@@ -106,7 +106,7 @@ namespace IGApi
         /// </summary>
         public class L1PricesSubscription : HandyTableListenerAdapter
         {
-            private readonly List<RestRequestParameterEpic> EpicStreamList;
+            private readonly ObservableList<EpicStreamListItem> EpicStreamList;
             private readonly ApiEngine _apiEngine;
 
             public L1PricesSubscription(ApiEngine apiEngine)
@@ -121,7 +121,6 @@ namespace IGApi
                 {
                     var tickUpdate = L1LsPriceUpdateData(itemPos, itemName, update);
                     var onUpdateEpic = itemName.Replace("L1:", "");
-                    var restQueueParameterEpic = new RestRequestParameterEpic(onUpdateEpic);
 
                     if (EpicStreamPriceAvailableCheck(onUpdateEpic))
                     {
@@ -136,9 +135,18 @@ namespace IGApi
                     }
                     else
                     {
-                        Log.WriteLine("Invalid subscription found, resubscribing.");
-                        EpicStreamList.Remove(restQueueParameterEpic);
-                        _apiEngine.ReSubscribeToEpicTick();
+                        Log.WriteLine($"No streaming prices available for epic {onUpdateEpic}.");
+                        
+                        var epicStreamListItem = EpicStreamList.Find(f => f.Epic == onUpdateEpic);
+
+                        if (epicStreamListItem is not null)
+                        {
+                            EpicStreamList.Remove(epicStreamListItem);
+
+                            //  For this epic to be unsubscribed, all epics have to unsubscribe an re-subscribe.
+                            //  There is no way to (un-)subscribe a individual epic.
+                            _apiEngine.ReSubscribeToAllEpicTick();
+                        }
                     }
                 }
                 catch (Exception ex)

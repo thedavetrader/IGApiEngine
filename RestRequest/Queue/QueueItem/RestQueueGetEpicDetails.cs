@@ -6,19 +6,22 @@ namespace IGApi.RestRequest
 {
     public static partial class RestQueueQueueItem
     {
-        public static void RestQueueGetEpicDetails(List<RestRequestParameterEpic> restQueueParameterEpic)
+        public static void RestQueueGetEpicDetails(List<EpicStreamListItem>? epicStreamListItem)
         {
-            using IGApiDbContext iGApiDbContext = new();
+            if (epicStreamListItem is not null && epicStreamListItem.Any())
+            {
+                using IGApiDbContext iGApiDbContext = new();
 
-            _ = iGApiDbContext.RestRequestQueue ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.RestRequestQueue));
+                _ = iGApiDbContext.RestRequestQueue ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.RestRequestQueue));
 
-            string parameters = JsonConvert.SerializeObject(restQueueParameterEpic, Formatting.None);
+                string parameters = JsonConvert.SerializeObject(epicStreamListItem, Formatting.None);
 
-            RestRequestQueue restRequestQueueItem = new(nameof(RestRequest.GetEpicDetails), parameters, true, false);
+                RestRequestQueue restRequestQueueItem = new(nameof(RestRequest.GetEpicDetails), parameters, true, false);
 
-            iGApiDbContext.SaveRestRequestQueue(restRequestQueueItem);
+                iGApiDbContext.SaveRestRequestQueue(restRequestQueueItem);
 
-            Task.Run(async () => await iGApiDbContext.SaveChangesAsync()).Wait();
+                Task.Run(async () => await iGApiDbContext.SaveChangesAsync()).Wait();
+            }
         }
     }
 }

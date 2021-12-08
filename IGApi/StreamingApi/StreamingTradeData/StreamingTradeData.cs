@@ -107,9 +107,12 @@ namespace IGApi
                         var status = updateData.status;
                         var epic = updateData.epic;
                         var dealId = updateData.dealId;
-                        var RestQueueParameterEpic = new RestRequestParameterEpic(epic);
+                        var epicStreamListItem =
+                            _iGApiEngine.EpicStreamList.Find(f => f.Epic == epic) ??
+                            new EpicStreamListItem(epic, usedByOpenPositions: true);
 
                         using IGApiDbContext iGApiDbContext = new();
+
                         _ = iGApiDbContext.OpenPositions ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.OpenPositions));
 
                         #region SycnWithDb
@@ -128,9 +131,9 @@ namespace IGApi
 
                         #region RegisterStreamEpic
                         if (status == StreamingStatusEnum.OPEN)
-                            _iGApiEngine.AddEpicStreamListItems(RestQueueParameterEpic);
+                            _iGApiEngine.AddEpicStreamListItems(epicStreamListItem);
                         else if (status == StreamingStatusEnum.CLOSED || status == StreamingStatusEnum.DELETED)
-                            _iGApiEngine.RemoveEpicStreamListItems(RestQueueParameterEpic);
+                            _iGApiEngine.RemoveEpicStreamListItems(epicStreamListItem);
                         #endregion
 
                         Task.Run(async () => await iGApiDbContext.SaveChangesAsync()).Wait();

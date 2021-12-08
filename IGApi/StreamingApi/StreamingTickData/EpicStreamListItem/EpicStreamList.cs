@@ -11,26 +11,27 @@ namespace IGApi
 {
     public sealed partial class ApiEngine
     {
-        public ListExtension<RestRequestParameterEpic> EpicStreamList = new();
+        public ObservableList<EpicStreamListItem> EpicStreamList = new();
 
         /// <summary>
         /// Register new epics to EpicStreamList and removes closed ones. Only after both actions are done, notify changes to the list.
         /// </summary>
-        /// <param name="epics"></param>
-        public void SyncEpicStreamListItems(List<RestRequestParameterEpic> epics)
+        /// <param name="syncEpicStreamListItems"></param>
+        public void SyncEpicStreamListItems(List<EpicStreamListItem> syncEpicStreamListItems)
         {
-            if (epics.Any())
+            if (syncEpicStreamListItems.Any())
             {
                 lock (EpicStreamList)
                 {
                     bool isChanged = false;
-
                     //  Add new open epics to list.
-                    List<RestRequestParameterEpic> newEpics = epics.Where(validItem => !EpicStreamList.Where(item => item.Epic == validItem.Epic).Any()).Distinct().ToList();
+                    List<EpicStreamListItem> newEpicStreamListItems =
+                        syncEpicStreamListItems
+                            .Where(epic => !EpicStreamList.Where(item => item.Epic == epic.Epic).Any()).Distinct().ToList();
 
-                    if (newEpics.Any())
+                    if (newEpicStreamListItems.Any())
                     {
-                        newEpics.ForEach(epic =>
+                        newEpicStreamListItems.ForEach(epic =>
                         {
                             if (EpicStreamPriceAvailableCheck(epic.Epic))
                             {
@@ -38,20 +39,20 @@ namespace IGApi
                                 isChanged = true;
                             }
                             else
-                                epics.Remove(epic);
+                                syncEpicStreamListItems.Remove(epic);
                         });
                     }
 
-                    //  TODO: Only remove closed epics from list if soucres is openposition update (use reflectoin nameof)
                     EpicStreamList
-                        .Where(item => !epics.Where(w => w.Epic == item.Epic).Any()).ToList()
+                        .Where(item => !syncEpicStreamListItems.Where(w => w.Epic == item.Epic).Any()).ToList()
                         .ForEach(epicStreamListItem =>
                         {
-                            EpicStreamList.Remove(epicStreamListItem);
+                            if (!epicStreamListItem.multiUse)   // Implicitly assume that if it is not multiUse, it must be used by the source caller of SyncEpicStreamListItems
+                                EpicStreamList.Remove(epicStreamListItem);
                             isChanged = true;
                         });
 
-                    if (EpicStreamList.RemoveAll(item => !epics.Where(w => w.Epic == item.Epic).Any()) > 0)
+                    if (EpicStreamList.RemoveAll(item => !syncEpicStreamListItems.Where(w => w.Epic == item.Epic).Any()) > 0)
                         isChanged = true;
 
                     //  Notify change once list is properly updated.
@@ -61,7 +62,7 @@ namespace IGApi
             }
         }
 
-        public void AddEpicStreamListItems(RestRequestParameterEpic epicStreamListItem)
+        public void AddEpicStreamListItems(EpicStreamListItem epicStreamListItem)
         {
             lock (EpicStreamList)
             {
@@ -72,7 +73,7 @@ namespace IGApi
             }
         }
 
-        public void RemoveEpicStreamListItems(RestRequestParameterEpic epicStreamListItem)
+        public void RemoveEpicStreamListItems(EpicStreamListItem epicStreamListItem)
         {
             lock (EpicStreamList)
             {
@@ -93,7 +94,7 @@ namespace IGApi
             if (epicDetail is not null)
             {
                 StreamingPricesAvailable = epicDetail.StreamingPricesAvailable;
-                
+
                 if (!StreamingPricesAvailable)
                     LogInvalidEpic(epic);
             }

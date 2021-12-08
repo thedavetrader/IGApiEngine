@@ -1,6 +1,6 @@
 ﻿namespace IGApi.Common
 {
-    public class ListExtension<T> : List<T>
+    public class ObservableList<T> : List<T>
     {
 
         public event EventHandler? ListChanged;

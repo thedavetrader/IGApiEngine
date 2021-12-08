@@ -24,5 +24,15 @@ namespace IGApi.Common
         {
             return TimeSpan.Parse(time) - DateTimeOffset.Now.Offset;
         }
+
+        /// <summary>
+        /// Counts the number of arguments that are true.
+        /// </summary>
+        /// <param name="booleans"></param>
+        /// <returns></returns>
+        public static int CountTrue(params bool[] booleans)
+        {
+            return booleans.Count(t => t);
+        }
     }
 }
