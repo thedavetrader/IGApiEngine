@@ -4,9 +4,9 @@ namespace IGApi.Common
 {
     public class SmartDispatcher : PropertyEventDispatcher
     {
-        private static PropertyEventDispatcher instance = new SmartDispatcher();
+        private static readonly PropertyEventDispatcher instance = new SmartDispatcher();
 
-        public static PropertyEventDispatcher getInstance()
+        public static PropertyEventDispatcher GetInstance()
         {
             return instance;
         }

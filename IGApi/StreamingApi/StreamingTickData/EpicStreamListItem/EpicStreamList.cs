@@ -17,13 +17,17 @@ namespace IGApi
         /// Register new epics to EpicStreamList and removes closed ones. Only after both actions are done, notify changes to the list.
         /// </summary>
         /// <param name="syncEpicStreamListItems"></param>
-        public void SyncEpicStreamListItems(List<EpicStreamListItem> syncEpicStreamListItems)
+        public void SyncEpicStreamListItems(
+            List<EpicStreamListItem> syncEpicStreamListItems,
+            EpicStreamListItem.EpicStreamListItemSource epicStreamListItemSource
+            )
         {
-            if (syncEpicStreamListItems.Any())
+            lock (EpicStreamList)
             {
-                lock (EpicStreamList)
+                bool isChanged = false;
+
+                if (syncEpicStreamListItems.Any())
                 {
-                    bool isChanged = false;
                     //  Add new open epics to list.
                     List<EpicStreamListItem> newEpicStreamListItems =
                         syncEpicStreamListItems
@@ -42,23 +46,28 @@ namespace IGApi
                                 syncEpicStreamListItems.Remove(epic);
                         });
                     }
-
-                    EpicStreamList
-                        .Where(item => !syncEpicStreamListItems.Where(w => w.Epic == item.Epic).Any()).ToList()
-                        .ForEach(epicStreamListItem =>
-                        {
-                            if (!epicStreamListItem.multiUse)   // Implicitly assume that if it is not multiUse, it must be used by the source caller of SyncEpicStreamListItems
-                                EpicStreamList.Remove(epicStreamListItem);
-                            isChanged = true;
-                        });
-
-                    if (EpicStreamList.RemoveAll(item => !syncEpicStreamListItems.Where(w => w.Epic == item.Epic).Any()) > 0)
-                        isChanged = true;
-
-                    //  Notify change once list is properly updated.
-                    if (isChanged)
-                        EpicStreamList.NotifyChange();
                 }
+
+                EpicStreamList
+                    .Where(esl =>
+                        !syncEpicStreamListItems.Where(sesli => sesli.Epic == esl.Epic).Any() &&
+                        esl.IsSource(epicStreamListItemSource)).ToList()
+                    .ForEach(epicStreamListItem =>
+                    {
+                        if (epicStreamListItem.multiUse)
+                        {
+                            epicStreamListItem.SetSource(epicStreamListItemSource, false);
+                        }
+                        else // Implicitly assume that if it is not multiUse, it must be used by the source caller of SyncEpicStreamListItems
+                        {
+                            EpicStreamList.Remove(epicStreamListItem);
+                            isChanged = true;
+                        }
+                    });
+
+                //  Notify change once list is properly updated.
+                if (isChanged)
+                    EpicStreamList.NotifyChange();
             }
         }
 

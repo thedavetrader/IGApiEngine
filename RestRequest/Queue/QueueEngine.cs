@@ -92,8 +92,8 @@ namespace IGApi.RestRequest
 
         private static void InitResQueueItems()
         {
-            RestQueueQueueItem.RestQueueGetOpenPositions();
-            RestQueueQueueItem.RestQueueGetAccountDetails();
+            QueueQueueItem.QueueItemGetOpenPositions();
+            QueueQueueItem.QueueItemGetAccountDetails();
         }
     }
 }

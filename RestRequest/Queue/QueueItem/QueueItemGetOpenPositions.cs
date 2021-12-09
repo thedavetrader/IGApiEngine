@@ -4,11 +4,11 @@ using Newtonsoft.Json;
 
 namespace IGApi.RestRequest
 {
-    public static partial class RestQueueQueueItem
+    public static partial class QueueQueueItem
     {
-        public static void RestQueueGetAccountDetails()
+        public static void QueueItemGetOpenPositions()
         {
-            var restRequest = nameof(RestRequest.GetAccountDetails);
+            var restRequest = nameof(RestRequest.GetOpenPositions);
 
             using IGApiDbContext iGApiDbContext = new();
 

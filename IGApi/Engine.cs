@@ -35,7 +35,7 @@ namespace IGApi
                     !String.IsNullOrEmpty(_password) &&
                     !String.IsNullOrEmpty(_apiKey))
                 {
-                    _iGRestApiClient = new IgRestApiClient(_env, (SmartDispatcher)SmartDispatcher.getInstance());
+                    _iGRestApiClient = new IgRestApiClient(_env, (SmartDispatcher)SmartDispatcher.GetInstance());
                     _iGStreamApiClient = new IGStreamingApiClient();
                 }
                 else

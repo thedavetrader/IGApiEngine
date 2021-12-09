@@ -109,7 +109,7 @@ namespace IGApi
                         var dealId = updateData.dealId;
                         var epicStreamListItem =
                             _iGApiEngine.EpicStreamList.Find(f => f.Epic == epic) ??
-                            new EpicStreamListItem(epic, usedByOpenPositions: true);
+                            new EpicStreamListItem(epic, EpicStreamListItem.EpicStreamListItemSource.SourceOpenPositions);
 
                         using IGApiDbContext iGApiDbContext = new();
 

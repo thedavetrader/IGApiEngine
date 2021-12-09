@@ -4,17 +4,19 @@ using Newtonsoft.Json;
 
 namespace IGApi.RestRequest
 {
-    public static partial class RestQueueQueueItem
+    public static partial class QueueQueueItem
     {
-        public static void RestQueueGetEpicDetails(List<EpicStreamListItem>? epicStreamListItem)
+        public static void QueueItemGetEpicDetails(List<string>? epics)
         {
-            if (epicStreamListItem is not null && epicStreamListItem.Any())
+            if (epics is not null && epics.Any())
             {
                 using IGApiDbContext iGApiDbContext = new();
 
                 _ = iGApiDbContext.RestRequestQueue ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.RestRequestQueue));
 
-                string parameters = JsonConvert.SerializeObject(epicStreamListItem, Formatting.None);
+                string parameters = JsonConvert.SerializeObject(
+                    epics.Select(epic => new { epic }).Distinct(),
+                    Formatting.None);
 
                 RestRequestQueue restRequestQueueItem = new(nameof(RestRequest.GetEpicDetails), parameters, true, false);
 

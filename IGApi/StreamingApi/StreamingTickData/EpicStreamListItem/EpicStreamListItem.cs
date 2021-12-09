@@ -9,28 +9,54 @@ namespace IGApi
     {
         public readonly string Epic;
 
-        public readonly bool UsedByOpenPositions;
+        private bool _sourceOpenPositions;
 
-        public readonly bool usedByWorkingOrders;
+        private bool _sourceWorkingOrders;
+
+        public enum EpicStreamListItemSource {
+            SourceOpenPositions,
+            SourceWorkingOrders,
+            None
+        }
 
         public bool multiUse
         {
             get
             {
                 return Utility.CountTrue(
-                    UsedByOpenPositions,
-                    usedByWorkingOrders) > 1;
+                    _sourceOpenPositions,
+                    _sourceWorkingOrders) > 1;
             }
         }
 
         public EpicStreamListItem(
             string epic,
-            bool usedByOpenPositions = false,
-            bool usedByWorkingOrders = false
+            EpicStreamListItemSource epicStreamListItemSource
             )
         {
             Epic = epic;
-            UsedByOpenPositions = usedByOpenPositions;
+            SetSource(epicStreamListItemSource);
+        }
+
+        /// <summary>
+        /// Sets the source of the EpicStreamListItem.
+        /// </summary>
+        /// <param name="epicStreamListItemSource"></param>
+        /// <param name="isInUse"></param>
+        public void SetSource(EpicStreamListItemSource epicStreamListItemSource, bool isInUse = true)
+        {
+            switch (epicStreamListItemSource)
+            {
+                case EpicStreamListItemSource.SourceOpenPositions: _sourceOpenPositions = isInUse; break;
+                case EpicStreamListItemSource.SourceWorkingOrders: _sourceWorkingOrders = isInUse; break;
+            }
+        }
+
+        public bool IsSource(EpicStreamListItemSource epicStreamListItemSource)
+        {
+            return 
+                epicStreamListItemSource == EpicStreamListItemSource.SourceOpenPositions && _sourceOpenPositions ||
+                epicStreamListItemSource == EpicStreamListItemSource.SourceWorkingOrders && _sourceWorkingOrders;
         }
     }
 }

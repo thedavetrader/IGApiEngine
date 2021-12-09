@@ -69,15 +69,15 @@ namespace IGApi.RestRequest
                     #region EpicStreamList
                     var epicStreamListItems = currentApiOpenPositions
                         .Where(w => w.market.streamingPricesAvailable)
-                        .Select(s => new EpicStreamListItem(s.market.epic, usedByOpenPositions: true))
+                        .Select(s => new EpicStreamListItem(s.market.epic, EpicStreamListItem.EpicStreamListItemSource.SourceOpenPositions))
                         .Distinct()
                         .ToList();
 
-                    _apiEngine.SyncEpicStreamListItems(epicStreamListItems);
+                    _apiEngine.SyncEpicStreamListItems(epicStreamListItems, EpicStreamListItem.EpicStreamListItemSource.SourceOpenPositions);
                     #endregion
 
                     #region GetEpicDetails
-                    RestQueueQueueItem.RestQueueGetEpicDetails(currentApiOpenPositions.Select(s => new EpicStreamListItem(s.market.epic)).ToList());
+                    QueueQueueItem.QueueItemGetEpicDetails(currentApiOpenPositions.Select(s => s.market.epic).ToList());
                     #endregion
                 }
             }
