@@ -16,8 +16,8 @@ namespace IGApi.Model
         [Obsolete("Do not use this constructor. It's intended use is for EF-Core only.", true)]
         public EpicDetailCurrency()
         {
-            Epic = string.Format(Constants.InvalidEntry, nameof(Epic));
-            Code = string.Format(Constants.InvalidEntry, nameof(Code));
+            Epic = string.Format(Constants.InvalidEntry, nameof(EpicDetailCurrency));
+            Code = string.Format(Constants.InvalidEntry, nameof(EpicDetailCurrency));
             EpicDetail = new EpicDetail();
             Currency = new Currency();
         }

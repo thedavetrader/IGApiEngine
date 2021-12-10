@@ -1,8 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using dto.endpoint.positions.get.otc.v2;
 using IGApi.Common;
 using IGWebApiClient;
-using Microsoft.EntityFrameworkCore;
 
 namespace IGApi.Model
 {
@@ -28,7 +26,26 @@ namespace IGApi.Model
         
         public static EpicTick? SaveEpicTick(
             [NotNullAttribute] this IGApiDbContext iGApiDbContext,
-            [NotNullAttribute] MarketData marketData
+            [NotNullAttribute] dto.endpoint.positions.get.otc.v2.MarketData marketData
+            )
+        {
+            _ = iGApiDbContext.EpicTicks ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.EpicTicks));
+
+            var epic = marketData.epic;
+
+            var epicTick = Task.Run(async () => await iGApiDbContext.EpicTicks.FindAsync(epic)).Result;
+
+            if (epicTick is not null)
+                epicTick.MapProperties(marketData);
+            else
+                epicTick = iGApiDbContext.EpicTicks.Add(new EpicTick(marketData)).Entity;
+
+            return epicTick;
+        }        
+
+        public static EpicTick? SaveEpicTick(
+            [NotNullAttribute] this IGApiDbContext iGApiDbContext,
+            [NotNullAttribute] dto.endpoint.workingorders.get.v2.MarketData marketData
             )
         {
             _ = iGApiDbContext.EpicTicks ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.EpicTicks));
@@ -44,7 +61,6 @@ namespace IGApi.Model
 
             return epicTick;
         }
-
 
     }
 }

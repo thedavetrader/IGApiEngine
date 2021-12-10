@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IGApi.Migrations
 {
     [DbContext(typeof(IGApiDbContext))]
-    [Migration("20211208103956_Init")]
-    partial class Init
+    [Migration("20211210190519_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -592,7 +592,94 @@ namespace IGApi.Migrations
 
                     SqlServerEntityTypeBuilderExtensions.IsMemoryOptimized(b);
 
-                    b.HasCheckConstraint("rest_request", "rest_request in ('GetAccountDetails', 'GetOpenPositions', 'CreatePosition','GetEpicDetails')");
+                    b.HasCheckConstraint("rest_request", "rest_request in ('GetAccountDetails','GetOpenPositions','GetWorkingOrders','GetEpicDetails')");
+                });
+
+            modelBuilder.Entity("IGApi.Model.WorkingOrder", b =>
+                {
+                    b.Property<string>("AccountId")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("account_id");
+
+                    b.Property<string>("DealId")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("deal_id");
+
+                    b.Property<DateTime>("ApiLastUpdate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("api_last_update");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_date");
+
+                    b.Property<string>("CurrencyCode")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("currency_code");
+
+                    b.Property<string>("Direction")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("direction");
+
+                    b.Property<bool>("Dma")
+                        .HasColumnType("bit")
+                        .HasColumnName("dma");
+
+                    b.Property<string>("Epic")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("epic");
+
+                    b.Property<DateTime?>("GoodTillDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("good_till_date");
+
+                    b.Property<bool>("GuaranteedStop")
+                        .HasColumnType("bit")
+                        .HasColumnName("guaranteed_stop");
+
+                    b.Property<decimal?>("LimitDistance")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("limit_distance");
+
+                    b.Property<decimal?>("OrderLevel")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("order_level");
+
+                    b.Property<decimal?>("OrderSize")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("order_size");
+
+                    b.Property<string>("OrderType")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("order_type");
+
+                    b.Property<decimal?>("StopDistance")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("stop_distance");
+
+                    b.Property<string>("TimeInForce")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("time_in_force");
+
+                    b.HasKey("AccountId", "DealId");
+
+                    b.ToTable("working_order");
                 });
 
             modelBuilder.Entity("IGApi.Model.EpicDetailCurrency", b =>

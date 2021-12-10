@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace IGApi.Migrations
 {
-    public partial class Init : Migration
+    public partial class init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -157,9 +157,35 @@ namespace IGApi.Migrations
                 {
                     table.PrimaryKey("PK_rest_request_queue", x => x.id)
                         .Annotation("SqlServer:Clustered", false);
-                    table.CheckConstraint("CK_rest_request_queue_rest_request", "rest_request in ('GetAccountDetails', 'GetOpenPositions', 'CreatePosition','GetEpicDetails')");
+                    table.CheckConstraint("CK_rest_request_queue_rest_request", "rest_request in ('GetAccountDetails','GetOpenPositions','GetWorkingOrders','GetEpicDetails')");
                 })
                 .Annotation("SqlServer:MemoryOptimized", true);
+
+            migrationBuilder.CreateTable(
+                name: "working_order",
+                columns: table => new
+                {
+                    account_id = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: false),
+                    deal_id = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: false),
+                    direction = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: false),
+                    epic = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: false),
+                    order_size = table.Column<decimal>(type: "decimal(38,19)", precision: 38, scale: 19, nullable: true),
+                    order_level = table.Column<decimal>(type: "decimal(38,19)", precision: 38, scale: 19, nullable: true),
+                    time_in_force = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: false),
+                    good_till_date = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    created_date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    guaranteed_stop = table.Column<bool>(type: "bit", nullable: false),
+                    order_type = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: false),
+                    stop_distance = table.Column<decimal>(type: "decimal(38,19)", precision: 38, scale: 19, nullable: true),
+                    limit_distance = table.Column<decimal>(type: "decimal(38,19)", precision: 38, scale: 19, nullable: true),
+                    currency_code = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: false),
+                    dma = table.Column<bool>(type: "bit", nullable: false),
+                    api_last_update = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_working_order", x => new { x.account_id, x.deal_id });
+                });
 
             migrationBuilder.CreateTable(
                 name: "epic_detail_currency",
@@ -286,6 +312,9 @@ namespace IGApi.Migrations
             migrationBuilder.DropTable(
                 name: "rest_request_queue")
                 .Annotation("SqlServer:MemoryOptimized", true);
+
+            migrationBuilder.DropTable(
+                name: "working_order");
 
             migrationBuilder.DropTable(
                 name: "currency");

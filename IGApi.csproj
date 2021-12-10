@@ -86,9 +86,7 @@
     <Compile Remove="Migrations\20211207183914_EpicDetailOpeningHour_v1.1.Designer.cs" />
     <Compile Remove="Migrations\20211208103723_EpicDetailCurrency_v2.0.cs" />
     <Compile Remove="Migrations\20211208103723_EpicDetailCurrency_v2.0.Designer.cs" />
-    <Compile Remove="Migrations\IGApiDbContextModelSnapshot.cs" />
     <Compile Remove="Model\ModelExtensions.cs" />
-    <Compile Remove="RestRequest\Queue\QueueItem\QueueQueueItem.cs" />
   </ItemGroup>
 
   <ItemGroup>

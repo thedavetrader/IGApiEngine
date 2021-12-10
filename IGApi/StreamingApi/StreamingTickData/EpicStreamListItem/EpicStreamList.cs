@@ -71,7 +71,7 @@ namespace IGApi
             }
         }
 
-        public void AddEpicStreamListItems(EpicStreamListItem epicStreamListItem)
+        public void AddEpicStreamListItem(EpicStreamListItem epicStreamListItem)
         {
             lock (EpicStreamList)
             {
@@ -82,11 +82,21 @@ namespace IGApi
             }
         }
 
-        public void RemoveEpicStreamListItems(EpicStreamListItem epicStreamListItem)
+        public void RemoveEpicStreamListItem(EpicStreamListItem epicStreamListItem)
         {
             lock (EpicStreamList)
             {
                 EpicStreamList.Remove(epicStreamListItem);
+
+                EpicStreamList.NotifyChange();
+            }
+        }
+
+        public void RemoveEpicStreamListItems(IEnumerable<EpicStreamListItem> epicStreamListItems)
+        {
+            lock (EpicStreamList)
+            {
+                EpicStreamList.RemoveAll(r => epicStreamListItems.Any(a => a.Epic == r.Epic));
 
                 EpicStreamList.NotifyChange();
             }

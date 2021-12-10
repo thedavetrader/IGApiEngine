@@ -31,7 +31,7 @@ namespace IGApi.Model
 
                     iGApiDbContext.EpicDetailsSpecialInfo.RemoveRange(
                         iGApiDbContext.EpicDetailsSpecialInfo
-                            .Where(w => w.Epic == epicDetail.Epic).ToList()
+                            .Where(w => w.Epic == epicDetail.Epic).ToList() // Use ToList() to prevent that Linq constructs a predicate that can not be sent to db.
                             .Where(a => !instrumentData.specialInfo.Any(b => b == a.SpecialInfo)));
 
                     //  Upsert
@@ -48,7 +48,7 @@ namespace IGApi.Model
 
                     iGApiDbContext.EpicDetailsCurrency.RemoveRange(
                         iGApiDbContext.EpicDetailsCurrency
-                        .Where(w => w.Epic == epicDetail.Epic).ToList()
+                        .Where(w => w.Epic == epicDetail.Epic).ToList() // Use ToList() to prevent that Linq constructs a predicate that can not be sent to db.
                         .Where(a => !instrumentData.currencies.Any(b => b.code == a.Code)));
 
                     //  Upsert
@@ -65,7 +65,7 @@ namespace IGApi.Model
 
                     iGApiDbContext.EpicDetailsMarginDepositBand.RemoveRange(
                         iGApiDbContext.EpicDetailsMarginDepositBand
-                        .Where(w => w.Epic == epicDetail.Epic).ToList()
+                        .Where(w => w.Epic == epicDetail.Epic).ToList() // Use ToList() to prevent that Linq constructs a predicate that can not be sent to db.
                         .Where(a => !instrumentData.marginDepositBands.Any(b => b.min == a.Min)));
 
                     //  Upsert
@@ -82,7 +82,7 @@ namespace IGApi.Model
 
                     iGApiDbContext.EpicDetailsOpeningHour.RemoveRange(
                         iGApiDbContext.EpicDetailsOpeningHour
-                        .Where(w => w.Epic == epicDetail.Epic).ToList()
+                        .Where(w => w.Epic == epicDetail.Epic).ToList() // Use ToList() to prevent that Linq constructs a predicate that can not be sent to db.
                         .Where(a => !instrumentData.openingHours.marketTimes.Any(b => Utility.ConvertLocalTimeStringToUtcTimespan(b.openTime) == a.OpenTime)));
 
                     //  Upsert

@@ -1,11 +1,8 @@
-﻿using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.Globalization;
-using IGApi.Model;
+﻿using System.Globalization;
 using IGApi.Common;
+using IGApi.Model;
 using IGWebApiClient;
 using Lightstreamer.DotNet.Client;
-using Newtonsoft.Json;
 
 namespace IGApi
 {
@@ -23,7 +20,7 @@ namespace IGApi
 
             _tickSubscription = new(this);
 
-         //   _tickSubscribedTableKey = null;
+            //   _tickSubscribedTableKey = null;
         }
 
         private void EpicStreamListChanged(object? sender, EventArgs e)
@@ -67,7 +64,7 @@ namespace IGApi
                     var subscribeEpicList = EpicStreamList.Select(e => e.Epic).Distinct().ToList();
 
                     _tickSubscribedTableKey = _iGStreamApiClient.SubscribeToMarketDetails(subscribeEpicList, _tickSubscription);
-                    
+
                     Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatFourColumns, "[StreamingTickData]", "", "", ""));
                     Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatTwoColumns, "[StreamingTickData]", "(Re-)subscribed epics to tick Lightning streamer."));
                     Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatFourColumns, "[StreamingTickData]", "", "", ""));
@@ -122,32 +119,17 @@ namespace IGApi
                     var tickUpdate = L1LsPriceUpdateData(itemPos, itemName, update);
                     var onUpdateEpic = itemName.Replace("L1:", "");
 
-                    if (EpicStreamPriceAvailableCheck(onUpdateEpic))
-                    {
-                        using IGApiDbContext iGApiDbContext = new();
-                        _ = iGApiDbContext.EpicTicks ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.EpicTicks));
+                    using IGApiDbContext iGApiDbContext = new();
+                    _ = iGApiDbContext.EpicTicks ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.EpicTicks));
 
-                        var existingEpicTick = EpicStreamList.Where(epic => epic.Epic == onUpdateEpic).FirstOrDefault();
-                        {
-                            iGApiDbContext.SaveEpicTick(tickUpdate, onUpdateEpic);
-                            Task.Run(async () => await iGApiDbContext.SaveChangesAsync()).Wait();
-                        }
-                    }
-                    else
-                    {
-                        Log.WriteLine($"No streaming prices available for epic {onUpdateEpic}.");
-                        
-                        var epicStreamListItem = EpicStreamList.Find(f => f.Epic == onUpdateEpic);
+                    //TODO: ZEROPRIO Debug EpicTick
+                    //string debug = JsonConvert.SerializeObject(tickUpdate,Formatting.None);
+                    //Debug.WriteLine(debug);
 
-                        if (epicStreamListItem is not null)
-                        {
-                            EpicStreamList.Remove(epicStreamListItem);
+                    iGApiDbContext.SaveEpicTick(tickUpdate, onUpdateEpic);
 
-                            //  For this epic to be unsubscribed, all epics have to unsubscribe an re-subscribe.
-                            //  There is no way to (un-)subscribe a individual epic.
-                            _apiEngine.ReSubscribeToAllEpicTick();
-                        }
-                    }
+                    Task.Run(async () => await iGApiDbContext.SaveChangesAsync()).Wait();
+
                 }
                 catch (Exception ex)
                 {
@@ -155,6 +137,6 @@ namespace IGApi
                     throw;
                 }
             }
-        }    
+        }
     }
 }

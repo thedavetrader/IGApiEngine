@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using dto.endpoint.positions.get.otc.v2;
 using IGWebApiClient;
 
 namespace IGApi.Model
@@ -21,13 +20,13 @@ namespace IGApi.Model
                 Change = l1LsPriceData.Change;
                 ChangePct = l1LsPriceData.ChangePct;
                 MarketDelay = l1LsPriceData.MarketDelay;
-                MarketState = l1LsPriceData.MarketState;
+                MarketState = l1LsPriceData.MarketState ?? MarketState ?? String.Empty;
                 UpdateTime = DateTime.UtcNow;
             }
         }
 
         public void MapProperties(
-            [NotNullAttribute] MarketData marketData
+            [NotNullAttribute] dto.endpoint.positions.get.otc.v2.MarketData marketData
             )
         {
             {
@@ -39,7 +38,25 @@ namespace IGApi.Model
                 Change = marketData.netChange;
                 ChangePct = marketData.percentageChange;
                 MarketDelay = marketData.delayTime;
-                MarketState = marketData.marketStatus;
+                MarketState = marketData.marketStatus ?? MarketState ?? String.Empty;
+                UpdateTime = DateTime.UtcNow;
+            }
+        }
+
+        public void MapProperties(
+            [NotNullAttribute] dto.endpoint.workingorders.get.v2.MarketData marketData
+            )
+        {
+            {
+                Epic = marketData.epic;
+                Offer = marketData.offer;
+                Bid = marketData.bid;
+                High = marketData.high;
+                Low = marketData.low;
+                Change = marketData.netChange;
+                ChangePct = marketData.percentageChange;
+                MarketDelay = marketData.delayTime;
+                MarketState = marketData.marketStatus ?? MarketState ?? String.Empty;
                 UpdateTime = DateTime.UtcNow;
             }
         }

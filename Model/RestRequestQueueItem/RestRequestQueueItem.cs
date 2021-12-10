@@ -3,13 +3,13 @@
 namespace IGApi.Model
 {
     [Table("rest_request_queue")]
-    public partial class RestRequestQueue
+    public partial class RestRequestQueueItem
     {
         [Column("id")]
         public int Id { get; set; }
-        
+
         [Column("timestamp")]
-        public DateTime Timestamp { get; set; }
+        public DateTime Timestamp { get; set; } = DateTime.UtcNow;
         
         [Column("rest_request")]
         public string RestRequest { get; set; } = "[ERROR] RestRequest is required.";

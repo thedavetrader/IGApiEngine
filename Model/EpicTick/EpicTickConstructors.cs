@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
-using dto.endpoint.positions.get.otc.v2;
 using IGApi.Common;
 using IGWebApiClient;
 
@@ -36,7 +35,21 @@ namespace IGApi.Model
         /// <param name="marketData"></param>
         /// <param name="epic"></param>
         public EpicTick(
-            [NotNullAttribute] MarketData marketData
+            [NotNullAttribute] dto.endpoint.positions.get.otc.v2.MarketData marketData
+            )
+        {
+            MapProperties(marketData);
+
+            _ = Epic ?? throw new PrimaryKeyNullReferenceException(nameof(Epic));
+        }
+
+        /// <summary>
+        /// For creating new accounts using dto.endpoint.workingorders.get.v2.MarketData
+        /// </summary>
+        /// <param name="marketData"></param>
+        /// <param name="epic"></param>
+        public EpicTick(
+            [NotNullAttribute] dto.endpoint.workingorders.get.v2.MarketData marketData
             )
         {
             MapProperties(marketData);

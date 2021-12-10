@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using dto.endpoint.positions.get.otc.v2;
 using IGWebApiClient;
 
 namespace IGApi.Model
@@ -12,7 +8,7 @@ namespace IGApi.Model
     public partial class OpenPosition
     {
         public void MapProperties(
-            [NotNullAttribute] dto.endpoint.positions.get.otc.v2.OpenPositionData openPositionData,
+            [NotNullAttribute] OpenPositionData openPositionData,
             [NotNullAttribute] string accountId,
             [NotNullAttribute] string epic
             )

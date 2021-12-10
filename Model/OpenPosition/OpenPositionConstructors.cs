@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using IGApi.Common;
 using IGWebApiClient;
+using dto.endpoint.positions.get.otc.v2;
 
 namespace IGApi.Model
 {
@@ -25,7 +26,7 @@ namespace IGApi.Model
         /// <exception cref="PrimaryKeyNullReferenceException"></exception>
         /// <exception cref="EssentialPropertyNullReferenceException"></exception>
         public OpenPosition(
-            [NotNullAttribute] dto.endpoint.positions.get.otc.v2.OpenPositionData openPositionData,
+            [NotNullAttribute] OpenPositionData openPositionData,
             [NotNullAttribute] string accountId,
             [NotNullAttribute] string epic
             )

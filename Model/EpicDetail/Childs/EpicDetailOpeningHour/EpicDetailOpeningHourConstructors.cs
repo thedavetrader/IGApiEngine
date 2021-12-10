@@ -16,7 +16,7 @@ namespace IGApi.Model
         [Obsolete("Do not use this constructor. It's intended use is for EF-Core only.", true)]
         public EpicDetailOpeningHour()
         {
-            Epic = string.Format(Constants.InvalidEntry, nameof(EpicTick));
+            Epic = string.Format(Constants.InvalidEntry, nameof(EpicDetailOpeningHour));
             EpicDetail = new EpicDetail();
         }
 

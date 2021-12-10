@@ -131,9 +131,9 @@ namespace IGApi
 
                         #region RegisterStreamEpic
                         if (status == StreamingStatusEnum.OPEN)
-                            _iGApiEngine.AddEpicStreamListItems(epicStreamListItem);
+                            _iGApiEngine.AddEpicStreamListItem(epicStreamListItem);
                         else if (status == StreamingStatusEnum.CLOSED || status == StreamingStatusEnum.DELETED)
-                            _iGApiEngine.RemoveEpicStreamListItems(epicStreamListItem);
+                            _iGApiEngine.RemoveEpicStreamListItem(epicStreamListItem);
                         #endregion
 
                         Task.Run(async () => await iGApiDbContext.SaveChangesAsync()).Wait();

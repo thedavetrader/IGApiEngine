@@ -30,7 +30,7 @@ namespace IGApi.Model
         public int? MarketDelay{ get; set; }
         
         [Column("market_state")]
-        public string MarketState { get; set; } = "[ERROR] The market state is unknown";
+        public string MarketState { get; set; }
         
         [Column("bid")]
         public decimal? Bid{ get; set; }

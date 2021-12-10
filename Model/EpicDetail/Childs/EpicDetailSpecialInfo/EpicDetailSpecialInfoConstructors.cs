@@ -15,8 +15,8 @@ namespace IGApi.Model
         [Obsolete("Do not use this constructor. It's intended use is for EF-Core only.", true)]
         public EpicDetailSpecialInfo()
         {
-            Epic = string.Format(Constants.InvalidEntry, nameof(EpicTick));
-            SpecialInfo= string.Format(Constants.InvalidEntry, nameof(SpecialInfo));
+            Epic = string.Format(Constants.InvalidEntry, nameof(EpicDetailSpecialInfo));
+            SpecialInfo= string.Format(Constants.InvalidEntry, nameof(EpicDetailSpecialInfo));
             EpicDetail = new EpicDetail();
         }
 

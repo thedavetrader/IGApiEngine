@@ -32,7 +32,7 @@ namespace IGApi.RestRequest
                 epicString = String.Join(",", epicList);
                 #endregion
 
-                var response = GetEpicDetailsResponse(epicString);
+                var response = RestApiClientCall(_apiEngine.IGRestApiClient.marketDetailsMulti(epicString));
 
                 #region SyncToDb
                 using IGApiDbContext iGApiDbContext = new();
@@ -44,9 +44,7 @@ namespace IGApi.RestRequest
                     response.Response.marketDetails.ForEach(MarketDetail =>
                     {
                         if (MarketDetail is not null)
-                        {
-                            var epicDetail = iGApiDbContext.SaveEpicDetail(MarketDetail.instrument);
-                        }
+                            iGApiDbContext.SaveEpicDetail(MarketDetail.instrument);
                     });
 
                     Task.Run(async () => await iGApiDbContext.SaveChangesAsync()).Wait();  // Use wait to prevent the Task object is disposed while still saving the changes.

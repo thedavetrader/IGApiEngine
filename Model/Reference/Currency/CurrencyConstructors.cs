@@ -16,7 +16,7 @@ namespace IGApi.Model
         [Obsolete("Do not use this constructor. It's intended use is for EF-Core only.", true)]
         public Currency()
         {
-            Code = string.Format(Constants.InvalidEntry, nameof(Code));
+            Code = string.Format(Constants.InvalidEntry, nameof(Currency));
         }
 
         public Currency(

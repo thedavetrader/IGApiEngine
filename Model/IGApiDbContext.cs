@@ -34,6 +34,7 @@
             EpicDetailDepositBandOnModelCreating(modelBuilder);
             EpicDetailOpeningHourOnModelCreating(modelBuilder);
             CurrencyOnModelCreating(modelBuilder);
+            WorkingOrderOnModelCreating(modelBuilder);
 
             //  Set default varchar(4000)
             foreach (var property in modelBuilder.Model.GetEntityTypes()

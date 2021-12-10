@@ -16,8 +16,8 @@ namespace IGApi.Model
         [Obsolete("Do not use this constructor. It's intended use is for EF-Core only.", true)]
         public EpicDetailMarginDepositBand()
         {
-            Epic = string.Format(Constants.InvalidEntry, nameof(EpicTick));
-            Currency = string.Format(Constants.InvalidEntry, nameof(Currency));
+            Epic = string.Format(Constants.InvalidEntry, nameof(EpicDetailMarginDepositBand));
+            Currency = string.Format(Constants.InvalidEntry, nameof(EpicDetailMarginDepositBand));
             EpicDetail = new EpicDetail();
         }
 
