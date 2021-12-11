@@ -1,4 +1,5 @@
 ﻿using IGApi.Common;
+using IGApi.IGApi.StreamingApi.StreamingTickData.EpicStreamListItem;
 using IGApi.Model;
 using Newtonsoft.Json;
 
@@ -12,7 +13,7 @@ namespace IGApi.RestRequest
             {
                 string? currentAccountId = _apiEngine.LoginSessionInformation?.currentAccountId;
                 _ = currentAccountId ?? throw new NullReferenceException(nameof(currentAccountId));
-                
+
                 var response = RestApiClientCall(_apiEngine.IGRestApiClient.workingOrdersV2());
 
                 if (response is not null)
@@ -30,7 +31,7 @@ namespace IGApi.RestRequest
                     SyncToEpicStreamList(currentApiWorkingOrders);
 
                     var parameters = currentApiWorkingOrders.Select(s => new { s.marketData.epic }).Distinct();
-                    
+
                     if (parameters.Any())
                     {
                         string? jsonParameters = null;
@@ -40,6 +41,8 @@ namespace IGApi.RestRequest
                             Formatting.None);
 
                         QueueQueueItem.QueueItem(nameof(RestRequest.GetEpicDetails), true, false, jsonParameters);
+
+                        //TODO: Notify GetTradeActivity
                     }
                 }
             }
@@ -66,15 +69,15 @@ namespace IGApi.RestRequest
                                 iGApiDbContext.SaveEpicTick(WorkingOrder.marketData);
                         }
                     });
-
-                    //  Remove closed positions (no longer existing).
-                    iGApiDbContext.WorkingOrders.RemoveRange(
-                        iGApiDbContext.WorkingOrders
-                            .Where(w => w.AccountId == currentAccountId).ToList()   // Use ToList() to prevent that Linq constructs a predicate that can not be sent to db.
-                            .Where(a => !currentApiWorkingOrders.Any(b => b.workingOrderData.dealId == a.DealId)));
-
-                    Task.Run(async () => await iGApiDbContext.SaveChangesAsync()).Wait();  // Use wait to prevent the Task object is disposed while still saving the changes.
                 }
+
+                //  Remove closed positions (no longer existing).
+                iGApiDbContext.WorkingOrders.RemoveRange(
+                    iGApiDbContext.WorkingOrders
+                        .Where(w => w.AccountId == currentAccountId).ToList()   // Use ToList() to prevent that Linq constructs a predicate that can not be sent to db.
+                        .Where(a => !currentApiWorkingOrders.Any(b => b.workingOrderData.dealId == a.DealId)));
+
+                Task.Run(async () => await iGApiDbContext.SaveChangesAsync()).Wait();  // Use wait to prevent the Task object is disposed while still saving the changes.
             }
 
             void SyncToEpicStreamList(List<dto.endpoint.workingorders.get.v2.WorkingOrder> currentApiWorkingOrders)

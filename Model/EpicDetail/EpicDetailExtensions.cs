@@ -92,10 +92,6 @@ namespace IGApi.Model
                 #endregion
             }
 
-            //TODO:     ZEROPRIO Example of ChangeTracker.DebugView Just for reference.
-            //iGApiDbContext.ChangeTracker.DetectChanges();
-            //Debug.WriteLine(iGApiDbContext.ChangeTracker.DebugView.LongView);
-
             return epicDetail;
         }
     }

@@ -8,9 +8,9 @@ namespace IGApi.RestRequest
     public static partial class QueueQueueItem
     {
         public static void QueueItem(
-            string restRequest, 
-            [NotNullAttribute] bool executeAsap,
-            [NotNullAttribute] bool isRecurrent,
+            string restRequest,
+            [NotNull] bool executeAsap,
+            [NotNull] bool isRecurrent,
             string? parameters = null)
         {
             using IGApiDbContext iGApiDbContext = new();

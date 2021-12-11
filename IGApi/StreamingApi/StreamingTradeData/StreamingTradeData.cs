@@ -6,6 +6,7 @@ using IGApi.Common;
 using IGWebApiClient;
 using Lightstreamer.DotNet.Client;
 using Newtonsoft.Json;
+using IGApi.IGApi.StreamingApi.StreamingTickData.EpicStreamListItem;
 
 namespace IGApi
 {
@@ -65,6 +66,7 @@ namespace IGApi
         public class TradeSubscription : HandyTableListenerAdapter
         {
             private readonly ApiEngine _iGApiEngine;
+            enum UpdateType { OpenPosition, WorkingOrder, Confirms };
 
             public TradeSubscription(ApiEngine iGApiEngine)
             {
@@ -78,71 +80,148 @@ namespace IGApi
 
                 try
                 {
-                    var confirms = update.GetNewValue("CONFIRMS");
                     var opu = update.GetNewValue("OPU");
-                    var wou = update.GetNewValue("WOU");
+                    //BUG @ IG. Working Order updates are also labeled as OPU.
+                    var wou = update.GetNewValue("OPU");
+                    var confirms = update.GetNewValue("CONFIRMS");
+                    UpdateType updateType = UpdateType.Confirms;
+
+                    //TODO: _PRIO SO identify WOU if contains field timeInForce
+                    updateType =
+                        String.IsNullOrEmpty(confirms) &&
+                        !string.IsNullOrEmpty(opu)
+                        && opu.Contains("timeInForce") ? UpdateType.WorkingOrder : UpdateType.OpenPosition;
 
                     string? inputData = null;
 
-                    if (!(String.IsNullOrEmpty(opu)))
+                    if (!(String.IsNullOrEmpty(opu)) && updateType == UpdateType.OpenPosition)
                     {
                         inputData = opu;
                         Log.WriteLine("OPU");
                     }
-                    if (!(String.IsNullOrEmpty(wou)))
+                    else if (!(String.IsNullOrEmpty(wou)) && updateType == UpdateType.WorkingOrder)
                     {
                         inputData = wou;
                         Log.WriteLine("WOU");
                     }
-                    if (!(String.IsNullOrEmpty(confirms)))
+                    else if (!(String.IsNullOrEmpty(confirms)) && updateType == UpdateType.Confirms)
                     {
                         inputData = confirms;
                         Log.WriteLine("CONFIRMS");
                     }
 
                     if (!(String.IsNullOrEmpty(inputData)))
-                    {
-                        var updateData = JsonConvert.DeserializeObject<LsTradeSubscriptionData>(inputData);
-                        var accountId = itemName.Replace("TRADE:", "");
-                        var status = updateData.status;
-                        var epic = updateData.epic;
-                        var dealId = updateData.dealId;
-                        var epicStreamListItem =
-                            _iGApiEngine.EpicStreamList.Find(f => f.Epic == epic) ??
-                            new EpicStreamListItem(epic, EpicStreamListItem.EpicStreamListItemSource.SourceOpenPositions);
-
-                        using IGApiDbContext iGApiDbContext = new();
-
-                        _ = iGApiDbContext.OpenPositions ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.OpenPositions));
-
-                        #region SycnWithDb
-                        if (status == StreamingStatusEnum.OPEN || status == StreamingStatusEnum.UPDATED || status == StreamingStatusEnum.AMENDED)
-                        {
-                            iGApiDbContext.SaveOpenPosition(updateData, accountId);
-                        }
-                        else if (status == StreamingStatusEnum.CLOSED || status == StreamingStatusEnum.DELETED)
-                        {
-                            var openPosition = Task.Run(async () => await iGApiDbContext.OpenPositions.FindAsync(accountId, dealId)).Result;
-
-                            if (openPosition != null)
-                                iGApiDbContext.Remove(openPosition);
-                        }
-                        #endregion
-
-                        #region RegisterStreamEpic
-                        if (status == StreamingStatusEnum.OPEN)
-                            _iGApiEngine.AddEpicStreamListItem(epicStreamListItem);
-                        else if (status == StreamingStatusEnum.CLOSED || status == StreamingStatusEnum.DELETED)
-                            _iGApiEngine.RemoveEpicStreamListItem(epicStreamListItem);
-                        #endregion
-
-                        Task.Run(async () => await iGApiDbContext.SaveChangesAsync()).Wait();
-                    }
+                        SyncToDb(itemName, updateType, inputData);
                 }
                 catch (Exception ex)
                 {
                     Log.WriteException(ex, nameof(OnUpdate));
                     throw;
+                }
+
+                void SyncToDb(string itemName, UpdateType updateType, string inputData)
+                {
+                    var accountId = itemName.Replace("TRADE:", "");
+
+                    var openPositionData = JsonConvert.DeserializeObject<LsTradeSubscriptionData>(inputData);
+                    var workingOrderData = JsonConvert.DeserializeObject<dto.endpoint.workingorders.get.v2.WorkingOrderData>(inputData);
+                    IGApiDbContext iGApiDbContext = new();
+
+                    if (updateType == UpdateType.OpenPosition)
+                    {
+                        var status = openPositionData.status;
+                        var epic = openPositionData.epic;
+                        var epicStreamListItemSource = EpicStreamListItem.EpicStreamListItemSource.SourceOpenPositions;
+
+                        if (status is not null && epic is not null)
+                        {
+                            SyncToDbOpenPositions(openPositionData, accountId, iGApiDbContext);
+
+                            RegisterStreamEpic((StreamingStatusEnum)status, epic, epicStreamListItemSource);
+                        }
+                    }
+                    else if (updateType == UpdateType.WorkingOrder)
+                    {
+                        var status = openPositionData.status;   // Working order does not contain status. And because of the bug, wou are sent as opu, so get the status from opu.
+                        var epic = workingOrderData.epic;
+                        var epicStreamListItemSource = EpicStreamListItem.EpicStreamListItemSource.SourceWorkingOrders;
+
+                        if (status is not null && epic is not null)
+                        {
+                            SyncToDbWorkingOrders((StreamingStatusEnum)status, workingOrderData, accountId, iGApiDbContext);
+
+                            RegisterStreamEpic((StreamingStatusEnum)status, epic, epicStreamListItemSource);
+                        }
+                    }
+                    else if (updateType == UpdateType.Confirms)
+                        throw new NotImplementedException("Streamupdates of the type \"Confirms\" are not supported.");
+
+                    Task.Run(async () => await iGApiDbContext.SaveChangesAsync()).Wait();
+
+                }
+
+                void RegisterStreamEpic(StreamingStatusEnum status, string? epic, EpicStreamListItem.EpicStreamListItemSource epicStreamListItemSource)
+                {
+                    var epicStreamListItem =
+                        _iGApiEngine.EpicStreamList.Find(f => f.Epic == epic) ??
+                        new EpicStreamListItem(epic, (EpicStreamListItem.EpicStreamListItemSource)epicStreamListItemSource);
+
+                    if (status == StreamingStatusEnum.OPEN)
+                        _iGApiEngine.AddEpicStreamListItem(epicStreamListItem);
+                    else if (status == StreamingStatusEnum.CLOSED || status == StreamingStatusEnum.DELETED)
+                        _iGApiEngine.RemoveEpicStreamListItem(epicStreamListItem);
+                }
+
+                static void SyncToDbOpenPositions(LsTradeSubscriptionData openPositionData, string accountId, IGApiDbContext iGApiDbContext)
+                {
+                    _ = iGApiDbContext.OpenPositions ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.OpenPositions));
+
+                    if (
+                        openPositionData.status == StreamingStatusEnum.OPEN ||
+                        openPositionData.status == StreamingStatusEnum.UPDATED ||
+                        openPositionData.status == StreamingStatusEnum.AMENDED)
+                    {
+                        iGApiDbContext.SaveOpenPosition(openPositionData, accountId);
+                    }
+                    else if (
+                        openPositionData.status == StreamingStatusEnum.CLOSED ||
+                        openPositionData.status == StreamingStatusEnum.DELETED)
+                    {
+                        var openPosition = Task.Run(async () => await iGApiDbContext.OpenPositions.FindAsync(accountId, openPositionData.dealId)).Result;
+
+                        if (openPosition != null)
+                            iGApiDbContext.Remove(openPosition);
+
+                        //TODO: Notify GetTradeActivity
+                    }
+                }
+
+                static void SyncToDbWorkingOrders(
+                    StreamingStatusEnum status,
+                    dto.endpoint.workingorders.get.v2.WorkingOrderData WorkingOrderData,
+                    string accountId,
+                    IGApiDbContext iGApiDbContext)
+                {
+                    _ = iGApiDbContext.WorkingOrders ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.WorkingOrders));
+
+                    if (
+                        status == StreamingStatusEnum.OPEN ||
+                        status == StreamingStatusEnum.UPDATED ||
+                        status == StreamingStatusEnum.AMENDED)
+                    {
+                        iGApiDbContext.SaveWorkingOrder(WorkingOrderData, accountId);
+                    }
+                    else if (
+                        status == StreamingStatusEnum.CLOSED ||
+                        status == StreamingStatusEnum.DELETED)
+                    {
+                        var WorkingOrder = Task.Run(async () => await iGApiDbContext.WorkingOrders.FindAsync(accountId, WorkingOrderData.dealId)).Result;
+
+                        if (WorkingOrder != null)
+                            iGApiDbContext.Remove(WorkingOrder);
+
+                        //TODO: Notify GetTradeActivity
+                    }
                 }
             }
         }

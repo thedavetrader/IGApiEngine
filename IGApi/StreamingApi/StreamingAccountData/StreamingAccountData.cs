@@ -10,6 +10,7 @@ namespace IGApi
     {
         private SubscribedTableKey? _accountBalanceStk = null;
         private AccountDetailsTableListerner? _streamingAccountData;
+
         private void SubscribeToAccountDetails()
         {
             try

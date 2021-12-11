@@ -1,6 +1,6 @@
 ﻿using IGApi.Common;
 
-namespace IGApi
+namespace IGApi.IGApi.StreamingApi.StreamingTickData.EpicStreamListItem
 {
     /// <summary>
     /// This object holds Epic data, that is formed such that it can be serialized and deserialized to and from JSON RestQueueParameter.
@@ -13,7 +13,8 @@ namespace IGApi
 
         private bool _sourceWorkingOrders;
 
-        public enum EpicStreamListItemSource {
+        public enum EpicStreamListItemSource
+        {
             SourceOpenPositions,
             SourceWorkingOrders,
             None
@@ -54,7 +55,7 @@ namespace IGApi
 
         public bool IsSource(EpicStreamListItemSource epicStreamListItemSource)
         {
-            return 
+            return
                 epicStreamListItemSource == EpicStreamListItemSource.SourceOpenPositions && _sourceOpenPositions ||
                 epicStreamListItemSource == EpicStreamListItemSource.SourceWorkingOrders && _sourceWorkingOrders;
         }

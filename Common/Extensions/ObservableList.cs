@@ -1,4 +1,4 @@
-﻿namespace IGApi.Common
+﻿namespace IGApi.Common.Extensions
 {
     public class ObservableList<T> : List<T>
     {

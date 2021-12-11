@@ -3,6 +3,7 @@ using IGApi;
 using IGApi.Model;
 using IGApi.Common;
 using IGWebApiClient;
+using IGApi.Common.Extensions;
 
 namespace IGApi.RestRequest
 {

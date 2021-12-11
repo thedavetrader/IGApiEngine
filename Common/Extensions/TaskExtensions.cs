@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IGApi.Common
+namespace IGApi.Common.Extensions
 {
     internal static class Extensions
     {

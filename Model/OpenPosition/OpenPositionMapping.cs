@@ -18,15 +18,17 @@ namespace IGApi.Model
                 Epic = epic;
                 ContractSize = openPositionData.contractSize;
                 ControlledRisk = openPositionData.controlledRisk;
-                CreatedDateUtc = DateTime.ParseExact(
+                CreatedDateUtc = openPositionData.createdDateUTC is null ?
+                    CreatedDateUtc :
+                    DateTime.ParseExact(
                     openPositionData.createdDateUTC,
                     "yyyy-MM-dd'T'HH:mm:ss",
                     CultureInfo.InvariantCulture,
                     DateTimeStyles.AssumeUniversal |
                     DateTimeStyles.AdjustToUniversal);
-                Currency = openPositionData.currency;
-                DealId = openPositionData.dealId;
-                Direction = openPositionData.direction;
+                Currency = openPositionData.currency ?? Currency;
+                DealId = openPositionData.dealId ?? DealId;
+                Direction = openPositionData.direction ?? Direction;
                 Level = openPositionData.level;
                 LimitLevel = openPositionData.limitLevel;
                 Size = openPositionData.size;
@@ -47,18 +49,14 @@ namespace IGApi.Model
                 Epic = lsTradeSubscriptionData.epic;
                 DealId = lsTradeSubscriptionData.dealId;
                 Direction = lsTradeSubscriptionData.direction.ToString() ?? "[ERROR] Direction unknown.";
-
                 decimal.TryParse(lsTradeSubscriptionData.level, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out decimal level);
                 Level = level;
-
                 decimal.TryParse(lsTradeSubscriptionData.limitLevel, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out decimal limitLevel);
-                LimitLevel = limitLevel;
-
+                LimitLevel = limitLevel == 0 ? null : limitLevel;
                 decimal.TryParse(lsTradeSubscriptionData.size, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out decimal size);
                 Size = size;
-
                 decimal.TryParse(lsTradeSubscriptionData.stopLevel, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out decimal stopLevel);
-                StopLevel = stopLevel;
+                StopLevel = stopLevel == 0 ? null : stopLevel;
                 ApiLastUpdate = DateTime.UtcNow;
             }
         }

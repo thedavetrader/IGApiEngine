@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using IGApi.Common;
-using IGWebApiClient;
 using dto.endpoint.workingorders.get.v2;
+using IGApi.Common;
 
 namespace IGApi.Model
 {

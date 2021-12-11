@@ -1,5 +1,7 @@
 ﻿using System.Globalization;
 using IGApi.Common;
+using IGApi.Common.Extensions;
+using IGApi.IGApi.StreamingApi.StreamingTickData.EpicStreamListItem;
 using IGApi.Model;
 using IGWebApiClient;
 using Lightstreamer.DotNet.Client;

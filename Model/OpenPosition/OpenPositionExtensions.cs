@@ -2,6 +2,7 @@
 using IGApi.Common;
 using IGWebApiClient;
 using dto.endpoint.positions.get.otc.v2;
+using System.Diagnostics;
 
 namespace IGApi.Model
 {
@@ -40,6 +41,10 @@ namespace IGApi.Model
                 openPosition.MapProperties(lsTradeSubscriptionData, accountId);
             else
                 openPosition = iGApiDbContext.OpenPositions.Add(new OpenPosition(lsTradeSubscriptionData, accountId)).Entity;
+
+            //TODO:     ZEROPRIO Example of ChangeTracker.DebugView Just for reference.
+            iGApiDbContext.ChangeTracker.DetectChanges();
+            Debug.WriteLine(iGApiDbContext.ChangeTracker.DebugView.LongView);
 
             return openPosition;
         }

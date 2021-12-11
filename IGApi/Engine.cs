@@ -51,7 +51,7 @@ namespace IGApi
             StreamingTickDataInit();
             StreamingTradeDataInit();
 
-            Task.Run(()=> IGApi.RestRequest.QueueEngine.Start());
+            Task.Run(()=> RestRequest.QueueEngine.Start());
 
         }
     }

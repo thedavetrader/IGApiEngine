@@ -16,6 +16,7 @@ namespace IGApi.RestRequest
             int _cycleCount;
 
             InitResQueueItems();
+            InitCleanWorkOrdersAndOpenPositions();
 
             Log.WriteLine("QueueEngine is listening for restrequests.");
 
@@ -90,6 +91,28 @@ namespace IGApi.RestRequest
             }
         }
 
+        /// <summary>
+        /// Open positions and working orders could be changed during the time the API was not running. 
+        /// Therefor assume the current state invalid and regard them as obsolete and to be removed.
+        /// </summary>
+        /// <exception cref="DBContextNullReferenceException"></exception>
+        private static void InitCleanWorkOrdersAndOpenPositions()
+        {
+            using IGApiDbContext iGApiDbContext = new();
+            
+            _ = iGApiDbContext.WorkingOrders ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.WorkingOrders));
+            
+            _ = iGApiDbContext.OpenPositions ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.OpenPositions));
+
+            iGApiDbContext.WorkingOrders.RemoveRange(iGApiDbContext.WorkingOrders);
+            iGApiDbContext.OpenPositions.RemoveRange(iGApiDbContext.OpenPositions);
+
+            Task.Run(async ()=> await iGApiDbContext.SaveChangesAsync()).Wait();
+        }
+
+        /// <summary>
+        /// Make sure essential details are queued to recurrently refresh.
+        /// </summary>
         private static void InitResQueueItems()
         {
             QueueQueueItem.QueueItem(nameof(RestRequest.GetAccountDetails), false, true);

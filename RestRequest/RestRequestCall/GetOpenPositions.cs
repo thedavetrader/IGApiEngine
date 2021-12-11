@@ -1,4 +1,5 @@
 ﻿using IGApi.Common;
+using IGApi.IGApi.StreamingApi.StreamingTickData.EpicStreamListItem;
 using IGApi.Model;
 using Newtonsoft.Json;
 
@@ -40,6 +41,8 @@ namespace IGApi.RestRequest
                             Formatting.None);
 
                         QueueQueueItem.QueueItem(nameof(RestRequest.GetEpicDetails), true, false, jsonParameters);
+
+                        //TODO: Notify GetTradeActivity
                     }
                 }
             }
@@ -66,15 +69,15 @@ namespace IGApi.RestRequest
                                 iGApiDbContext.SaveEpicTick(OpenPosition.market);
                         }
                     });
-
-                    //  Remove closed positions (no longer existing).
-                    iGApiDbContext.OpenPositions.RemoveRange(
-                        iGApiDbContext.OpenPositions
-                            .Where(w => w.AccountId == currentAccountId).ToList()   // Use ToList() to prevent that Linq constructs a predicate that can not be sent to db.
-                            .Where(a => !currentApiOpenPositions.Any(b => b.position.dealId == a.DealId)));
-
-                    Task.Run(async () => await iGApiDbContext.SaveChangesAsync()).Wait();  // Use wait to prevent the Task object is disposed while still saving the changes.
                 }
+
+                //  Remove closed positions (no longer existing).
+                iGApiDbContext.OpenPositions.RemoveRange(
+                    iGApiDbContext.OpenPositions
+                        .Where(w => w.AccountId == currentAccountId).ToList()   // Use ToList() to prevent that Linq constructs a predicate that can not be sent to db.
+                        .Where(a => !currentApiOpenPositions.Any(b => b.position.dealId == a.DealId)));
+
+                Task.Run(async () => await iGApiDbContext.SaveChangesAsync()).Wait();  // Use wait to prevent the Task object is disposed while still saving the changes.
             }
 
             void SyncToEpicStreamList(List<dto.endpoint.positions.get.otc.v2.OpenPosition> currentApiOpenPositions)
