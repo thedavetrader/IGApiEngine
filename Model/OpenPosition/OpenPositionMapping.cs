@@ -36,6 +36,7 @@ namespace IGApi.Model
                 TrailingStep = openPositionData.trailingStep;
                 TrailingStopDistance = openPositionData.trailingStopDistance;
                 ApiLastUpdate = DateTime.UtcNow;
+                DealReference = openPositionData.dealReference;
             }
         }        
         
@@ -58,6 +59,7 @@ namespace IGApi.Model
                 decimal.TryParse(lsTradeSubscriptionData.stopLevel, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out decimal stopLevel);
                 StopLevel = stopLevel == 0 ? null : stopLevel;
                 ApiLastUpdate = DateTime.UtcNow;
+                DealReference = lsTradeSubscriptionData.dealReference;
             }
         }
     }

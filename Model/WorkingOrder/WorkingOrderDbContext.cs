@@ -7,6 +7,8 @@ namespace IGApi.Model
         public DbSet<WorkingOrder>? WorkingOrders { get; set; }
         public static void WorkingOrderOnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<WorkingOrder>().Property(p => p.DealId).HasMaxLength(64);
+
             modelBuilder.Entity<WorkingOrder>()
                 .HasKey(p => new
                 {

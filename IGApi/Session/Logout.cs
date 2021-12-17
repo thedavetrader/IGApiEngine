@@ -11,22 +11,31 @@ namespace IGApi
 
         private void Logout()
         {
-            try
+            if (isSessionFunctionsAvailable)
             {
-                if (IGRestApiClient is not null)
-                {
-                    UnsubscribeFromAccountDetails();
-                    UnsubscribeFromTradeDetails();
-                    UnsubscribeFromAllEpicTick();
-                    IGRestApiClient.logout();
 
-                    Log.WriteLine("Logged out");
+                try
+                {
+                    isSessionFunctionsAvailable = false;
+
+                    if (IGRestApiClient is not null)
+                    {
+                        UnsubscribeFromAccountDetails();
+                        UnsubscribeFromTradeDetails();
+                        UnsubscribeFromAllEpicTick();
+                        IGRestApiClient.logout();
+                        Log.WriteLine("Logged out");
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                Log.WriteException(ex, nameof(Logout));
-                throw;
+                catch (Exception ex)
+                {
+                    Log.WriteException(ex, nameof(Logout));
+                    throw;
+                }
+                finally
+                {
+                    isSessionFunctionsAvailable = true;
+                }
             }
         }
     }

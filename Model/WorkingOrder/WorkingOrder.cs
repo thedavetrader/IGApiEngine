@@ -51,7 +51,7 @@ namespace IGApi.Model
         public decimal? LimitDistance { get; set; }
 
         [Column("currency_code")]
-        public string CurrencyCode { get; set; }
+        public string? CurrencyCode { get; set; }
 
         [Column("dma")]
         public bool Dma { get; set; }

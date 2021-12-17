@@ -11,6 +11,7 @@
 
         /// <summary>
         /// When the source is in string format and represents the local (as is known by IG) client time.
+        /// Do not use to construct DateTime, this function does not offset for date.
         /// </summary>
         /// <param name="time"></param>
         /// <returns></returns>

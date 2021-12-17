@@ -14,20 +14,6 @@ namespace IGApi.Model
                 {
                     p.Epic
                 });
-
-
-
-            //modelBuilder.Entity<EpicDetail>()
-            //    .HasMany<EpicDetailSpecialInfo>(p => p.SpecialInfo)
-            //    .WithOne(p => p.EpicDetail);
-
-            //modelBuilder.Entity<EpicDetail>()
-            //    .HasMany<EpicDetailCurrency>(p => p.Currency)
-            //    .WithOne(p => p.EpicDetail);
-
-            //modelBuilder.Entity<EpicDetail>()
-            //    .HasMany<EpicDetailMarginDepositBand>(p => p.MarginDepositBand)
-            //    .WithOne(p => p.EpicDetail);
         }
     }
 }

@@ -5,7 +5,7 @@ namespace IGApi.Model
     public partial class IGApiDbContext
     {
         public DbSet<EpicTick>? EpicTicks { get; set; }
-        public static void TickOnModelCreating(ModelBuilder modelBuilder)
+        public static void EpicTickOnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<EpicTick>().IsMemoryOptimized(true);
 

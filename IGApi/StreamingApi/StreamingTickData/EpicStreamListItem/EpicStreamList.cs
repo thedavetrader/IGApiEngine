@@ -40,7 +40,7 @@ namespace IGApi
                                 isChanged = true;
                             }
                             else
-                                syncEpicStreamListItems.Remove(epic);
+                                isChanged = syncEpicStreamListItems.Remove(epic);
                         });
                     }
                 }
@@ -56,10 +56,7 @@ namespace IGApi
                             epicStreamListItem.SetSource(epicStreamListItemSource, false);
                         }
                         else // Implicitly assume that if it is not multiUse, it must be used by the source caller of SyncEpicStreamListItems
-                        {
-                            EpicStreamList.Remove(epicStreamListItem);
-                            isChanged = true;
-                        }
+                            isChanged = EpicStreamList.Remove(epicStreamListItem);
                     });
 
                 //  Notify change once list is properly updated.
@@ -83,19 +80,20 @@ namespace IGApi
         {
             lock (EpicStreamList)
             {
-                EpicStreamList.Remove(epicStreamListItem);
-
-                EpicStreamList.NotifyChange();
+                if (EpicStreamList.Remove(epicStreamListItem))
+                    EpicStreamList.NotifyChange();
             }
         }
 
         public void RemoveEpicStreamListItems(IEnumerable<EpicStreamListItem> epicStreamListItems)
         {
-            lock (EpicStreamList)
+            if (epicStreamListItems.Any())
             {
-                EpicStreamList.RemoveAll(r => epicStreamListItems.Any(a => a.Epic == r.Epic));
-
-                EpicStreamList.NotifyChange();
+                lock (EpicStreamList)
+                {
+                    if (EpicStreamList.RemoveAll(r => epicStreamListItems.Any(a => a.Epic == r.Epic)) > 0)
+                        EpicStreamList.NotifyChange();
+                }
             }
         }
 

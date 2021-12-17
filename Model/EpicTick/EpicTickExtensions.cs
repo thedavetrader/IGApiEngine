@@ -14,14 +14,14 @@ namespace IGApi.Model
         {
             _ = iGApiDbContext.EpicTicks ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.EpicTicks));
 
-            var epicTick = Task.Run(async () => await iGApiDbContext.EpicTicks.FindAsync(epic)).Result;
+            var currentEpicTick = Task.Run(async () => await iGApiDbContext.EpicTicks.FindAsync(epic)).Result;
 
-            if (epicTick is not null)
-                epicTick.MapProperties(l1LsPriceData, epic);
+            if (currentEpicTick is not null)
+                currentEpicTick.MapProperties(l1LsPriceData, epic);
             else
-                epicTick = iGApiDbContext.EpicTicks.Add(new EpicTick(l1LsPriceData, epic)).Entity;
+                currentEpicTick = iGApiDbContext.EpicTicks.Add(new EpicTick(l1LsPriceData, epic)).Entity;
 
-            return epicTick;
+            return currentEpicTick;
         }
         
         public static EpicTick? SaveEpicTick(
@@ -33,14 +33,14 @@ namespace IGApi.Model
 
             var epic = marketData.epic;
 
-            var epicTick = Task.Run(async () => await iGApiDbContext.EpicTicks.FindAsync(epic)).Result;
+            var currentEpicTick = Task.Run(async () => await iGApiDbContext.EpicTicks.FindAsync(epic)).Result;
 
-            if (epicTick is not null)
-                epicTick.MapProperties(marketData);
+            if (currentEpicTick is not null)
+                currentEpicTick.MapProperties(marketData);
             else
-                epicTick = iGApiDbContext.EpicTicks.Add(new EpicTick(marketData)).Entity;
+                currentEpicTick = iGApiDbContext.EpicTicks.Add(new EpicTick(marketData)).Entity;
 
-            return epicTick;
+            return currentEpicTick;
         }        
 
         public static EpicTick? SaveEpicTick(
@@ -52,14 +52,14 @@ namespace IGApi.Model
 
             var epic = marketData.epic;
 
-            var epicTick = Task.Run(async () => await iGApiDbContext.EpicTicks.FindAsync(epic)).Result;
+            var currentEpicTick = Task.Run(async () => await iGApiDbContext.EpicTicks.FindAsync(epic)).Result;
 
-            if (epicTick is not null)
-                epicTick.MapProperties(marketData);
+            if (currentEpicTick is not null)
+                currentEpicTick.MapProperties(marketData);
             else
-                epicTick = iGApiDbContext.EpicTicks.Add(new EpicTick(marketData)).Entity;
+                currentEpicTick = iGApiDbContext.EpicTicks.Add(new EpicTick(marketData)).Entity;
 
-            return epicTick;
+            return currentEpicTick;
         }
 
     }

@@ -14,32 +14,14 @@ namespace IGApi.Model
         {
             _ = iGApiDbContext.WorkingOrders ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.WorkingOrders));
 
-            var WorkingOrder = Task.Run(async () => await iGApiDbContext.WorkingOrders.FindAsync(accountId, WorkingOrderData.dealId)).Result;
+            var currentWorkingOrder = Task.Run(async () => await iGApiDbContext.WorkingOrders.FindAsync(accountId, WorkingOrderData.dealId)).Result;
 
-            if (WorkingOrder is not null)
-                WorkingOrder.MapProperties(WorkingOrderData, accountId);
+            if (currentWorkingOrder is not null)
+                currentWorkingOrder.MapProperties(WorkingOrderData, accountId);
             else
-                WorkingOrder = iGApiDbContext.WorkingOrders.Add(new WorkingOrder(WorkingOrderData, accountId)).Entity;
+                currentWorkingOrder = iGApiDbContext.WorkingOrders.Add(new WorkingOrder(WorkingOrderData, accountId)).Entity;
 
-            return WorkingOrder;
+            return currentWorkingOrder;
         }
-
-        //public static WorkingOrder? SaveWorkingOrder(
-        //[NotNullAttribute] this IGApiDbContext iGApiDbContext,
-        //[NotNullAttribute] LsTradeSubscriptionData lsTradeSubscriptionData,
-        //[NotNullAttribute] string accountId
-        //)
-        //{
-        //    _ = iGApiDbContext.WorkingOrders ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.WorkingOrders));
-
-        //    var WorkingOrder = Task.Run(async () => await iGApiDbContext.WorkingOrders.FindAsync(accountId, lsTradeSubscriptionData.dealId)).Result;
-
-        //    if (WorkingOrder is not null)
-        //        WorkingOrder.MapProperties(lsTradeSubscriptionData, accountId);
-        //    else
-        //        WorkingOrder = iGApiDbContext.WorkingOrders.Add(new WorkingOrder(lsTradeSubscriptionData, accountId)).Entity;
-
-        //    return WorkingOrder;
-        //}
     }
 }

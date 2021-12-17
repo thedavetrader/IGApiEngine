@@ -16,8 +16,12 @@ namespace IGApi.Common
 
     internal class RestCallHttpRequestException : HttpRequestException
     {
+        public RestCallHttpRequestException(string? message) : base(message)
+        {
+        }
+
         internal RestCallHttpRequestException(string restCall, HttpStatusCode httpStatusCode) 
-            : base($"The restcall \"{restCall}\" failed. Check internet connection or IG api service status.", null, httpStatusCode) { }
+            : base($"The restcall \"{restCall}\" failed. Check internet connection or IG api service status. HttpStatusCode: \"{httpStatusCode}\".", null, httpStatusCode) { }
     }
 
     internal class RestCallNullReferenceException : NullReferenceException
@@ -35,6 +39,11 @@ namespace IGApi.Common
     {
         internal EssentialPropertyNullReferenceException(string property)
             : base($"The essential property \"{property}\" is empty.") { }
+    }
+    internal class EssentialPropertyInvalidCastException : InvalidCastException
+    {
+        internal EssentialPropertyInvalidCastException(string property)
+            : base($"The essential property \"{property}\" could not be casted.") { }
     }
     internal class InvalidRestRequestMissingParametersException : Exception
     {

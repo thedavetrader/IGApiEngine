@@ -42,21 +42,7 @@ namespace IGApi.Model
             _ = Direction ?? throw new EssentialPropertyNullReferenceException(nameof(Direction));
             _ = TimeInForce ?? throw new EssentialPropertyNullReferenceException(nameof(TimeInForce));
             _ = OrderType ?? throw new EssentialPropertyNullReferenceException(nameof(OrderType));
-            _ = CurrencyCode ?? throw new EssentialPropertyNullReferenceException(nameof(CurrencyCode));
         }
-
-        //public WorkingOrder(
-        //    [NotNullAttribute] LsTradeSubscriptionData lsTradeSubscriptionData,
-        //    [NotNullAttribute] string accountId
-        //    )
-        //{
-        //    MapProperties(lsTradeSubscriptionData, accountId);
-
-        //    _ = AccountId ?? throw new PrimaryKeyNullReferenceException(nameof(AccountId));
-        //    _ = Epic ?? throw new EssentialPropertyNullReferenceException(nameof(Epic));
-        //    _ = DealId ?? throw new EssentialPropertyNullReferenceException(nameof(DealId));
-        //    _ = Direction ?? throw new EssentialPropertyNullReferenceException(nameof(Direction));
-        //    _ = Currency ?? throw new EssentialPropertyNullReferenceException(nameof(Currency));
-        //}
+       
     }
 }

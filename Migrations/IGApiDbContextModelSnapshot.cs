@@ -115,6 +115,280 @@ namespace IGApi.Migrations
                     b.ToTable("account");
                 });
 
+            modelBuilder.Entity("IGApi.Model.ActivityHistory", b =>
+                {
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("timestamp");
+
+                    b.Property<string>("DealId")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)")
+                        .HasColumnName("deal_id");
+
+                    b.Property<string>("ActionStatus")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("action_status");
+
+                    b.Property<string>("Activity")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("activity");
+
+                    b.Property<string>("ActivityHistoryId")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("activity_history_id");
+
+                    b.Property<string>("Channel")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("channel");
+
+                    b.Property<string>("Currency")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("currency");
+
+                    b.Property<string>("Epic")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("epic");
+
+                    b.Property<decimal?>("Level")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("level");
+
+                    b.Property<decimal?>("Limit")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("limit");
+
+                    b.Property<string>("MarketName")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("market_name");
+
+                    b.Property<string>("Period")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("period");
+
+                    b.Property<string>("Reference")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("reference");
+
+                    b.Property<string>("Result")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("result");
+
+                    b.Property<string>("Size")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("size");
+
+                    b.Property<decimal?>("Stop")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("stop");
+
+                    b.Property<string>("StopType")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("stop_type");
+
+                    b.HasKey("Timestamp", "DealId");
+
+                    b.ToTable("activity_history");
+                });
+
+            modelBuilder.Entity("IGApi.Model.ApiRequestQueueItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<bool>("ExecuteAsap")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false)
+                        .HasColumnName("execute_asap");
+
+                    b.Property<bool>("IsRecurrent")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_recurrent");
+
+                    b.Property<string>("Parameters")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("parameter");
+
+                    b.Property<string>("RestRequest")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("nvarchar(512)")
+                        .HasColumnName("rest_request");
+
+                    b.Property<DateTime>("Timestamp")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasColumnName("timestamp")
+                        .HasDefaultValueSql("getutcdate()");
+
+                    b.HasKey("Id");
+
+                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("Id"), false);
+
+                    b.HasIndex("ExecuteAsap", "Timestamp");
+
+                    SqlServerIndexBuilderExtensions.IsClustered(b.HasIndex("ExecuteAsap", "Timestamp"), false);
+
+                    b.ToTable("api_request_queue_item");
+
+                    SqlServerEntityTypeBuilderExtensions.IsMemoryOptimized(b);
+
+                    b.HasCheckConstraint("rest_request", "rest_request in ('GetAccountDetails','GetOpenPositions','GetWorkingOrders','GetActivityHistory','GetTransactionHistory','GetClientSentiment','CreatePosition','EditPosition','ClosePosition','CreateWorkingOrder','EditWorkingOrder','DeleteWorkingOrder','GetEpicDetails')");
+                });
+
+            modelBuilder.Entity("IGApi.Model.ClientSentiment", b =>
+                {
+                    b.Property<string>("MarketId")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("market_id");
+
+                    b.Property<DateTime>("ApiLastUpdate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("api_last_update");
+
+                    b.Property<decimal?>("LongPositionPercentage")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("long_position_percentage");
+
+                    b.Property<decimal?>("ShortPositionPercentage")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("short_position_percentage");
+
+                    b.HasKey("MarketId");
+
+                    b.ToTable("client_sentiment");
+                });
+
+            modelBuilder.Entity("IGApi.Model.ConfirmResponse", b =>
+                {
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("timestamp");
+
+                    b.Property<string>("DealReference")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)")
+                        .HasColumnName("deal_reference");
+
+                    b.Property<string>("AffectedDeals")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("affected_deals");
+
+                    b.Property<string>("DealId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)")
+                        .HasColumnName("deal_id");
+
+                    b.Property<string>("DealStatus")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("deal_status");
+
+                    b.Property<string>("Direction")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("direction");
+
+                    b.Property<string>("Epic")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("epic");
+
+                    b.Property<string>("Expiry")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("expiry");
+
+                    b.Property<bool>("GuaranteedStop")
+                        .HasColumnType("bit")
+                        .HasColumnName("guaranteed_stop");
+
+                    b.Property<decimal?>("Level")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("level");
+
+                    b.Property<decimal?>("LimitDistance")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("limit_distance");
+
+                    b.Property<decimal?>("LimitLevel")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("limit_level");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("reason");
+
+                    b.Property<decimal?>("Size")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("size");
+
+                    b.Property<string>("Status")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("status");
+
+                    b.Property<decimal?>("StopDistance")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("stop_distance");
+
+                    b.Property<decimal?>("StopLevel")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("stop_level");
+
+                    b.HasKey("Timestamp", "DealReference");
+
+                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("Timestamp", "DealReference"), false);
+
+                    b.ToTable("confirm_response");
+
+                    SqlServerEntityTypeBuilderExtensions.IsMemoryOptimized(b);
+                });
+
             modelBuilder.Entity("IGApi.Model.Currency", b =>
                 {
                     b.Property<string>("Code")
@@ -174,6 +448,66 @@ namespace IGApi.Migrations
                         .HasMaxLength(4000)
                         .HasColumnType("nvarchar(4000)")
                         .HasColumnName("country");
+
+                    b.Property<string>("DealingRuleMarketOrderPreference")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("dealing_rule_market_order_preference");
+
+                    b.Property<string>("DealingRuleTrailingStopsPreference")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("dealing_rule_trailing_stop_preference");
+
+                    b.Property<string>("DealingRuleUnitMaxStopOrLimitDistance")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("dealing_rule_unit_max_stop_or_limit_distance");
+
+                    b.Property<string>("DealingRuleUnitMinControlledRiskStopDistance")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("dealing_rule_unit_min_controlled_risk_stop_distance");
+
+                    b.Property<string>("DealingRuleUnitMinDealSize")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("dealing_rule_unit_min_deal_size");
+
+                    b.Property<string>("DealingRuleUnitMinNormalStopOrLimitDistance")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("dealing_rule_unit_min_normal_stop_or_limit_distance");
+
+                    b.Property<string>("DealingRuleUnitMinStepDistance")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("dealing_rule_unit_min_step_distance");
+
+                    b.Property<decimal?>("DealingRuleValueMaxStopOrLimitDistance")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("dealing_rule_value_max_stop_or_limit_distance");
+
+                    b.Property<decimal?>("DealingRuleValueMinControlledRiskStopDistance")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("dealing_rule_value_min_controlled_risk_stop_distance");
+
+                    b.Property<decimal?>("DealingRuleValueMinDealSize")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("dealing_rule_value_min_deal_size");
+
+                    b.Property<decimal?>("DealingRuleValueMinNormalStopOrLimitDistance")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("dealing_rule_value_min_normal_stop_or_limit_distance");
+
+                    b.Property<decimal?>("DealingRuleValueMinStepDistance")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("dealing_rule_value_min_step_distance");
 
                     b.Property<string>("Expiry")
                         .IsRequired()
@@ -466,8 +800,8 @@ namespace IGApi.Migrations
                         .HasColumnName("account_id");
 
                     b.Property<string>("DealId")
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)")
                         .HasColumnName("deal_id");
 
                     b.Property<DateTime>("ApiLastUpdate")
@@ -492,6 +826,12 @@ namespace IGApi.Migrations
                         .HasMaxLength(4000)
                         .HasColumnType("nvarchar(4000)")
                         .HasColumnName("currency");
+
+                    b.Property<string>("DealReference")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("deal_reference");
 
                     b.Property<string>("Direction")
                         .IsRequired()
@@ -540,57 +880,67 @@ namespace IGApi.Migrations
                     b.ToTable("open_position");
                 });
 
-            modelBuilder.Entity("IGApi.Model.RestRequestQueue", b =>
+            modelBuilder.Entity("IGApi.Model.TransactionHistory", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("date");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<bool>("ExecuteAsap")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false)
-                        .HasColumnName("execute_asap");
-
-                    b.Property<bool>("IsRecurrent")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false)
-                        .HasColumnName("is_recurrent");
-
-                    b.Property<string>("Parameters")
+                    b.Property<string>("Reference")
                         .HasMaxLength(4000)
                         .HasColumnType("nvarchar(4000)")
-                        .HasColumnName("parameter");
+                        .HasColumnName("reference");
 
-                    b.Property<string>("RestRequest")
+                    b.Property<bool>("CashTransaction")
+                        .HasColumnType("bit")
+                        .HasColumnName("cash_transaction");
+
+                    b.Property<decimal?>("CloseLevel")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("close_level");
+
+                    b.Property<string>("Currency")
                         .IsRequired()
-                        .HasMaxLength(512)
-                        .HasColumnType("nvarchar(512)")
-                        .HasColumnName("rest_request");
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("currency");
 
-                    b.Property<DateTime>("Timestamp")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasColumnName("timestamp")
-                        .HasDefaultValueSql("getutcdate()");
+                    b.Property<string>("InstrumentName")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("instrument_name");
 
-                    b.HasKey("Id");
+                    b.Property<decimal?>("OpenLevel")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("open_level");
 
-                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("Id"), false);
+                    b.Property<string>("Period")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("period");
 
-                    b.HasIndex("ExecuteAsap", "Timestamp");
+                    b.Property<decimal>("ProfitAndLoss")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("profit_and_loss");
 
-                    SqlServerIndexBuilderExtensions.IsClustered(b.HasIndex("ExecuteAsap", "Timestamp"), false);
+                    b.Property<decimal?>("Size")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("size");
 
-                    b.ToTable("rest_request_queue");
+                    b.Property<string>("TransactionType")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("transaction_type");
 
-                    SqlServerEntityTypeBuilderExtensions.IsMemoryOptimized(b);
+                    b.HasKey("Date", "Reference");
 
-                    b.HasCheckConstraint("rest_request", "rest_request in ('GetAccountDetails','GetOpenPositions','GetWorkingOrders','GetEpicDetails')");
+                    b.ToTable("transaction_history");
                 });
 
             modelBuilder.Entity("IGApi.Model.WorkingOrder", b =>
@@ -601,8 +951,8 @@ namespace IGApi.Migrations
                         .HasColumnName("account_id");
 
                     b.Property<string>("DealId")
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)")
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)")
                         .HasColumnName("deal_id");
 
                     b.Property<DateTime>("ApiLastUpdate")
@@ -614,7 +964,6 @@ namespace IGApi.Migrations
                         .HasColumnName("created_date");
 
                     b.Property<string>("CurrencyCode")
-                        .IsRequired()
                         .HasMaxLength(4000)
                         .HasColumnType("nvarchar(4000)")
                         .HasColumnName("currency_code");

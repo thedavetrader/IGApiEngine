@@ -1,6 +1,7 @@
 ﻿using System.Collections.Specialized;
 using System.Configuration;
 using IGApi.Common;
+using IGApi.Common.Extensions;
 using IGWebApiClient;
 
 namespace IGApi
@@ -49,10 +50,9 @@ namespace IGApi
             }
 
             StreamingTickDataInit();
-            StreamingTradeDataInit();
+            StreamingTradeDetailsInit();
 
-            Task.Run(()=> RestRequest.QueueEngine.Start());
-
+            new Task(() => RestRequest.ApiRequestQueueEngine.Start()).FireAndForget();
         }
     }
 }

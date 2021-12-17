@@ -43,31 +43,13 @@ namespace IGApi.Model
         public int SprintMarketsMinimumExpiryTime { get; set; }
 
         [Column("sprintmarket_maximum_expiry_time")]
-        public int SprintMarketsMaximumExpiryTime { get; set; }		
+        public int SprintMarketsMaximumExpiryTime { get; set; }
 
         [Column("margin_factor")]
         public decimal? MarginFactor { get; set; }
 
         [Column("margin_factor_unit")]
         public string MarginFactorUnit { get; set; } = Constants.PropertyNullError;
-
-        [Column("slippage_factor_unit")]
-        public string? SlippageFactorUnit { get; set; }
-
-        [Column("slippage_factor_value")]
-        public decimal? SlippageFactorValue { get; set; }					
-
-        [Column("expiry_last_dealingdate")]
-        public DateTime? ExpirylastDealingDate { get; set; }
-
-        [Column("expiry_settlement_info")]
-        public string? ExpirysettlementInfo { get; set; }
-
-        [Column("last_rollover_time")]
-        public DateTime? LastRolloverTime { get; set; }
-        
-        [Column("rollover_info")]
-        public string? RolloverInfo { get; set; }
 
         [Column("news_code")]
         public string? NewsCode { get; set; } = Constants.PropertyNullError;
@@ -89,6 +71,70 @@ namespace IGApi.Model
 
         [Column("api_last_update")]
         public DateTime ApiLastUpdate { get; set; } = DateTime.UtcNow;
+
+        #region Class contained properties
+        #region ExpirtyDetails
+        [Column("expiry_last_dealingdate")]
+        public DateTime? ExpirylastDealingDate { get; set; }
+
+        [Column("expiry_settlement_info")]
+        public string? ExpirysettlementInfo { get; set; }
+        #endregion
+
+        #region SlippageFactor
+        [Column("slippage_factor_unit")]
+        public string? SlippageFactorUnit { get; set; }
+
+        [Column("slippage_factor_value")]
+        public decimal? SlippageFactorValue { get; set; }
+        #endregion
+
+        #region RolloverDetails
+        [Column("last_rollover_time")]
+        public DateTime? LastRolloverTime { get; set; }
+
+        [Column("rollover_info")]
+        public string? RolloverInfo { get; set; }
+        #endregion
+
+        #region DealingRules
+        [Column("dealing_rule_unit_min_step_distance")]
+        public string? DealingRuleUnitMinStepDistance { get; set; }
+
+        [Column("dealing_rule_unit_min_deal_size")]
+        public string? DealingRuleUnitMinDealSize { get; set; }
+        
+        [Column("dealing_rule_unit_min_controlled_risk_stop_distance")]
+        public string? DealingRuleUnitMinControlledRiskStopDistance { get; set; }
+        
+        [Column("dealing_rule_unit_min_normal_stop_or_limit_distance")]
+        public string? DealingRuleUnitMinNormalStopOrLimitDistance { get; set; }
+        
+        [Column("dealing_rule_unit_max_stop_or_limit_distance")]
+        public string? DealingRuleUnitMaxStopOrLimitDistance { get; set; }
+        
+        [Column("dealing_rule_value_min_step_distance")]
+        public decimal? DealingRuleValueMinStepDistance { get; set; }
+        
+        [Column("dealing_rule_value_min_deal_size")]
+        public decimal? DealingRuleValueMinDealSize { get; set; }
+        
+        [Column("dealing_rule_value_min_controlled_risk_stop_distance")]
+        public decimal? DealingRuleValueMinControlledRiskStopDistance { get; set; }
+        
+        [Column("dealing_rule_value_min_normal_stop_or_limit_distance")]
+        public decimal? DealingRuleValueMinNormalStopOrLimitDistance { get; set; }
+        
+        [Column("dealing_rule_value_max_stop_or_limit_distance")]
+        public decimal? DealingRuleValueMaxStopOrLimitDistance { get; set; }
+        
+        [Column("dealing_rule_market_order_preference")]
+        public string? DealingRuleMarketOrderPreference { get; set; }
+        
+        [Column("dealing_rule_trailing_stop_preference")]
+        public string? DealingRuleTrailingStopsPreference { get; set; }
+        #endregion
+        #endregion
 
         #region Childs
         public virtual List<EpicDetailMarginDepositBand>? MarginDepositBands { get; set; }

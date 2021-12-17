@@ -27,7 +27,7 @@
             AccountOnModelCreating(modelBuilder);
             IGRestRequestQueueOnModelCreating(modelBuilder);
             OpenPositionOnModelCreating(modelBuilder);
-            TickOnModelCreating(modelBuilder);
+            EpicTickOnModelCreating(modelBuilder);
             EpicDetailOnModelCreating(modelBuilder);
             EpicDetailSpecialInfoOnModelCreating(modelBuilder);
             EpicDetailCurrencyOnModelCreating(modelBuilder);
@@ -35,6 +35,10 @@
             EpicDetailOpeningHourOnModelCreating(modelBuilder);
             CurrencyOnModelCreating(modelBuilder);
             WorkingOrderOnModelCreating(modelBuilder);
+            ActivityOnModelCreating(modelBuilder);
+            TransactionOnModelCreating(modelBuilder);
+            ClientSentimentOnModelCreating(modelBuilder);
+            ConfirmResponseOnModelCreating(modelBuilder);
 
             //  Set default varchar(4000)
             foreach (var property in modelBuilder.Model.GetEntityTypes()

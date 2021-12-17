@@ -19,7 +19,10 @@ namespace IGApi.Model
 		
 		[Column("deal_id")]
 		public string DealId { get; set; }
-		
+
+		[Column("deal_reference")]
+		public string DealReference { get; set; }
+
 		[Column("created_date_utc")]
 		public DateTime CreatedDateUtc { get; set; }
 		

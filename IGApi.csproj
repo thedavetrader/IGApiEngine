@@ -1,5 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
+  <PropertyGroup>
+    <SSDTUnitTestPath Condition="'$(SSDTUnitTestPath)' == ''">$(VsInstallRoot)\Common7\IDE\Extensions\Microsoft\SQLDB</SSDTUnitTestPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <SSDTPath Condition="'$(SSDTPath)' == ''">$(VsInstallRoot)\Common7\IDE\Extensions\Microsoft\SQLDB\DAC</SSDTPath>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+  </PropertyGroup>
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -7,28 +15,26 @@
     <BaseIntermediateOutputPath>C:\Users\theda\source\builds\IGApi\obj\</BaseIntermediateOutputPath>
     <BaseOutputPath>C:\Users\theda\source\builds\IGApi\bin\</BaseOutputPath>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Remove="bin\**" />
     <Compile Remove="Model\IGApiAccountBalance\**" />
     <Compile Remove="Model\IGApiOpenPositions\**" />
     <Compile Remove="Model\IGApiStreamingAccountData\**" />
     <Compile Remove="obj\**" />
-    <Compile Remove="RestRequest\RestApi\**" />
+    <Compile Remove="ApiRequest\RestApi\**" />
     <EmbeddedResource Remove="bin\**" />
     <EmbeddedResource Remove="Model\IGApiAccountBalance\**" />
     <EmbeddedResource Remove="Model\IGApiOpenPositions\**" />
     <EmbeddedResource Remove="Model\IGApiStreamingAccountData\**" />
     <EmbeddedResource Remove="obj\**" />
-    <EmbeddedResource Remove="RestRequest\RestApi\**" />
+    <EmbeddedResource Remove="ApiRequest\RestApi\**" />
     <None Remove="bin\**" />
     <None Remove="Model\IGApiAccountBalance\**" />
     <None Remove="Model\IGApiOpenPositions\**" />
     <None Remove="Model\IGApiStreamingAccountData\**" />
     <None Remove="obj\**" />
-    <None Remove="RestRequest\RestApi\**" />
+    <None Remove="ApiRequest\RestApi\**" />
   </ItemGroup>
-
   <ItemGroup>
     <Compile Remove="Common\Extensions\ObservableCollectionExtension.cs" />
     <Compile Remove="Common\ObservableRangeCollection.cs" />
@@ -88,7 +94,6 @@
     <Compile Remove="Migrations\20211208103723_EpicDetailCurrency_v2.0.Designer.cs" />
     <Compile Remove="Model\ModelExtensions.cs" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="6.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.0" />
@@ -97,22 +102,39 @@
     <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
     <PackageReference Include="Validation" Version="2.5.42" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\ig-webapi-dotnet-sample\IGWebApiClient\IGWebApiClient.csproj">
       <CopyLocal>True</CopyLocal>
       <CopyLocalSatelliteAssemblies>True</CopyLocalSatelliteAssemblies>
     </ProjectReference>
   </ItemGroup>
-
   <ItemGroup>
     <Reference Include="DotNetClient_N2">
       <HintPath>..\ig-webapi-dotnet-sample\packages\3rdPartyDlls\DotNetClient_N2.dll</HintPath>
     </Reference>
   </ItemGroup>
-
   <ItemGroup>
     <Folder Include="Migrations\" />
+    <Folder Include="SqlScripts\ApiRequest\WorkingOrder\" />
   </ItemGroup>
-
+  <ItemGroup />
+  <ItemGroup Condition="$(VisualStudioVersion) == '17.0'">
+    <Reference Include="Microsoft.Data.Tools.Schema.Sql, Version=15.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>$(SSDTPath)\Microsoft.Data.Tools.Schema.Sql.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Data.Tools.Schema.Sql.UnitTesting, Version=17.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>$(SSDTUnitTestPath)\Microsoft.Data.Tools.Schema.Sql.UnitTesting.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Microsoft.Data.Tools.Schema.Sql.UnitTestingAdapter, Version=17.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>$(SSDTUnitTestPath)\Microsoft.Data.Tools.Schema.Sql.UnitTestingAdapter.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <PropertyGroup>
+    <SsdtUnitTestVersion>3.1</SsdtUnitTestVersion>
+  </PropertyGroup>
+  <Import Project="$(SQLDBExtensionsRefPath)\Microsoft.Data.Tools.Schema.Sql.UnitTesting.targets" Condition="$(VisualStudioVersion) != '15.0' And '$(SQLDBExtensionsRefPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.Sql.UnitTesting.targets" Condition="$(VisualStudioVersion) != '15.0' And '$(SQLDBExtensionsRefPath)' == ''" />
 </Project>

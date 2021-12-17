@@ -21,8 +21,6 @@ namespace IGApi
             EpicStreamList.ListChanged += EpicStreamListChanged;
 
             _tickSubscription = new(this);
-
-            //   _tickSubscribedTableKey = null;
         }
 
         private void EpicStreamListChanged(object? sender, EventArgs e)
@@ -61,7 +59,7 @@ namespace IGApi
             {
                 _ = LoginSessionInformation ?? throw new NullReferenceException(nameof(LoginSessionInformation));
 
-                if (!string.IsNullOrEmpty(LoginSessionInformation.lightstreamerEndpoint))
+                if (!string.IsNullOrEmpty(LoginSessionInformation.lightstreamerEndpoint) && EpicStreamList.Any())
                 {
                     var subscribeEpicList = EpicStreamList.Select(e => e.Epic).Distinct().ToList();
 
@@ -73,8 +71,8 @@ namespace IGApi
                     Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatFourColumns, "[StreamingTickData]", "", "", "Epic"));
                     Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatFourColumns, "[StreamingTickData]", "", "", new string('_', 40)));
 
-                    foreach (var epic in EpicStreamList)
-                        Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatFourColumns, "[StreamingTickData]", "", "", epic.Epic));
+                    foreach (var epic in subscribeEpicList)
+                        Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatFourColumns, "[StreamingTickData]", "", "", epic));
 
                     Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatFourColumns, "[StreamingTickData]", "", "", ""));
                 }
@@ -123,10 +121,6 @@ namespace IGApi
 
                     using IGApiDbContext iGApiDbContext = new();
                     _ = iGApiDbContext.EpicTicks ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.EpicTicks));
-
-                    //TODO: ZEROPRIO Debug EpicTick
-                    //string debug = JsonConvert.SerializeObject(tickUpdate,Formatting.None);
-                    //Debug.WriteLine(debug);
 
                     iGApiDbContext.SaveEpicTick(tickUpdate, onUpdateEpic);
 

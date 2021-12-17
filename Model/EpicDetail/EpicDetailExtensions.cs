@@ -8,91 +8,98 @@ namespace IGApi.Model
     {
         public static EpicDetail? SaveEpicDetail(
             [NotNullAttribute] this IGApiDbContext iGApiDbContext,
-            [NotNullAttribute] InstrumentData instrumentData
+            [NotNullAttribute] InstrumentData instrumentData,
+            DealingRulesData? dealingRulesData
             )
         {
             _ = iGApiDbContext.EpicDetails ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.EpicDetails));
 
-            var epicDetail = Task.Run(async () => await iGApiDbContext.EpicDetails.FindAsync(instrumentData.epic)).Result;
+            var currentEpicDetail = Task.Run(async () => await iGApiDbContext.EpicDetails.FindAsync(instrumentData.epic)).Result;
 
-            if (epicDetail is not null)
-                epicDetail.MapProperties(instrumentData);
+            if (currentEpicDetail is not null)
+                currentEpicDetail.MapProperties(instrumentData, dealingRulesData);
             else
-                epicDetail = iGApiDbContext.EpicDetails.Add(new EpicDetail(instrumentData)).Entity;
+                currentEpicDetail = iGApiDbContext.EpicDetails.Add(new EpicDetail(instrumentData, dealingRulesData)).Entity;
 
-            // Save childs
-            if (epicDetail is not null)
+            // Save child and related entities.
+            SaveSpecialInfo(iGApiDbContext, instrumentData, currentEpicDetail);
+            SaveCurrency(iGApiDbContext, instrumentData, currentEpicDetail);
+            SaveMarginDepositBand(iGApiDbContext, instrumentData, currentEpicDetail);
+            SaveOpeningHour(iGApiDbContext, instrumentData, currentEpicDetail);
+
+            return currentEpicDetail;
+
+            static void SaveSpecialInfo(IGApiDbContext iGApiDbContext, InstrumentData instrumentData, EpicDetail? currentEpicDetail)
             {
-                #region SpecialInfo
-                if (instrumentData.specialInfo is not null)
+                if (currentEpicDetail is not null && instrumentData.specialInfo is not null)
                 {
                     //  Remove obsolete
                     _ = iGApiDbContext.EpicDetailsSpecialInfo ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.EpicDetailsSpecialInfo));
 
                     iGApiDbContext.EpicDetailsSpecialInfo.RemoveRange(
                         iGApiDbContext.EpicDetailsSpecialInfo
-                            .Where(w => w.Epic == epicDetail.Epic).ToList() // Use ToList() to prevent that Linq constructs a predicate that can not be sent to db.
+                            .Where(w => w.Epic == currentEpicDetail.Epic).ToList() // Use ToList() to prevent that Linq constructs a predicate that can not be sent to db.
                             .Where(a => !instrumentData.specialInfo.Any(b => b == a.SpecialInfo)));
 
                     //  Upsert
                     instrumentData.specialInfo.ForEach(SpecialInfo =>
-                        iGApiDbContext.SaveEpicDetailSpecialInfo(epicDetail, SpecialInfo));
+                        iGApiDbContext.SaveEpicDetailSpecialInfo(currentEpicDetail, SpecialInfo));
                 }
-                #endregion
+            }
 
-                #region Currency
-                if (instrumentData.currencies is not null)
+            static void SaveCurrency(IGApiDbContext iGApiDbContext, InstrumentData instrumentData, EpicDetail? currentEpicDetail)
+            {
+                if (currentEpicDetail is not null && instrumentData.currencies is not null)
                 {
                     //  Remove obsolete
                     _ = iGApiDbContext.EpicDetailsCurrency ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.EpicDetailsCurrency));
 
                     iGApiDbContext.EpicDetailsCurrency.RemoveRange(
                         iGApiDbContext.EpicDetailsCurrency
-                        .Where(w => w.Epic == epicDetail.Epic).ToList() // Use ToList() to prevent that Linq constructs a predicate that can not be sent to db.
+                        .Where(w => w.Epic == currentEpicDetail.Epic).ToList() // Use ToList() to prevent that Linq constructs a predicate that can not be sent to db.
                         .Where(a => !instrumentData.currencies.Any(b => b.code == a.Code)));
 
                     //  Upsert
                     instrumentData.currencies.ForEach(Currency =>
-                        iGApiDbContext.SaveEpicDetailCurrency(epicDetail, Currency));
+                        iGApiDbContext.SaveEpicDetailCurrency(currentEpicDetail, Currency));
                 }
-                #endregion
+            }
 
-                #region MarginDepositBands
-                if (instrumentData.marginDepositBands is not null)
+            static void SaveMarginDepositBand(IGApiDbContext iGApiDbContext, InstrumentData instrumentData, EpicDetail? currentEpicDetail)
+            {
+                if (currentEpicDetail is not null && instrumentData.marginDepositBands is not null)
                 {
                     //  Remove obsolete
                     _ = iGApiDbContext.EpicDetailsMarginDepositBand ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.EpicDetailsMarginDepositBand));
 
                     iGApiDbContext.EpicDetailsMarginDepositBand.RemoveRange(
                         iGApiDbContext.EpicDetailsMarginDepositBand
-                        .Where(w => w.Epic == epicDetail.Epic).ToList() // Use ToList() to prevent that Linq constructs a predicate that can not be sent to db.
+                        .Where(w => w.Epic == currentEpicDetail.Epic).ToList() // Use ToList() to prevent that Linq constructs a predicate that can not be sent to db.
                         .Where(a => !instrumentData.marginDepositBands.Any(b => b.min == a.Min)));
 
                     //  Upsert
                     instrumentData.marginDepositBands.ForEach(depositBand =>
-                        iGApiDbContext.SaveEpicDetailMarginDepositBand(epicDetail, depositBand));
+                        iGApiDbContext.SaveEpicDetailMarginDepositBand(currentEpicDetail, depositBand));
                 }
-                #endregion
+            }
 
-                #region OpeningHours
-                if (instrumentData.openingHours is not null)
+            static void SaveOpeningHour(IGApiDbContext iGApiDbContext, InstrumentData instrumentData, EpicDetail? currentEpicDetail)
+            {
+                if (currentEpicDetail is not null && instrumentData.openingHours is not null)
                 {
                     //  Remove obsolete
                     _ = iGApiDbContext.EpicDetailsOpeningHour ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.EpicDetailsOpeningHour));
 
                     iGApiDbContext.EpicDetailsOpeningHour.RemoveRange(
                         iGApiDbContext.EpicDetailsOpeningHour
-                        .Where(w => w.Epic == epicDetail.Epic).ToList() // Use ToList() to prevent that Linq constructs a predicate that can not be sent to db.
+                        .Where(w => w.Epic == currentEpicDetail.Epic).ToList() // Use ToList() to prevent that Linq constructs a predicate that can not be sent to db.
                         .Where(a => !instrumentData.openingHours.marketTimes.Any(b => Utility.ConvertLocalTimeStringToUtcTimespan(b.openTime) == a.OpenTime)));
 
                     //  Upsert
                     instrumentData.openingHours.marketTimes.ForEach(openingHours =>
-                        iGApiDbContext.SaveEpicDetailOpeningHour(epicDetail, openingHours));
+                        iGApiDbContext.SaveEpicDetailOpeningHour(currentEpicDetail, openingHours));
                 }
-                #endregion
             }
-
-            return epicDetail;
         }
     }
 }

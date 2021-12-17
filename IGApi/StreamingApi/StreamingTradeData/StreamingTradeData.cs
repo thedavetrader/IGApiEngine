@@ -7,20 +7,36 @@ using IGWebApiClient;
 using Lightstreamer.DotNet.Client;
 using Newtonsoft.Json;
 using IGApi.IGApi.StreamingApi.StreamingTickData.EpicStreamListItem;
+using System.Diagnostics;
 
 namespace IGApi
 {
     public sealed partial class ApiEngine
     {
-        private SubscribedTableKey? _tradeSubscribedTableKey = new();
+        private SubscribedTableKey? _tradeSubscribedTableKey = null;
         private TradeSubscription? _tradeSubscription;
 
         /// <summary>
         /// Init everything for StreamingDataInit. Should only be called by constructor of IGApiEngine.
         /// </summary>
-        private void StreamingTradeDataInit()
+        private void StreamingTradeDetailsInit()
         {
             _tradeSubscription = new(this);
+        }
+
+        private void ReSubscribeTradeDetails()
+        {
+            try
+            {
+                UnsubscribeFromTradeDetails();
+
+                SubscribeToTradeDetails();
+            }
+            catch (Exception ex)
+            {
+                Log.WriteException(ex, nameof(ReSubscribeToAllEpicTick));
+                throw;
+            }
         }
 
         /// <summary>
@@ -36,7 +52,11 @@ namespace IGApi
                 if (!string.IsNullOrEmpty(LoginSessionInformation.lightstreamerEndpoint))
                 {
                     _tradeSubscribedTableKey = _iGStreamApiClient.SubscribeToTradeSubscription(LoginSessionInformation.currentAccountId, _tradeSubscription);
-                    Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatTwoColumns, "[StreamingTickData]", "Subscribed to confirms(CONFIRMS), working order updates(WOU) and open position updates(OPU)"));
+
+                    if (_tradeSubscribedTableKey is not null)
+                        Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatTwoColumns, "[StreamingTickData]", "Subscribed to confirms(CONFIRMS), working order updates(WOU) and open position updates(OPU)"));
+                    else
+                        Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatTwoColumns, "[StreamingTickData]", "Faild to subscribe to confirms(CONFIRMS), working order updates(WOU) and open position updates(OPU)"));
                 }
             }
             catch (Exception ex)
@@ -66,7 +86,7 @@ namespace IGApi
         public class TradeSubscription : HandyTableListenerAdapter
         {
             private readonly ApiEngine _iGApiEngine;
-            enum UpdateType { OpenPosition, WorkingOrder, Confirms };
+            enum UpdateType { OpenPosition, WorkingOrder, Confirms, Unknown };
 
             public TradeSubscription(ApiEngine iGApiEngine)
             {
@@ -80,84 +100,96 @@ namespace IGApi
 
                 try
                 {
-                    var opu = update.GetNewValue("OPU");
-                    //BUG @ IG. Working Order updates are also labeled as OPU.
-                    var wou = update.GetNewValue("OPU");
-                    var confirms = update.GetNewValue("CONFIRMS");
-                    UpdateType updateType = UpdateType.Confirms;
+                    UpdateType updateType = UpdateType.Unknown;
 
-                    //TODO: _PRIO SO identify WOU if contains field timeInForce
-                    updateType =
-                        String.IsNullOrEmpty(confirms) &&
-                        !string.IsNullOrEmpty(opu)
-                        && opu.Contains("timeInForce") ? UpdateType.WorkingOrder : UpdateType.OpenPosition;
+                    string? updateData = null;
 
-                    string? inputData = null;
-
-                    if (!(String.IsNullOrEmpty(opu)) && updateType == UpdateType.OpenPosition)
+                    updateData = update.GetNewValue("CONFIRMS");
+                    if (!String.IsNullOrEmpty(updateData))
                     {
-                        inputData = opu;
-                        Log.WriteLine("OPU");
+                        updateType = UpdateType.Confirms;
                     }
-                    else if (!(String.IsNullOrEmpty(wou)) && updateType == UpdateType.WorkingOrder)
+                    else
                     {
-                        inputData = wou;
-                        Log.WriteLine("WOU");
-                    }
-                    else if (!(String.IsNullOrEmpty(confirms)) && updateType == UpdateType.Confirms)
-                    {
-                        inputData = confirms;
-                        Log.WriteLine("CONFIRMS");
+                        //BUG @ IG. Working Order updates are also labeled as OPU.
+                        updateData = update.GetNewValue("OPU");
+
+                        if (!String.IsNullOrEmpty(updateData))
+                        {
+                            if (updateData.Contains("goodTillDate"))
+                            {
+                                updateType = UpdateType.WorkingOrder;
+                            }
+                            else
+                            {
+                                updateType = UpdateType.OpenPosition;
+                            }
+                        }
                     }
 
-                    if (!(String.IsNullOrEmpty(inputData)))
-                        SyncToDb(itemName, updateType, inputData);
+                    if (!String.IsNullOrEmpty(updateData) && updateType != UpdateType.Unknown)
+                        SyncToDb(itemName, updateType, updateData);
                 }
                 catch (Exception ex)
                 {
                     Log.WriteException(ex, nameof(OnUpdate));
+
                     throw;
                 }
 
-                void SyncToDb(string itemName, UpdateType updateType, string inputData)
+                void SyncToDb(string itemName, UpdateType updateType, string updateData)
                 {
                     var accountId = itemName.Replace("TRADE:", "");
 
-                    var openPositionData = JsonConvert.DeserializeObject<LsTradeSubscriptionData>(inputData);
-                    var workingOrderData = JsonConvert.DeserializeObject<dto.endpoint.workingorders.get.v2.WorkingOrderData>(inputData);
-                    IGApiDbContext iGApiDbContext = new();
-
-                    if (updateType == UpdateType.OpenPosition)
+                    if (updateType == UpdateType.OpenPosition || updateType == UpdateType.WorkingOrder)
                     {
-                        var status = openPositionData.status;
-                        var epic = openPositionData.epic;
-                        var epicStreamListItemSource = EpicStreamListItem.EpicStreamListItemSource.SourceOpenPositions;
+                        //  Always deserialize LsTradeSubscriptionData. It holds the update status that is used by OpenPosition as well as WorkingOrder.
+                        var openPositionData = JsonConvert.DeserializeObject<LsTradeSubscriptionData>(updateData);
 
-                        if (status is not null && epic is not null)
+                        if (updateType == UpdateType.OpenPosition)
                         {
-                            SyncToDbOpenPositions(openPositionData, accountId, iGApiDbContext);
+                            var status = openPositionData.status;
+                            var epic = openPositionData.epic;
+                            var epicStreamListItemSource = EpicStreamListItem.EpicStreamListItemSource.SourceOpenPositions;
 
-                            RegisterStreamEpic((StreamingStatusEnum)status, epic, epicStreamListItemSource);
+                            if (status is not null && epic is not null)
+                            {
+                                SyncToDbOpenPositions(openPositionData, accountId);
+
+                                RegisterStreamEpic((StreamingStatusEnum)status, epic, epicStreamListItemSource);
+
+                                LogUpdateInfo(updateType, epic, openPositionData.size, openPositionData.direction.ToString(), openPositionData.dealStatus.ToString());
+                            }
                         }
-                    }
-                    else if (updateType == UpdateType.WorkingOrder)
-                    {
-                        var status = openPositionData.status;   // Working order does not contain status. And because of the bug, wou are sent as opu, so get the status from opu.
-                        var epic = workingOrderData.epic;
-                        var epicStreamListItemSource = EpicStreamListItem.EpicStreamListItemSource.SourceWorkingOrders;
-
-                        if (status is not null && epic is not null)
+                        else if (updateType == UpdateType.WorkingOrder)
                         {
-                            SyncToDbWorkingOrders((StreamingStatusEnum)status, workingOrderData, accountId, iGApiDbContext);
+                            var workingOrderData = JsonConvert.DeserializeObject<dto.endpoint.workingorders.get.v2.WorkingOrderData>(updateData);
+                            var status = openPositionData.status;   // Working order does not contain status. And because of the bug, wou are sent as opu, so get the status from opu.
+                            var epic = workingOrderData.epic;
+                            var epicStreamListItemSource = EpicStreamListItem.EpicStreamListItemSource.SourceWorkingOrders;
 
-                            RegisterStreamEpic((StreamingStatusEnum)status, epic, epicStreamListItemSource);
+                            if (status is not null && epic is not null)
+                            {
+                                SyncToDbWorkingOrders((StreamingStatusEnum)status, workingOrderData, accountId);
+
+                                RegisterStreamEpic((StreamingStatusEnum)status, epic, epicStreamListItemSource);
+
+                                LogUpdateInfo(updateType, epic, (workingOrderData.orderSize ?? 0).ToString(), workingOrderData.direction, openPositionData.dealStatus.ToString());
+                            }
                         }
                     }
                     else if (updateType == UpdateType.Confirms)
-                        throw new NotImplementedException("Streamupdates of the type \"Confirms\" are not supported.");
+                    {
+                        var confirmData = JsonConvert.DeserializeObject<dto.endpoint.confirms.ConfirmsResponse>(updateData);
+                        var epic = confirmData.epic;
 
-                    Task.Run(async () => await iGApiDbContext.SaveChangesAsync()).Wait();
+                        if (!string.IsNullOrEmpty(epic))
+                        {
+                            SyncToDbConfirms(confirmData);
 
+                            LogUpdateInfo(updateType, epic, (confirmData.size ?? 0).ToString(), confirmData.direction, confirmData.dealStatus);
+                        }
+                    }
                 }
 
                 void RegisterStreamEpic(StreamingStatusEnum status, string? epic, EpicStreamListItem.EpicStreamListItemSource epicStreamListItemSource)
@@ -172,8 +204,9 @@ namespace IGApi
                         _iGApiEngine.RemoveEpicStreamListItem(epicStreamListItem);
                 }
 
-                static void SyncToDbOpenPositions(LsTradeSubscriptionData openPositionData, string accountId, IGApiDbContext iGApiDbContext)
+                static void SyncToDbOpenPositions(LsTradeSubscriptionData openPositionData, string accountId)
                 {
+                    IGApiDbContext iGApiDbContext = new();
                     _ = iGApiDbContext.OpenPositions ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.OpenPositions));
 
                     if (
@@ -191,17 +224,17 @@ namespace IGApi
 
                         if (openPosition != null)
                             iGApiDbContext.Remove(openPosition);
-
-                        //TODO: Notify GetTradeActivity
                     }
+
+                    Task.Run(async () => await iGApiDbContext.SaveChangesAsync()).Wait();
                 }
 
                 static void SyncToDbWorkingOrders(
                     StreamingStatusEnum status,
                     dto.endpoint.workingorders.get.v2.WorkingOrderData WorkingOrderData,
-                    string accountId,
-                    IGApiDbContext iGApiDbContext)
+                    string accountId)
                 {
+                    IGApiDbContext iGApiDbContext = new();
                     _ = iGApiDbContext.WorkingOrders ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.WorkingOrders));
 
                     if (
@@ -219,10 +252,28 @@ namespace IGApi
 
                         if (WorkingOrder != null)
                             iGApiDbContext.Remove(WorkingOrder);
-
-                        //TODO: Notify GetTradeActivity
                     }
+
+                    Task.Run(async () => await iGApiDbContext.SaveChangesAsync()).Wait();
                 }
+
+                static void SyncToDbConfirms(dto.endpoint.confirms.ConfirmsResponse ConfirmData)
+                {
+                    IGApiDbContext iGApiDbContext = new();
+                    _ = iGApiDbContext.ConfirmResponses?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.ConfirmResponses));
+
+                    iGApiDbContext.SaveConfirmResponse(ConfirmData);
+
+                    Task.Run(async () => await iGApiDbContext.SaveChangesAsync()).Wait();
+                }
+            }
+
+            void LogUpdateInfo(UpdateType updateType, string epic, string size, string direction, string? dealStatus)
+            {
+                Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatFourColumns, $"[{nameof(OnUpdate)}]", "", "", ""));
+                Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatTwoColumns, $"[{nameof(OnUpdate)}]", $"Trade activity received. {nameof(UpdateType)}: {updateType}"));
+                Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatTwoColumns, $"[{nameof(OnUpdate)}]", $"epic: {epic} size: {size} direction: {direction} dealStatus: {dealStatus ?? "UNKNOWN"}"));
+                Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatFourColumns, $"[{nameof(OnUpdate)}]", "", "", ""));
             }
         }
     }

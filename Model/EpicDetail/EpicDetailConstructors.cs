@@ -14,10 +14,11 @@ namespace IGApi.Model
         { Epic = string.Format(Constants.InvalidEntry, nameof(EpicDetail)); }
 
         public EpicDetail(
-            [NotNullAttribute] InstrumentData instrumentData
+            [NotNullAttribute] InstrumentData instrumentData,
+            DealingRulesData? dealingRulesData
             )
         {
-            MapProperties(instrumentData);
+            MapProperties(instrumentData, dealingRulesData);
 
             _ = Epic ?? throw new PrimaryKeyNullReferenceException(nameof(Epic));
         }
