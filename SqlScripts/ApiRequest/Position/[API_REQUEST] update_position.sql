@@ -38,6 +38,7 @@ as begin
     --  [Constraint: If trailingStop equals true, then set trailingStopDistance,trailingStopIncrement,stopLevel]
     if @trailing_stop = 1 and (@trailing_stop_distance is not null or @trailing_stop_increment is not null)
         throw 51000, 'If trailingStop equals true, then set trailingStopDistance,trailingStopIncrement,stopLevel', 1
+
     
     /*      ********************************
             Default
@@ -47,6 +48,8 @@ as begin
             INIT
             ********************************    */
     declare @deal_reference nvarchar(36)    
+    declare @epic           nvarchar(4000)
+    declare @direction      nvarchar(4000)
     
     select  @deal_reference             = op.deal_reference
     ,       @limit_level                = coalesce(@limit_level            , op.limit_level           ) -- Use value "0" to disable
@@ -54,6 +57,8 @@ as begin
     ,       @trailing_stop              = coalesce(@trailing_stop          , t.trailing_stop          )
     ,       @trailing_stop_distance     = coalesce(@trailing_stop_distance , op.trailing_stop_distance)
     ,       @trailing_stop_increment    = coalesce(@trailing_stop_increment, op.trailing_step         )
+    ,       @epic                       = op.epic
+    ,       @direction                  = op.direction
     from    open_position   op
     cross
     apply   (   select  trailing_stop = cast(iif(op.trailing_stop_distance is not null and op.trailing_step is not null, 1, 0) as bit) ) t
@@ -65,14 +70,20 @@ as begin
         ;throw 51000, @message, 1
     end
 
+    exec    validate_stop_limit
+            @epic           = @epic        
+    ,       @direction      = @direction   
+    ,       @limit_level    = @limit_level 
+    ,       @stop_level     = @stop_level  
+
     /*      ********************************
             Request for edit position.    
             ********************************    */
-    insert  rest_request_queue (
-            rest_request
+    insert  api_request_queue_item (
+            request
     ,       parameter
     ,       execute_asap        )
-    select  rest_request_queue  = 'EditPosition'
+    select  request             = 'EditPosition'
     ,       parameter           =   (   select  dealId                                      = @deal_id                 
                                         ,       'EditPositionRequest.limitLevel'            = @limit_level                  
                                         ,       'EditPositionRequest.stopLevel'             = @stop_level              
@@ -92,7 +103,7 @@ end
 
 go
 
-exec edit_position
+exec    edit_position
         @deal_id                    = 'DIAAAAG9UCFNVAL'
 ,       @limit_level                = 4500
 ,       @stop_level                 = 0

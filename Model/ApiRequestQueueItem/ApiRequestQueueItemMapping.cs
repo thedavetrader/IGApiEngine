@@ -14,7 +14,7 @@ namespace IGApi.Model
                 ExecuteAsap = restRequestQueueItem.ExecuteAsap;
                 IsRecurrent = restRequestQueueItem.IsRecurrent;
                 Parameters = restRequestQueueItem.Parameters;
-                RestRequest = restRequestQueueItem.RestRequest;
+                Request = restRequestQueueItem.Request;
                 Timestamp = restRequestQueueItem.Timestamp; // Might be that in future Timestamp overwrite should be optional.
             }
         }

@@ -25,6 +25,7 @@ ActivityHistory
             MarketName = string.Format(Constants.InvalidEntry, nameof(Activity));
             Result = string.Format(Constants.InvalidEntry, nameof(Activity));
             Size = string.Format(Constants.InvalidEntry, nameof(Activity));
+            Reference = string.Format(Constants.InvalidEntry, nameof(Activity));
         }
 
         /// <summary>

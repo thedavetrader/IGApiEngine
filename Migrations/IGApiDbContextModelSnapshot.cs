@@ -215,6 +215,28 @@ namespace IGApi.Migrations
                     b.ToTable("activity_history");
                 });
 
+            modelBuilder.Entity("IGApi.Model.ApiEngineStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("IsAlive")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("is_alive");
+
+                    b.HasKey("Id");
+
+                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("Id"), false);
+
+                    b.ToTable("api_engine_status");
+
+                    SqlServerEntityTypeBuilderExtensions.IsMemoryOptimized(b);
+                });
+
             modelBuilder.Entity("IGApi.Model.ApiRequestQueueItem", b =>
                 {
                     b.Property<int>("Id")
@@ -241,11 +263,11 @@ namespace IGApi.Migrations
                         .HasColumnType("nvarchar(4000)")
                         .HasColumnName("parameter");
 
-                    b.Property<string>("RestRequest")
+                    b.Property<string>("Request")
                         .IsRequired()
                         .HasMaxLength(512)
                         .HasColumnType("nvarchar(512)")
-                        .HasColumnName("rest_request");
+                        .HasColumnName("request");
 
                     b.Property<DateTime>("Timestamp")
                         .ValueGeneratedOnAdd()
@@ -265,7 +287,7 @@ namespace IGApi.Migrations
 
                     SqlServerEntityTypeBuilderExtensions.IsMemoryOptimized(b);
 
-                    b.HasCheckConstraint("rest_request", "rest_request in ('GetAccountDetails','GetOpenPositions','GetWorkingOrders','GetActivityHistory','GetTransactionHistory','GetClientSentiment','CreatePosition','EditPosition','ClosePosition','CreateWorkingOrder','EditWorkingOrder','DeleteWorkingOrder','GetEpicDetails')");
+                    b.HasCheckConstraint("request", "request in ('GetAccountDetails','GetOpenPositions','GetWorkingOrders','GetActivityHistory','GetTransactionHistory','GetClientSentiment','CreatePosition','EditPosition','ClosePosition','CreateWorkingOrder','EditWorkingOrder','DeleteWorkingOrder','GetWatchlists','CreateWatchlist','DeleteWatchlist','GetEpicDetails')");
                 });
 
             modelBuilder.Entity("IGApi.Model.ClientSentiment", b =>
@@ -941,6 +963,45 @@ namespace IGApi.Migrations
                     b.HasKey("Date", "Reference");
 
                     b.ToTable("transaction_history");
+                });
+
+            modelBuilder.Entity("IGApi.Model.Watchlist", b =>
+                {
+                    b.Property<string>("AccountId")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("account_id");
+
+                    b.Property<string>("Id")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("ApiLastUpdate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("api_last_update");
+
+                    b.Property<bool>("DefaultSystemWatchlist")
+                        .HasColumnType("bit")
+                        .HasColumnName("default_system_watchlist");
+
+                    b.Property<bool>("Deleteable")
+                        .HasColumnType("bit")
+                        .HasColumnName("deletable");
+
+                    b.Property<bool>("Editable")
+                        .HasColumnType("bit")
+                        .HasColumnName("editable");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("name");
+
+                    b.HasKey("AccountId", "Id");
+
+                    b.ToTable("watchlist");
                 });
 
             modelBuilder.Entity("IGApi.Model.WorkingOrder", b =>

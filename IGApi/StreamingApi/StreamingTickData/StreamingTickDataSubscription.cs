@@ -8,6 +8,7 @@ using Lightstreamer.DotNet.Client;
 
 namespace IGApi
 {
+    using static Log;
     public sealed partial class ApiEngine
     {
         private SubscribedTableKey? _tickSubscribedTableKey = null;
@@ -48,7 +49,7 @@ namespace IGApi
             }
             catch (Exception ex)
             {
-                Log.WriteException(ex, nameof(ReSubscribeToAllEpicTick));
+                WriteException(ex);
                 throw;
             }
         }
@@ -57,7 +58,7 @@ namespace IGApi
         {
             try
             {
-                _ = LoginSessionInformation ?? throw new NullReferenceException(nameof(LoginSessionInformation));
+                if (!IsLoggedIn) throw new IGApiConncectionError();
 
                 if (!string.IsNullOrEmpty(LoginSessionInformation.lightstreamerEndpoint) && EpicStreamList.Any())
                 {
@@ -65,35 +66,35 @@ namespace IGApi
 
                     _tickSubscribedTableKey = _iGStreamApiClient.SubscribeToMarketDetails(subscribeEpicList, _tickSubscription);
 
-                    Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatFourColumns, "[StreamingTickData]", "", "", ""));
-                    Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatTwoColumns, "[StreamingTickData]", "(Re-)subscribed epics to tick Lightning streamer."));
-                    Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatFourColumns, "[StreamingTickData]", "", "", ""));
-                    Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatFourColumns, "[StreamingTickData]", "", "", "Epic"));
-                    Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatFourColumns, "[StreamingTickData]", "", "", new string('_', 40)));
+                    WriteLog();
+                    WriteLog(Messages("(Re-)subscribed epics to tick Lightning streamer."));
+                    WriteLog();
+                    WriteLog(Messages("Epic"));
+                    WriteLog(Messages(new string('_', 40)));
 
                     foreach (var epic in subscribeEpicList)
-                        Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatFourColumns, "[StreamingTickData]", "", "", epic));
+                        WriteLog(Messages(epic));
 
-                    Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatFourColumns, "[StreamingTickData]", "", "", ""));
+                    WriteLog();
                 }
             }
             catch (Exception ex)
             {
-                Log.WriteException(ex, nameof(SubscribeToAllEpicTick));
+                WriteException(ex);
                 throw;
             }
         }
 
         private void UnsubscribeFromAllEpicTick()
         {
-            if (LoginSessionInformation is not null)
+            if (IsLoggedIn)
             {
                 if (_tickSubscribedTableKey is not null)
                 {
                     _iGStreamApiClient.UnsubscribeTableKey(_tickSubscribedTableKey);
                     _tickSubscribedTableKey = null;
 
-                    Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatTwoColumns, "[StreamingTickData]", "Unsubscribed all epics from tick Lightning streamer."));
+                    WriteLog(Messages("Unsubscribed all epics from tick Lightning streamer."));
                 }
             }
         }
@@ -129,7 +130,7 @@ namespace IGApi
                 }
                 catch (Exception ex)
                 {
-                    Log.WriteException(ex, nameof(OnUpdate));
+                    WriteException(ex);
                     throw;
                 }
             }

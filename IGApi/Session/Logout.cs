@@ -2,39 +2,36 @@
 
 namespace IGApi
 {
+    using static Log;
     public sealed partial class ApiEngine
     {
-        public void Stop()
-        {
-            Logout();   
-        }
-
         private void Logout()
         {
-            if (isSessionFunctionsAvailable)
+            if (isSessionLoginFunctionsAvailable)
             {
-
                 try
                 {
-                    isSessionFunctionsAvailable = false;
+                    isSessionLoginFunctionsAvailable = false;
 
                     if (IGRestApiClient is not null)
                     {
+                        _loginSessionInformation = null;
+
                         UnsubscribeFromAccountDetails();
                         UnsubscribeFromTradeDetails();
                         UnsubscribeFromAllEpicTick();
                         IGRestApiClient.logout();
-                        Log.WriteLine("Logged out");
+                        WriteLog(Messages("Logged out"));
                     }
                 }
                 catch (Exception ex)
                 {
-                    Log.WriteException(ex, nameof(Logout));
+                    WriteException(ex);
                     throw;
                 }
                 finally
                 {
-                    isSessionFunctionsAvailable = true;
+                    isSessionLoginFunctionsAvailable = true;
                 }
             }
         }

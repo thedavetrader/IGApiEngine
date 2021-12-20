@@ -24,6 +24,7 @@
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            ApiEngineStatusOnModelCreating(modelBuilder);
             AccountOnModelCreating(modelBuilder);
             IGRestRequestQueueOnModelCreating(modelBuilder);
             OpenPositionOnModelCreating(modelBuilder);
@@ -39,6 +40,7 @@
             TransactionOnModelCreating(modelBuilder);
             ClientSentimentOnModelCreating(modelBuilder);
             ConfirmResponseOnModelCreating(modelBuilder);
+            WatchlistOnModelCreating(modelBuilder);
 
             //  Set default varchar(4000)
             foreach (var property in modelBuilder.Model.GetEntityTypes()

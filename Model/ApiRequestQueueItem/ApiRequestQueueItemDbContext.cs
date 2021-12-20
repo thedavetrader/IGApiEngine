@@ -15,23 +15,27 @@ namespace IGApi.Model
                 p.Timestamp
             });
 
-            modelBuilder.Entity<ApiRequestQueueItem>().Property(p => p.RestRequest).HasMaxLength(512);
+            modelBuilder.Entity<ApiRequestQueueItem>().Property(p => p.Request).HasMaxLength(512);
 
-            modelBuilder.Entity<ApiRequestQueueItem>(e => e.HasCheckConstraint("rest_request", "rest_request in (" +
-                $"'{nameof(RestRequest.ApiRequestItem.GetAccountDetails)}'" + "," +
-                $"'{nameof(RestRequest.ApiRequestItem.GetOpenPositions)}'" + "," +
-                $"'{nameof(RestRequest.ApiRequestItem.GetWorkingOrders)}'" + "," +
-                $"'{nameof(RestRequest.ApiRequestItem.GetActivityHistory)}'" + "," +
-                $"'{nameof(RestRequest.ApiRequestItem.GetTransactionHistory)}'" + "," +
-                $"'{nameof(RestRequest.ApiRequestItem.GetClientSentiment)}'" + "," +
-                $"'{nameof(RestRequest.ApiRequestItem.CreatePosition)}'" + "," +
-                $"'{nameof(RestRequest.ApiRequestItem.EditPosition)}'" + "," +
-                $"'{nameof(RestRequest.ApiRequestItem.ClosePosition)}'" + "," +
-                $"'{nameof(RestRequest.ApiRequestItem.CreateWorkingOrder)}'" + "," +
-                $"'{nameof(RestRequest.ApiRequestItem.EditWorkingOrder)}'" + "," +
-                $"'{nameof(RestRequest.ApiRequestItem.DeleteWorkingOrder)}'" + "," +
-                $"'{nameof(RestRequest.ApiRequestItem.GetEpicDetails)}'" +
-                ")"));
+            modelBuilder.Entity<ApiRequestQueueItem>(e => e.HasCheckConstraint("request", "request in (" +
+                String.Join(",",
+                string.Format("'{0}'", nameof(RequestQueue.RequestQueueItem.GetAccountDetails)),
+                string.Format("'{0}'", nameof(RequestQueue.RequestQueueItem.GetOpenPositions)),
+                string.Format("'{0}'", nameof(RequestQueue.RequestQueueItem.GetWorkingOrders)),
+                string.Format("'{0}'", nameof(RequestQueue.RequestQueueItem.GetActivityHistory)),
+                string.Format("'{0}'", nameof(RequestQueue.RequestQueueItem.GetTransactionHistory)),
+                string.Format("'{0}'", nameof(RequestQueue.RequestQueueItem.GetClientSentiment)),
+                string.Format("'{0}'", nameof(RequestQueue.RequestQueueItem.CreatePosition)),
+                string.Format("'{0}'", nameof(RequestQueue.RequestQueueItem.EditPosition)),
+                string.Format("'{0}'", nameof(RequestQueue.RequestQueueItem.ClosePosition)),
+                string.Format("'{0}'", nameof(RequestQueue.RequestQueueItem.CreateWorkingOrder)),
+                string.Format("'{0}'", nameof(RequestQueue.RequestQueueItem.EditWorkingOrder)),
+                string.Format("'{0}'", nameof(RequestQueue.RequestQueueItem.DeleteWorkingOrder)),
+                string.Format("'{0}'", nameof(RequestQueue.RequestQueueItem.GetWatchlists)),
+                string.Format("'{0}'", nameof(RequestQueue.RequestQueueItem.CreateWatchlist)),
+                string.Format("'{0}'", nameof(RequestQueue.RequestQueueItem.DeleteWatchlist)),
+                string.Format("'{0}'", nameof(RequestQueue.RequestQueueItem.GetEpicDetails))
+                ) + ")"));
 
             modelBuilder.Entity<ApiRequestQueueItem>().Property(p => p.Timestamp).HasDefaultValueSql("getutcdate()");
             modelBuilder.Entity<ApiRequestQueueItem>().Property(p => p.ExecuteAsap).HasDefaultValue(false);

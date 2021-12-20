@@ -11,8 +11,8 @@ namespace IGApi.Model
         [Column("timestamp")]
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
         
-        [Column("rest_request")]
-        public string RestRequest { get; set; } = "[ERROR] RestRequest is required.";
+        [Column("request")]
+        public string Request { get; set; } = "[ERROR] RestRequest is required.";
         
         [Column("parameter")]
         public string? Parameters { get; set; } = string.Empty;

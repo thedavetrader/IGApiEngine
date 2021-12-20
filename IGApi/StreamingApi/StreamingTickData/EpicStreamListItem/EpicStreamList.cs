@@ -6,6 +6,7 @@ using IGApi.Model;
 
 namespace IGApi
 {
+    using static Log;
     public sealed partial class ApiEngine
     {
         public ObservableList<EpicStreamListItem> EpicStreamList = new();
@@ -119,13 +120,13 @@ namespace IGApi
 
         private static void LogInvalidEpic(string epic)
         {
-            Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatFourColumns, "[GetOpenPositionDetails]", "", "", ""));
-            Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatTwoColumns, "[GetOpenPositionDetails]", "Streaming prices unavailable for:"));
-            Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatFourColumns, "[GetOpenPositionDetails]", "", "", ""));
-            Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatFourColumns, "[GetOpenPositionDetails]", "", "", "Epic"));
-            Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatFourColumns, "[GetOpenPositionDetails]", "", "", new string('_', 40)));
-            Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatFourColumns, "[GetOpenPositionDetails]", "", "", epic.ToString()));
-            Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatFourColumns, "[GetOpenPositionDetails]", "", "", ""));
+            WriteLog();
+            WriteLog(Messages("Streaming prices unavailable for:"));
+            WriteLog(Messages(""));
+            WriteLog(Messages("Epic"));
+            WriteLog(Messages(new string('_', 40)));
+            WriteLog(Messages(epic.ToString()));
+            WriteLog(Messages(""));
         }
     }
 }

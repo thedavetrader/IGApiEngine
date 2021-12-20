@@ -15,8 +15,8 @@ namespace IGApi.Model
             var currentRestRequestQueueItem =
                     Task.Run(() => iGApiDbContext.ApiRequestQueueItems
                         .FirstOrDefault(w => 
-                            w.IsRecurrent && w.RestRequest == apiRequestQueueItem.RestRequest ||
-                            !w.IsRecurrent &&  w.ExecuteAsap == apiRequestQueueItem.ExecuteAsap &&  w.RestRequest == apiRequestQueueItem.RestRequest
+                            w.IsRecurrent && w.Request == apiRequestQueueItem.Request ||
+                            !w.IsRecurrent &&  w.ExecuteAsap == apiRequestQueueItem.ExecuteAsap &&  w.Request == apiRequestQueueItem.Request
                             )).Result 
                     ;
 

@@ -26,7 +26,6 @@ as begin
             ************************************************************************************************    */
 
     declare @message        nvarchar(4000)
-    declare @min_deal_size  decimal(38,19)
     
     if not @direction in ('BUY', 'SELL')
         throw 51000, 'Parameter "@direction" only accepts values "BUY" or "SELL".', 1
@@ -97,9 +96,14 @@ as begin
     /*      ********************************
             Default
             ********************************    */
+    declare @min_deal_size  decimal(38,19)
+
     select  @min_deal_size  = ed.dealing_rule_value_min_deal_size
     from    epic_detail     ed
     where   ed.epic         = @epic
+
+    if @currency_code is null
+        select  @currency_code  = dbo.get_epic_currency_code(@epic)
 
     if  @min_deal_size is null
     begin
@@ -112,9 +116,6 @@ as begin
         set @message = 'Size "' + convert(nvarchar, @size) + '" is less than minimum deal size "' + convert(nvarchar, @min_deal_size) + '".'
         ;throw 51000, @message, 1
     end
-
-    if @currency_code is null
-        select  @currency_code  = dbo.get_epic_currency_code(@epic)
     
     if @currency_code is null
     begin
@@ -126,15 +127,21 @@ as begin
             INIT
             ********************************    */
     declare @deal_reference nvarchar(36)    = right(convert(nvarchar(36), newid()), 30)
+    
+    exec    validate_stop_limit
+            @epic           = @epic        
+    ,       @direction      = @direction   
+    ,       @limit_level    = @limit_level 
+    ,       @stop_level     = @stop_level  
 
     /*      ********************************
             Request for create position.    
             ********************************    */
-    insert  rest_request_queue (
-            rest_request
+    insert  api_request_queue_item (
+            request
     ,       parameter
     ,       execute_asap        )
-    select  rest_request_queue  = 'CreatePosition'
+    select  request             = 'CreatePosition'
     ,       parameter           =   (   select  epic                    = @epic                   
                                         ,       direction               = @direction              
                                         ,       size                    = @size
@@ -175,7 +182,7 @@ exec create_position
 --,       @expiry                     = 
 --,       @level                      = 
 --,       @guaranteed_stop            = 
---,       @stop_level                 = 
+--,       @stop_level                 = 5000
 --,       @stop_distance              = 
 --,       @trailing_stop              = 
 --,       @trailing_stop_increment    = 

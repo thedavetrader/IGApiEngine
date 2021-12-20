@@ -2,16 +2,20 @@
 using System.Configuration;
 using IGApi.Common;
 using IGApi.Common.Extensions;
+using IGApi.Model;
 using IGWebApiClient;
 
 namespace IGApi
 {
+    using static Log;
     public sealed partial class ApiEngine
     {
         private static readonly Lazy<ApiEngine> lazy =
             new(() => new ApiEngine());
 
         public static ApiEngine Instance => lazy.Value;
+
+        private CancellationTokenSource _cancellationTokenSource;
 
         public IgRestApiClient IGRestApiClient => _iGRestApiClient;
 
@@ -20,7 +24,12 @@ namespace IGApi
         private readonly IGStreamingApiClient _iGStreamApiClient;
 
         public static readonly int AllowedApiCallsPerMinute = Common.Configuration.GetAllowedApiCallsPerMinute();
+
         public static readonly int CycleTime = 60 / AllowedApiCallsPerMinute;
+
+        private Task _apiRequestQueueEngineTask;
+
+        private Task _setIsAliveTask;
 
         public ApiEngine()
         {
@@ -50,9 +59,78 @@ namespace IGApi
             }
 
             StreamingTickDataInit();
-            StreamingTradeDetailsInit();
 
-            new Task(() => RestRequest.ApiRequestQueueEngine.Start()).FireAndForget();
+            StreamingTradeDetailsInit();
         }
+
+        public void Start()
+        {
+            Login();
+
+            if (_cancellationTokenSource is not null)
+                _cancellationTokenSource.Dispose();
+
+            _cancellationTokenSource = new CancellationTokenSource();
+
+            CancellationToken cancellationToken = _cancellationTokenSource.Token;
+
+            _apiRequestQueueEngineTask = Task.Factory.StartNew(() => RequestQueue.RequestQueueEngine.Start(cancellationToken));
+
+            _setIsAliveTask = Task.Factory.StartNew(() =>
+                {
+                    bool hasInitializedReported = false;
+
+                    while (!cancellationToken.IsCancellationRequested)
+                    {
+                        if (RequestQueue.RequestQueueEngine.IsInitialized)
+                        {
+                            if (!hasInitializedReported)
+                            {
+                                // ASCII Art: https://patorjk.com/software/taag/#p=display&f=ANSI%20Regular&t=Initialization%20done!
+                                WriteLog();
+                                WriteLog(Messages("██ ███    ██ ██ ████████ ██  █████  ██      ██ ███████  █████  ████████ ██  ██████  ███    ██     ██████   ██████  ███    ██ ███████ ██"));
+                                WriteLog(Messages("██ ████   ██ ██    ██    ██ ██   ██ ██      ██    ███  ██   ██    ██    ██ ██    ██ ████   ██     ██   ██ ██    ██ ████   ██ ██      ██"));
+                                WriteLog(Messages("██ ██ ██  ██ ██    ██    ██ ███████ ██      ██   ███   ███████    ██    ██ ██    ██ ██ ██  ██     ██   ██ ██    ██ ██ ██  ██ █████   ██"));
+                                WriteLog(Messages("██ ██  ██ ██ ██    ██    ██ ██   ██ ██      ██  ███    ██   ██    ██    ██ ██    ██ ██  ██ ██     ██   ██ ██    ██ ██  ██ ██ ██        "));
+                                WriteLog(Messages("██ ██   ████ ██    ██    ██ ██   ██ ███████ ██ ███████ ██   ██    ██    ██  ██████  ██   ████     ██████   ██████  ██   ████ ███████ ██"));
+                                WriteLog();
+                                WriteLog(Messages("Ready to receive requests..."));
+
+                                hasInitializedReported = true;
+                            }
+                            ApiEngineStatus.SetIsAlive();
+                        }
+
+                        Utility.WaitFor(100);
+                    }
+
+                    if (cancellationToken.IsCancellationRequested)
+                        WriteLog(Messages("Cancellation request received. Updating alive status has stopped."));
+                }
+                , cancellationToken
+                );
+        }
+
+        public void Stop()
+        {
+            WriteLog(Messages("Cancelling subscribed threads."));
+            _cancellationTokenSource.Cancel();
+
+            //  Allow the ApiQueue to finish its tasks.
+            _apiRequestQueueEngineTask.Wait();
+            _setIsAliveTask.Wait();
+
+            WriteLog(Messages("All subscribed threads have stopped."));
+
+            Logout();
+        }
+
+        public void Restart()
+        {
+            Stop();
+
+            Start();
+        }
+
     }
 }

@@ -5,74 +5,67 @@ using IGApi.Model;
 using IGApi.Common;
 using IGWebApiClient;
 using Microsoft.EntityFrameworkCore;
-using IGApi.RestRequest;
+using IGApi.RequestQueue;
 
 namespace IGApi
 {
+    using static Log;
     public sealed partial class ApiEngine
     {
-        private static bool isSessionFunctionsAvailable = true;
+        private static bool isSessionLoginFunctionsAvailable = true;
 
-        public AuthenticationResponse? LoginSessionInformation { get; set; }
+        private AuthenticationResponse? _loginSessionInformation;
+
+        public AuthenticationResponse LoginSessionInformation { get { return _loginSessionInformation ?? throw new NullReferenceException(nameof(LoginSessionInformation)); } }
+
+        public bool IsLoggedIn { get { return _loginSessionInformation is not null; } }
 
         private readonly string? _env;
         private readonly string? _userName;
         private readonly string? _password;
         private readonly string? _apiKey;
 
-        public void Start()
-        {
-            Login();
-        }
-
-        public void Relogin()
-        {
-            Logout();
-
-            Login();
-        }
-
         private void Login()
         {
             //  Prevent that other tasks also invokes (re-)login at same time.
             //  The login procedure most surely will fail, or at least yield unpredictable results.
-            if (isSessionFunctionsAvailable)
+            if (isSessionLoginFunctionsAvailable)
             {
                 try
                 {
-                    isSessionFunctionsAvailable = false;
+                    isSessionLoginFunctionsAvailable = false;
 
                     var ar = new AuthenticationRequest { identifier = _userName, password = _password };
-                    var response = IGRestApiClient.SecureAuthenticate(ar, _apiKey).UseManagedCall(); 
+                    var response = IGRestApiClient.SecureAuthenticate(ar, _apiKey).UseManagedCall();
 
                     if (response is not null)
                     {
 
-                        LoginSessionInformation = response.Response;
+                        _loginSessionInformation = response.Response;
 
-                        Log.WriteLine("Logged in, current account: " + LoginSessionInformation.currentAccountId);
+                        WriteLog(Messages("Logged in, current account: " + LoginSessionInformation.currentAccountId));
 
                         InitAccount(response);
 
                         LightstreamerLogin(response);
                     }
                     else
-                        throw new RestCallNullReferenceException(nameof(IGRestApiClient.SecureAuthenticate));
+                        throw new RestCallNullReferenceException();
                 }
                 catch (Exception ex)
                 {
-                    Log.WriteException(ex, nameof(Login));
+                    WriteException(ex);
                     throw;
                 }
                 finally
                 {
-                    isSessionFunctionsAvailable = true;
+                    isSessionLoginFunctionsAvailable = true;
                 }
             }
 
             void LightstreamerLogin(IgResponse<AuthenticationResponse> response)
             {
-                Log.WriteLine("establishing datastream connection");
+                WriteLog(Messages("establishing datastream connection"));
                 ConversationContext context = IGRestApiClient.GetConversationContext();
 
                 _ = context ?? throw new NullReferenceException(nameof(context));
@@ -97,8 +90,8 @@ namespace IGApi
 
                             if (connectionEstablished)
                             {
-                                Log.WriteLine(String.Format("Connecting to Lightstreamer. Endpoint ={0}",
-                                                                    LoginSessionInformation.lightstreamerEndpoint));
+                                WriteLog(Messages(String.Format("Connecting to Lightstreamer. Endpoint ={0}",
+                                                                    LoginSessionInformation.lightstreamerEndpoint)));
 
                                 // Subscribe to Account Details and Trade Subscriptions...
                                 Task.Run(() => SubscribeToAllEpicTick()).Wait();
@@ -107,25 +100,25 @@ namespace IGApi
                             }
                             else
                             {
-                                Log.WriteLine(String.Format(
+                                WriteLog(Messages(String.Format(
                                     "Could NOT connect to Lightstreamer. Endpoint ={0}. Attempt = {1} ",
                                     LoginSessionInformation.lightstreamerEndpoint
-                                    , i));
+                                    , i)));
                             }
                         }
                         catch (Lightstreamer.DotNet.Client.SubscrException ex)
                         {
-                            Log.WriteException(ex, nameof(LightstreamerLogin));
+                            WriteException(ex);
                         }
                         catch (Exception ex)
                         {
-                            Log.WriteException(ex, nameof(LightstreamerLogin));
+                            WriteException(ex);
                             throw;
                         }
                     }
 
                     if (!connectionEstablished)
-                        Log.WriteLine($"Critical error. Could not connect to Lightstreamer after {retry} retries. Endpoint {LoginSessionInformation.lightstreamerEndpoint}");
+                        WriteLog(Messages($"Critical error. Could not connect to Lightstreamer after {retry} retries. Endpoint {LoginSessionInformation.lightstreamerEndpoint}"));
                 }
                 else
                 {

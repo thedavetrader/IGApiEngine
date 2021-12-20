@@ -64,9 +64,9 @@ as begin
     ,       @size           = coalesce(@size        , op.size                                                             )
     ,       @direction      = coalesce(@direction   , case op.direction when 'BUY' then 'SELL' when 'SELL' then 'BUY' end )
     from    open_position   op
-    where   (       @deal_id        is not null and op.deal_id          = @deal_id
-                or  @epic           is not null and op.epic             = @epic 
-                or  @deal_reference is not null and op.deal_reference   = @deal_reference   )
+    where   (       op.deal_id          = @deal_id
+                or  op.epic             = @epic 
+                or  op.deal_reference   = @deal_reference   )
     
     if @deal_reference is null
     begin
@@ -88,7 +88,7 @@ as begin
 
     if @size is null
     begin
-        set @message = 'Size could not be found for epic "' + coalesce(@epic, 'NULL') + '". Possible no open position for this epic. Alternatively provide the size with the parameter "@size".'
+        set @message = 'Size could not be found for epic "' + coalesce(@epic, 'NULL') + '". Possibly no open position for this epic. Alternatively provide the size with the parameter "@size".'
         ;throw 51000, @message, 1
     end
 
@@ -99,11 +99,11 @@ as begin
     /*      ********************************
             Request for create position.    
             ********************************    */
-    insert  rest_request_queue (
-            rest_request
+    insert  api_request_queue_item(
+            request
     ,       parameter
     ,       execute_asap        )
-    select  rest_request_queue  = 'ClosePosition'
+    select  request             = 'ClosePosition'
     ,       parameter           =   (   select  dealId      = @deal_id
                                         ,       direction   = @direction
                                         ,       epic        = iif(@deal_id is not null, null, @epic)    -- Prefer @deal_id above @epic.

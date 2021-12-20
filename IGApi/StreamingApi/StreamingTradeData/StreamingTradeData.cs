@@ -11,6 +11,7 @@ using System.Diagnostics;
 
 namespace IGApi
 {
+    using static Log;
     public sealed partial class ApiEngine
     {
         private SubscribedTableKey? _tradeSubscribedTableKey = null;
@@ -34,7 +35,7 @@ namespace IGApi
             }
             catch (Exception ex)
             {
-                Log.WriteException(ex, nameof(ReSubscribeToAllEpicTick));
+                WriteException(ex);
                 throw;
             }
         }
@@ -47,35 +48,35 @@ namespace IGApi
         {
             try
             {
-                _ = LoginSessionInformation ?? throw new NullReferenceException(nameof(LoginSessionInformation));
+                if (!IsLoggedIn) throw new IGApiConncectionError();
 
                 if (!string.IsNullOrEmpty(LoginSessionInformation.lightstreamerEndpoint))
                 {
                     _tradeSubscribedTableKey = _iGStreamApiClient.SubscribeToTradeSubscription(LoginSessionInformation.currentAccountId, _tradeSubscription);
 
                     if (_tradeSubscribedTableKey is not null)
-                        Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatTwoColumns, "[StreamingTickData]", "Subscribed to confirms(CONFIRMS), working order updates(WOU) and open position updates(OPU)"));
+                        WriteLog(Messages("Subscribed to confirms(CONFIRMS), working order updates(WOU) and open position updates(OPU)"));
                     else
-                        Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatTwoColumns, "[StreamingTickData]", "Faild to subscribe to confirms(CONFIRMS), working order updates(WOU) and open position updates(OPU)"));
+                        WriteLog(Messages("Failed to subscribe to confirms(CONFIRMS), working order updates(WOU) and open position updates(OPU)"));
                 }
             }
             catch (Exception ex)
             {
-                Log.WriteException(ex, nameof(SubscribeToTradeDetails));
+                WriteException(ex);
                 throw;
             }
         }
 
         private void UnsubscribeFromTradeDetails()
         {
-            if (LoginSessionInformation is not null)
+            if (IsLoggedIn)
             {
                 if (_tradeSubscribedTableKey is not null)
                 {
                     _iGStreamApiClient.UnsubscribeTableKey(_tradeSubscribedTableKey);
                     _tradeSubscribedTableKey = null;
 
-                    Log.WriteLine("Successfully unsubscribed from trade subscription.");
+                    WriteLog(Messages("Successfully unsubscribed from trade subscription."));
                 }
             }
         }
@@ -132,7 +133,7 @@ namespace IGApi
                 }
                 catch (Exception ex)
                 {
-                    Log.WriteException(ex, nameof(OnUpdate));
+                    WriteException(ex);
 
                     throw;
                 }
@@ -270,10 +271,10 @@ namespace IGApi
 
             void LogUpdateInfo(UpdateType updateType, string epic, string size, string direction, string? dealStatus)
             {
-                Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatFourColumns, $"[{nameof(OnUpdate)}]", "", "", ""));
-                Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatTwoColumns, $"[{nameof(OnUpdate)}]", $"Trade activity received. {nameof(UpdateType)}: {updateType}"));
-                Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatTwoColumns, $"[{nameof(OnUpdate)}]", $"epic: {epic} size: {size} direction: {direction} dealStatus: {dealStatus ?? "UNKNOWN"}"));
-                Log.WriteLine(string.Format(CultureInfo.InvariantCulture, Log.FormatFourColumns, $"[{nameof(OnUpdate)}]", "", "", ""));
+                WriteLog();
+                WriteLog(Messages($"Trade activity received. {nameof(UpdateType)}: {updateType}"));
+                WriteLog(Messages($"epic: {epic} size: {size} direction: {direction} dealStatus: {dealStatus ?? "UNKNOWN"}"));
+                WriteLog();
             }
         }
     }

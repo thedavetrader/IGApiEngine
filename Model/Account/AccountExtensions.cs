@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IGApi.Model
 {
+    using static Log;
     internal static partial class DtoModelExtensions
     {
         #region Session
@@ -102,7 +103,7 @@ namespace IGApi.Model
             }
             catch (Exception ex)
             {
-                Log.WriteException(ex, nameof(SaveAccount));
+                WriteException(ex);
                 throw;
             }
         }

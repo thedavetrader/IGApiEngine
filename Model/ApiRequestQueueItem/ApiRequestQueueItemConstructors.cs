@@ -5,6 +5,14 @@ namespace IGApi.Model
 {
     public partial class ApiRequestQueueItem
     {
+        /// <summary>
+        /// Also provide normal constructor for EF-Core.
+        /// </summary>
+        [Obsolete("Do not use this constructor. It's intended use is for EF-Core only.", true)]      
+        public ApiRequestQueueItem()
+        {
+        }
+
         public ApiRequestQueueItem(
             [NotNullAttribute] string restRequest,
             string? parameters,
@@ -12,7 +20,7 @@ namespace IGApi.Model
             [NotNullAttribute] bool isRecurrent
         )
         {
-            RestRequest = restRequest;
+            Request = restRequest;
             Parameters = parameters;
             ExecuteAsap = executeAsap;
             IsRecurrent = isRecurrent;

@@ -7,7 +7,6 @@ using IGWebApiClient;
 
 namespace IGApi.Model
 {
-    #region Currency
     public partial class Currency
     {
         /// <summary>
@@ -27,5 +26,4 @@ namespace IGApi.Model
             _ = Code ?? throw new PrimaryKeyNullReferenceException(nameof(Code));
         }
     }
-    #endregion
 }

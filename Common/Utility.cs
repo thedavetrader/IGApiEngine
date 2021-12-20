@@ -2,7 +2,7 @@
 {
     public static class Utility
     {
-        public static void DelayAction(int millisecond)
+        public static void WaitFor(int millisecond)
         {
             var timer = new System.Timers.Timer(millisecond);
             timer.Elapsed += delegate { timer.Stop(); };

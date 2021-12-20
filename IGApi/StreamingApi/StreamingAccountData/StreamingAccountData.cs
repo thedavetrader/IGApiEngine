@@ -6,6 +6,7 @@ using Lightstreamer.DotNet.Client;
 
 namespace IGApi
 {
+    using static Log;
     public sealed partial class ApiEngine
     {
         private SubscribedTableKey? _accountBalanceStk = null;
@@ -15,17 +16,17 @@ namespace IGApi
         {
             try
             {
-                _ = LoginSessionInformation ?? throw new NullReferenceException(nameof(LoginSessionInformation));
+                if (!IsLoggedIn) throw new IGApiConncectionError();
 
                 _streamingAccountData = new AccountDetailsTableListerner();
                 _streamingAccountData.Update += StreamingAccountDataUpdate;
 
-                Log.WriteLine("Lightstreamer - Subscribing to Account Details");
+                WriteLog(Messages("Lightstreamer - Subscribing to Account Details"));
                 _accountBalanceStk = _iGStreamApiClient.SubscribeToAccountDetails(LoginSessionInformation.currentAccountId, _streamingAccountData);
             }
             catch (Exception ex)
             {
-                Log.WriteException(ex, nameof(SubscribeToAccountDetails));
+                WriteException(ex);
                 throw;
             }
         }
@@ -34,7 +35,7 @@ namespace IGApi
         {
             try
             {
-                _ = LoginSessionInformation ?? throw new NullReferenceException(nameof(LoginSessionInformation));
+                if (!IsLoggedIn) throw new IGApiConncectionError();
 
                 var streamingAccountData = e.UpdateData;
                 string currentAccountId = LoginSessionInformation.currentAccountId;
@@ -47,7 +48,7 @@ namespace IGApi
             }
             catch (Exception ex) 
             {
-                Log.WriteException(ex, nameof(StreamingAccountDataUpdate));
+                WriteException(ex);
                 throw;
             }
         }
@@ -58,7 +59,7 @@ namespace IGApi
             {
                 _iGStreamApiClient.UnsubscribeTableKey(_accountBalanceStk);
 
-                Log.WriteLine("Successfully unsubscribed from Account Balance Subscription");
+                WriteLog(Messages("Successfully unsubscribed from Account Balance Subscription"));
             }
         }
     }
