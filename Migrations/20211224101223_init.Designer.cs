@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IGApi.Migrations
 {
     [DbContext(typeof(ApiDbContext))]
-    [Migration("20211224093243_ApiRequestQueueItem_v1.7")]
-    partial class ApiRequestQueueItem_v17
+    [Migration("20211224101223_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -241,24 +241,17 @@ namespace IGApi.Migrations
 
             modelBuilder.Entity("IGApi.Model.ApiRequestQueueItem", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Guid")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("guid")
+                        .HasDefaultValueSql("newid()");
 
                     b.Property<bool>("ExecuteAsap")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(false)
                         .HasColumnName("execute_asap");
-
-                    b.Property<Guid>("Guid")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("guid")
-                        .HasDefaultValueSql("newid()");
 
                     b.Property<bool>("IsRecurrent")
                         .ValueGeneratedOnAdd()
@@ -291,13 +284,9 @@ namespace IGApi.Migrations
                         .HasColumnName("timestamp")
                         .HasDefaultValueSql("getutcdate()");
 
-                    b.HasKey("Id");
+                    b.HasKey("Guid");
 
-                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("Id"), false);
-
-                    b.HasAlternateKey("Guid");
-
-                    SqlServerKeyBuilderExtensions.IsClustered(b.HasAlternateKey("Guid"), false);
+                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("Guid"), false);
 
                     b.HasIndex("ExecuteAsap", "Timestamp");
 

@@ -5,9 +5,6 @@ namespace IGApi.Model
     [Table("api_request_queue_item")]
     public partial class ApiRequestQueueItem
     {
-        [Column("id")]
-        public int Id { get; set; }
-
         [Column("guid")]
         public Guid Guid { get; set; }
 

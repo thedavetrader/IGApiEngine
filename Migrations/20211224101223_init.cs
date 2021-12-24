@@ -86,19 +86,20 @@ namespace IGApi.Migrations
                 name: "api_request_queue_item",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    guid = table.Column<Guid>(type: "uniqueidentifier", nullable: false, defaultValueSql: "newid()"),
+                    parent_guid = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     timestamp = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getutcdate()"),
                     request = table.Column<string>(type: "nvarchar(512)", maxLength: 512, nullable: false),
-                    parameter = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: true),
+                    parameter = table.Column<string>(type: "nvarchar(max)", maxLength: 4000, nullable: true),
                     execute_asap = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
-                    is_recurrent = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
+                    is_recurrent = table.Column<bool>(type: "bit", nullable: false, defaultValue: false),
+                    is_running = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_api_request_queue_item", x => x.id)
+                    table.PrimaryKey("PK_api_request_queue_item", x => x.guid)
                         .Annotation("SqlServer:Clustered", false);
-                    table.CheckConstraint("CK_api_request_queue_item_request", "request in ('GetAccountDetails','GetOpenPositions','GetWorkingOrders','GetEpicDetails','GetActivityHistory','GetTransactionHistory','GetClientSentiment','CreatePosition','EditPosition','ClosePosition','CreateWorkingOrder','EditWorkingOrder','DeleteWorkingOrder','GetWatchlists','CreateWatchlist','DeleteWatchlist','GetWatchListEpics','AddWatchlistEpic','RemoveWatchlistEpic')");
+                    table.CheckConstraint("CK_api_request_queue_item_request", "request in ('GetAccountDetails','GetOpenPositions','GetWorkingOrders','GetEpicDetails','GetActivityHistory','GetTransactionHistory','GetClientSentiment','CreatePosition','EditPosition','ClosePosition','CreateWorkingOrder','EditWorkingOrder','DeleteWorkingOrder','GetWatchlists','CreateWatchlist','DeleteWatchlist','GetWatchListEpics','AddWatchlistEpic','RemoveWatchlistEpic','Search')");
                 })
                 .Annotation("SqlServer:MemoryOptimized", true);
 
@@ -174,7 +175,7 @@ namespace IGApi.Migrations
                     type = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: false),
                     controlled_risk_allowed = table.Column<bool>(type: "bit", nullable: false),
                     streaming_prices_available = table.Column<bool>(type: "bit", nullable: false),
-                    market_id = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: false),
+                    market_id = table.Column<string>(type: "nvarchar(4000)", maxLength: 4000, nullable: true),
                     sprintmarket_minimum_expiry_time = table.Column<int>(type: "int", nullable: false),
                     sprintmarket_maximum_expiry_time = table.Column<int>(type: "int", nullable: false),
                     margin_factor = table.Column<decimal>(type: "decimal(38,19)", precision: 38, scale: 19, nullable: true),
@@ -257,6 +258,17 @@ namespace IGApi.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_open_position", x => new { x.account_id, x.deal_id });
+                });
+
+            migrationBuilder.CreateTable(
+                name: "search_result",
+                columns: table => new
+                {
+                    epic = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_search_result", x => x.epic);
                 });
 
             migrationBuilder.CreateTable(
@@ -403,23 +415,6 @@ namespace IGApi.Migrations
                     table.PrimaryKey("PK_epic_detail_special_info", x => new { x.epic, x.special_info });
                     table.ForeignKey(
                         name: "FK_epic_detail_special_info_epic_detail_epic",
-                        column: x => x.epic,
-                        principalTable: "epic_detail",
-                        principalColumn: "epic",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "search_result",
-                columns: table => new
-                {
-                    epic = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_search_result", x => x.epic);
-                    table.ForeignKey(
-                        name: "FK_search_result_epic_detail_epic",
                         column: x => x.epic,
                         principalTable: "epic_detail",
                         principalColumn: "epic",

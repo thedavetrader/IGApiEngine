@@ -15,7 +15,7 @@ namespace IGApi.Model
                 p.Timestamp
             });
 
-            modelBuilder.Entity<ApiRequestQueueItem>().HasAlternateKey(k => k.Guid);
+            modelBuilder.Entity<ApiRequestQueueItem>().HasKey(k => k.Guid);
 
             modelBuilder.Entity<ApiRequestQueueItem>().Property(p => p.Guid).HasDefaultValueSql("newid()");
 

@@ -239,24 +239,17 @@ namespace IGApi.Migrations
 
             modelBuilder.Entity("IGApi.Model.ApiRequestQueueItem", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Guid")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("guid")
+                        .HasDefaultValueSql("newid()");
 
                     b.Property<bool>("ExecuteAsap")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(false)
                         .HasColumnName("execute_asap");
-
-                    b.Property<Guid>("Guid")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("guid")
-                        .HasDefaultValueSql("newid()");
 
                     b.Property<bool>("IsRecurrent")
                         .ValueGeneratedOnAdd()
@@ -289,13 +282,9 @@ namespace IGApi.Migrations
                         .HasColumnName("timestamp")
                         .HasDefaultValueSql("getutcdate()");
 
-                    b.HasKey("Id");
+                    b.HasKey("Guid");
 
-                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("Id"), false);
-
-                    b.HasAlternateKey("Guid");
-
-                    SqlServerKeyBuilderExtensions.IsClustered(b.HasAlternateKey("Guid"), false);
+                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("Guid"), false);
 
                     b.HasIndex("ExecuteAsap", "Timestamp");
 

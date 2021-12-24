@@ -4,9 +4,6 @@
     {
         public static void WaitFor(int millisecond)
         {
-            //var timer = new System.Timers.Timer(millisecond);
-            //timer.Elapsed += delegate { timer.Stop(); };
-            //timer.Start();
             Thread.Sleep(millisecond);
         }
 

@@ -9,7 +9,7 @@ namespace IGApi.RequestQueue
     {
         private void checkConfirmationReceived(string dealReference)
         {
-            const int timeout = 2 * 100;    //TODO: Make configurable
+            const int timeout = 2 * 100;    //TODO: Make configurable timout wait for confirmationreceived 
             bool isReceived = false;
 
             ApiDbContext apiDbContext = new();

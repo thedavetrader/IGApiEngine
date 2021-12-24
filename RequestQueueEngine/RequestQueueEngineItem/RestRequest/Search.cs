@@ -8,7 +8,7 @@ namespace IGApi.RequestQueue
     public partial class RequestQueueEngineItem
     {
         public static event EventHandler? SearchCompleted;
-        //TODO: Make functionality that can create auto watchlists based on signals (let's begin with trending i.c.w. clientsentiment)
+
         [RequestType(isRestRequest: true, isTradingRequest: false)]
         public void Search()
         {
