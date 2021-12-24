@@ -43,10 +43,10 @@ namespace IGApi.Common
         internal EssentialPropertyInvalidCastException(string property)
             : base($"The essential property \"{property}\" could not be casted.") { }
     }
-    internal class InvalidRestRequestMissingParametersException : Exception
+    internal class InvalidRequestMissingParametersException : Exception
     {
-        internal InvalidRestRequestMissingParametersException(string restRequest)
-            : base($"The restrequest \"{restRequest}\" is invalid. This request requires parameters.") { }
+        internal InvalidRequestMissingParametersException([CallerMemberName] string? request = null)
+            : base($"The restrequest \"{request}\" is invalid. This request requires parameters.") { }
     }
 
     internal class IGApiConncectionError : Exception

@@ -12,7 +12,7 @@ namespace IGApi.Model
         public Watchlist()
         {
             AccountId = string.Format(Constants.InvalidEntry, nameof(Watchlist));
-            Id = string.Format(Constants.InvalidEntry, nameof(Watchlist));
+            WatchlistId = string.Format(Constants.InvalidEntry, nameof(Watchlist));
             Name = string.Format(Constants.InvalidEntry, nameof(Watchlist));
         }
 
@@ -31,7 +31,7 @@ namespace IGApi.Model
             MapProperties(watchlist, accountId);
 
             _ = AccountId ?? throw new PrimaryKeyNullReferenceException(nameof(AccountId));
-            _ = Id ?? throw new PrimaryKeyNullReferenceException(nameof(Id));
+            _ = WatchlistId ?? throw new PrimaryKeyNullReferenceException(nameof(WatchlistId));
             _ = Name ?? throw new EssentialPropertyNullReferenceException(nameof(Name));
         }
        

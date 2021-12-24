@@ -6,12 +6,12 @@ namespace IGApi.Model
     {
         public static void SetIsAlive()
         {
-            IGApiDbContext iGApiDbContext = new();
-            _ = iGApiDbContext.ApiEngineStatus ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.ApiEngineStatus));
+            ApiDbContext apiDbContext = new();
+            _ = apiDbContext.ApiEngineStatus ?? throw new DBContextNullReferenceException(nameof(apiDbContext.ApiEngineStatus));
 
-            iGApiDbContext.SaveApiEngineStatus();
+            apiDbContext.SaveApiEngineStatus();
 
-            Task.Run(async ()=> await iGApiDbContext.SaveChangesAsync()).Wait();
+            Task.Run(async ()=> await apiDbContext.SaveChangesAsync()).Wait();
         }
     }
 }

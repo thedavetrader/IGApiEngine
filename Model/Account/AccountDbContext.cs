@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IGApi.Model
 {
-    public partial class IGApiDbContext
+    public partial class ApiDbContext
     {
         public DbSet<Account>? Accounts { get; set; }
         public static void AccountOnModelCreating(ModelBuilder modelBuilder)

@@ -1,4 +1,3 @@
-use tdbt
 
 go
 
@@ -12,4 +11,4 @@ end
 
 go
 
-select dbo.get_api_engine_status_is_alive();
+--select dbo.get_api_engine_status_is_alive();

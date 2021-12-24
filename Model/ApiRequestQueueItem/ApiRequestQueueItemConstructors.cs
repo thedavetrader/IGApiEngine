@@ -17,13 +17,19 @@ namespace IGApi.Model
             [NotNullAttribute] string restRequest,
             string? parameters,
             [NotNullAttribute] bool executeAsap,
-            [NotNullAttribute] bool isRecurrent
+            [NotNullAttribute] bool isRecurrent,
+            Guid guid,
+            Guid? parentGuid
         )
         {
             Request = restRequest;
+            Timestamp = DateTime.UtcNow;
             Parameters = parameters;
             ExecuteAsap = executeAsap;
             IsRecurrent = isRecurrent;
+            IsRunning = false;
+            Guid = guid;
+            ParentGuid = parentGuid;
 
             if (executeAsap && isRecurrent)
                 throw new Exception("A queueitem can not be recurrent as well a beeing executed as soon as possible.");

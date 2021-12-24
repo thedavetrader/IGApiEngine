@@ -9,19 +9,19 @@ namespace IGApi.Model
     internal static partial class DtoModelExtensions
     {
         public static EpicDetailMarginDepositBand? SaveEpicDetailMarginDepositBand(
-            [NotNullAttribute] this IGApiDbContext iGApiDbContext,
+            [NotNullAttribute] this ApiDbContext apiDbContext,
             [NotNullAttribute] EpicDetail epicDetail,
             [NotNullAttribute] DepositBand DepositBand
             )
         {
-            _ = iGApiDbContext.EpicDetailsMarginDepositBand ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.EpicDetailsMarginDepositBand));
+            _ = apiDbContext.EpicDetailsMarginDepositBand ?? throw new DBContextNullReferenceException(nameof(apiDbContext.EpicDetailsMarginDepositBand));
 
-            var epicDetailDepositBand = Task.Run(async () => await iGApiDbContext.EpicDetailsMarginDepositBand.FindAsync(epicDetail.Epic, DepositBand.currency, DepositBand.min)).Result;
+            var epicDetailDepositBand = Task.Run(async () => await apiDbContext.EpicDetailsMarginDepositBand.FindAsync(epicDetail.Epic, DepositBand.currency, DepositBand.min)).Result;
 
             if (epicDetailDepositBand is not null)
                 epicDetailDepositBand.MapProperties(epicDetail, DepositBand);
             else
-                epicDetailDepositBand = iGApiDbContext.EpicDetailsMarginDepositBand.Add(new EpicDetailMarginDepositBand(epicDetail, DepositBand)).Entity;
+                epicDetailDepositBand = apiDbContext.EpicDetailsMarginDepositBand.Add(new EpicDetailMarginDepositBand(epicDetail, DepositBand)).Entity;
 
             return epicDetailDepositBand;
         }

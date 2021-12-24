@@ -13,7 +13,7 @@ namespace IGApi.Model
             DefaultSystemWatchlist = watchlist.defaultSystemWatchlist;
             Deleteable = watchlist.deleteable;
             Editable = watchlist.editable;
-            Id = watchlist.id;
+            WatchlistId = watchlist.id;
             Name = watchlist.name;
             ApiLastUpdate = DateTime.UtcNow;
         }

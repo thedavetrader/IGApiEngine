@@ -65,50 +65,68 @@ namespace IGApi
 
         public void Start()
         {
-            Login();
+            try
+            {
+                Login();
 
-            if (_cancellationTokenSource is not null)
-                _cancellationTokenSource.Dispose();
+                if (_cancellationTokenSource is not null)
+                    _cancellationTokenSource.Dispose();
 
-            _cancellationTokenSource = new CancellationTokenSource();
+                _cancellationTokenSource = new CancellationTokenSource();
 
-            CancellationToken cancellationToken = _cancellationTokenSource.Token;
+                CancellationToken cancellationToken = _cancellationTokenSource.Token;
 
-            _apiRequestQueueEngineTask = Task.Factory.StartNew(() => RequestQueue.RequestQueueEngine.Start(cancellationToken));
+                _apiRequestQueueEngineTask = Task.Factory.StartNew(() => RequestQueue.RequestQueueEngine.StartListening(cancellationToken));
 
-            _setIsAliveTask = Task.Factory.StartNew(() =>
-                {
-                    bool hasInitializedReported = false;
-
-                    while (!cancellationToken.IsCancellationRequested)
+                _setIsAliveTask = Task.Factory.StartNew(() =>
                     {
-                        if (RequestQueue.RequestQueueEngine.IsInitialized)
-                        {
-                            if (!hasInitializedReported)
-                            {
-                                // ASCII Art: https://patorjk.com/software/taag/#p=display&f=ANSI%20Regular&t=Initialization%20done!
-                                WriteLog();
-                                WriteLog(Messages("██ ███    ██ ██ ████████ ██  █████  ██      ██ ███████  █████  ████████ ██  ██████  ███    ██     ██████   ██████  ███    ██ ███████ ██"));
-                                WriteLog(Messages("██ ████   ██ ██    ██    ██ ██   ██ ██      ██    ███  ██   ██    ██    ██ ██    ██ ████   ██     ██   ██ ██    ██ ████   ██ ██      ██"));
-                                WriteLog(Messages("██ ██ ██  ██ ██    ██    ██ ███████ ██      ██   ███   ███████    ██    ██ ██    ██ ██ ██  ██     ██   ██ ██    ██ ██ ██  ██ █████   ██"));
-                                WriteLog(Messages("██ ██  ██ ██ ██    ██    ██ ██   ██ ██      ██  ███    ██   ██    ██    ██ ██    ██ ██  ██ ██     ██   ██ ██    ██ ██  ██ ██ ██        "));
-                                WriteLog(Messages("██ ██   ████ ██    ██    ██ ██   ██ ███████ ██ ███████ ██   ██    ██    ██  ██████  ██   ████     ██████   ██████  ██   ████ ███████ ██"));
-                                WriteLog();
-                                WriteLog(Messages("Ready to receive requests..."));
+                        bool hasInitializedReported = false;
 
-                                hasInitializedReported = true;
+                        while (!cancellationToken.IsCancellationRequested)
+                        {
+                            if (RequestQueue.RequestQueueEngine.IsInitialized)
+                            {
+                                if (!hasInitializedReported)
+                                {
+                                    // ASCII Art: https://patorjk.com/software/taag/#p=display&f=ANSI%20Regular&t=Initialization%20done!
+
+                                    Log.Lock();
+
+                                    WriteLog();
+                                    WriteLog(Messages("██ ███    ██ ██ ████████ ██  █████  ██      ██ ███████  █████  ████████ ██  ██████  ███    ██     ██████   ██████  ███    ██ ███████ ██"));
+                                    WriteLog(Messages("██ ████   ██ ██    ██    ██ ██   ██ ██      ██    ███  ██   ██    ██    ██ ██    ██ ████   ██     ██   ██ ██    ██ ████   ██ ██      ██"));
+                                    WriteLog(Messages("██ ██ ██  ██ ██    ██    ██ ███████ ██      ██   ███   ███████    ██    ██ ██    ██ ██ ██  ██     ██   ██ ██    ██ ██ ██  ██ █████   ██"));
+                                    WriteLog(Messages("██ ██  ██ ██ ██    ██    ██ ██   ██ ██      ██  ███    ██   ██    ██    ██ ██    ██ ██  ██ ██     ██   ██ ██    ██ ██  ██ ██ ██        "));
+                                    WriteLog(Messages("██ ██   ████ ██    ██    ██ ██   ██ ███████ ██ ███████ ██   ██    ██    ██  ██████  ██   ████     ██████   ██████  ██   ████ ███████ ██"));
+                                    WriteLog();
+                                    WriteLog(Messages("Ready to receive requests..."));
+                                    WriteLog();
+
+                                    Log.UnLock();
+
+                                    hasInitializedReported = true;
+                                }
+                                ApiEngineStatus.SetIsAlive();
                             }
-                            ApiEngineStatus.SetIsAlive();
+
+                            Utility.WaitFor(100);
                         }
 
-                        Utility.WaitFor(100);
+                        if (cancellationToken.IsCancellationRequested)
+                            WriteLog(Messages("Cancellation request received. Updating alive status has stopped."));
                     }
-
-                    if (cancellationToken.IsCancellationRequested)
-                        WriteLog(Messages("Cancellation request received. Updating alive status has stopped."));
-                }
-                , cancellationToken
-                );
+                    , cancellationToken
+                    );
+            }
+            catch (Exception ex)
+            {
+                WriteException(ex);
+                throw;
+            }
+            finally
+            {
+                Log.UnLock();
+            }
         }
 
         public void Stop()

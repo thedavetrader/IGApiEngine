@@ -1,15 +1,26 @@
-﻿using System.Globalization;
+﻿using System.Collections.Specialized;
+using System.Configuration;
+using System.Globalization;
 using IGApi.Common;
 using IGApi.Common.Extensions;
 using IGApi.IGApi.StreamingApi.StreamingTickData.EpicStreamListItem;
 using IGApi.Model;
+using IGApi.RequestQueue;
 
 namespace IGApi
 {
     using static Log;
     public sealed partial class ApiEngine
     {
-        public ObservableList<EpicStreamListItem> EpicStreamList = new();
+        public CustomList<EpicStreamListItem> EpicStreamList = new();
+
+        private void EpicStreamListChanged(object? sender, EventArgs e)
+        {
+            if (EpicStreamList.Count > 40)
+                throw new Exception("[CRITICAL_ERROR] IG does not allow more then 40 concurrent streaming subscriptions.");
+
+            Task.Run(() => ReSubscribeToAllEpicTick());
+        }
 
         /// <summary>
         /// Register new epics to EpicStreamList and removes closed ones. Only after both actions are done, notify changes to the list.
@@ -102,9 +113,9 @@ namespace IGApi
         {
             bool StreamingPricesAvailable;
 
-            IGApiDbContext iGApiDbContext = new();
-            _ = iGApiDbContext.EpicDetails ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.EpicDetails));
-            var epicDetail = iGApiDbContext.EpicDetails.Find(epic);
+            ApiDbContext apiDbContext = new();
+            _ = apiDbContext.EpicDetails ?? throw new DBContextNullReferenceException(nameof(apiDbContext.EpicDetails));
+            var epicDetail = apiDbContext.EpicDetails.Find(epic);
 
             if (epicDetail is not null)
             {

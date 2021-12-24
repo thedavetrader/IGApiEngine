@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using IGApi.Common;
+﻿using IGApi.Common;
 using IGApi.Common.Extensions;
 using IGApi.IGApi.StreamingApi.StreamingTickData.EpicStreamListItem;
 using IGApi.Model;
@@ -22,11 +21,6 @@ namespace IGApi
             EpicStreamList.ListChanged += EpicStreamListChanged;
 
             _tickSubscription = new(this);
-        }
-
-        private void EpicStreamListChanged(object? sender, EventArgs e)
-        {
-            Task.Run(() => ReSubscribeToAllEpicTick());
         }
 
         /// <summary>
@@ -104,7 +98,7 @@ namespace IGApi
         /// </summary>
         public class L1PricesSubscription : HandyTableListenerAdapter
         {
-            private readonly ObservableList<EpicStreamListItem> EpicStreamList;
+            private readonly CustomList<EpicStreamListItem> EpicStreamList;
             private readonly ApiEngine _apiEngine;
 
             public L1PricesSubscription(ApiEngine apiEngine)
@@ -120,12 +114,12 @@ namespace IGApi
                     var tickUpdate = L1LsPriceUpdateData(itemPos, itemName, update);
                     var onUpdateEpic = itemName.Replace("L1:", "");
 
-                    using IGApiDbContext iGApiDbContext = new();
-                    _ = iGApiDbContext.EpicTicks ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.EpicTicks));
+                    using ApiDbContext apiDbContext = new();
+                    _ = apiDbContext.EpicTicks ?? throw new DBContextNullReferenceException(nameof(apiDbContext.EpicTicks));
 
-                    iGApiDbContext.SaveEpicTick(tickUpdate, onUpdateEpic);
+                    apiDbContext.SaveEpicTick(tickUpdate, onUpdateEpic);
 
-                    Task.Run(async () => await iGApiDbContext.SaveChangesAsync()).Wait();
+                    Task.Run(async () => await apiDbContext.SaveChangesAsync()).Wait();
 
                 }
                 catch (Exception ex)

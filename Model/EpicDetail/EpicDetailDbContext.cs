@@ -2,7 +2,7 @@
 
 namespace IGApi.Model
 {
-    public partial class IGApiDbContext
+    public partial class ApiDbContext
     {
         public DbSet<EpicDetail>? EpicDetails { get; set; }
         public static void EpicDetailOnModelCreating(ModelBuilder modelBuilder)

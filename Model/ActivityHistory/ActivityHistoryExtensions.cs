@@ -8,18 +8,18 @@ namespace IGApi.Model
     internal static partial class DtoModelExtensions
     {
         public static ActivityHistory? SaveActivityHistory(
-            [NotNullAttribute] this IGApiDbContext iGApiDbContext,
+            [NotNullAttribute] this ApiDbContext apiDbContext,
             [NotNullAttribute] Activity activity
             )
         {
-            _ = iGApiDbContext.ActivitiesHistory ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.ActivitiesHistory));
+            _ = apiDbContext.ActivitiesHistory ?? throw new DBContextNullReferenceException(nameof(apiDbContext.ActivitiesHistory));
 
-            var currentActivity = Task.Run(async () => await iGApiDbContext.ActivitiesHistory.FindAsync(activity.GetTimestamp(), activity.dealId)).Result;
+            var currentActivity = Task.Run(async () => await apiDbContext.ActivitiesHistory.FindAsync(activity.GetTimestamp(), activity.dealId)).Result;
 
             if (currentActivity is not null)
                 currentActivity.MapProperties(activity);
             else
-                currentActivity = iGApiDbContext.ActivitiesHistory.Add(new ActivityHistory(activity)).Entity;
+                currentActivity = apiDbContext.ActivitiesHistory.Add(new ActivityHistory(activity)).Entity;
 
             return currentActivity;
         }
@@ -46,7 +46,7 @@ namespace IGApi.Model
                 out TimeSpan time))
             {
                 var timestampLocal = DateTime.SpecifyKind(date + time, DateTimeKind.Local);
-                return TimeZoneInfo.ConvertTimeToUtc(timestampLocal, TimeZoneInfo.Local); ;
+                return TimeZoneInfo.ConvertTimeToUtc(timestampLocal, TimeZoneInfo.Local);
             }
             else
                 throw new EssentialPropertyNullReferenceException(nameof(GetTimestamp));

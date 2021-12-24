@@ -37,7 +37,7 @@ namespace IGApi.Model
         public bool StreamingPricesAvailable { get; set; }
 
         [Column("market_id")]
-        public string MarketId { get; set; } = Constants.PropertyNullError;
+        public string? MarketId { get; set; } = Constants.PropertyNullError;
 
         [Column("sprintmarket_minimum_expiry_time")]
         public int SprintMarketsMinimumExpiryTime { get; set; }
@@ -145,6 +145,9 @@ namespace IGApi.Model
 
         public virtual List<EpicDetailCurrency>? Currencies { get; set; }
         #endregion
+
+        //	Linked
+        public virtual List<WatchlistEpicDetail> watchlistEpicDetails { get; set; }
     }
 }
 

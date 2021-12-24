@@ -133,20 +133,20 @@ namespace IGApi
 
                 if (accountData.accounts.Count > 0)
                 {
-                    using IGApiDbContext iGApiDbContext = new();
+                    using ApiDbContext apiDbContext = new();
 
                     foreach (var sessionAccount in accountData.accounts)
                     {
                         if (sessionAccount.preferred)
                         {
                             currentAccountId = sessionAccount.accountId;
-                            iGApiDbContext.SaveAccount(sessionAccount, accountData.accountInfo);
+                            apiDbContext.SaveAccount(sessionAccount, accountData.accountInfo);
                         }
                         else
-                            iGApiDbContext.SaveAccount(sessionAccount);
+                            apiDbContext.SaveAccount(sessionAccount);
                     }
 
-                    Task.Run(async () => await iGApiDbContext.SaveChangesAsync()).Wait(); // Use wait, avoiding object disposed DbContext operations are still running.
+                    Task.Run(async () => await apiDbContext.SaveChangesAsync()).Wait(); // Use wait, avoiding object disposed DbContext operations are still running.
                 }
             }
         }

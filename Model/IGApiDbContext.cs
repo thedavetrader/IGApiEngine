@@ -5,7 +5,7 @@
     using System.Threading.Tasks;
     using Microsoft.EntityFrameworkCore;
 
-    public partial class IGApiDbContext : DbContext
+    public partial class ApiDbContext : DbContext
     {
         //TODO:     PRIOLOW_connectionString
         private static readonly string _connectionString = "Password=96ci^w4XSCP&iy&m;Database=TDBT;User ID=TheDaveTrader;Data Source=LITTLEKICK;";
@@ -41,6 +41,8 @@
             ClientSentimentOnModelCreating(modelBuilder);
             ConfirmResponseOnModelCreating(modelBuilder);
             WatchlistOnModelCreating(modelBuilder);
+            WatchlistEpicDetailOnModelCreating(modelBuilder);
+            SearchResultOnModelCreating(modelBuilder);
 
             //  Set default varchar(4000)
             foreach (var property in modelBuilder.Model.GetEntityTypes()

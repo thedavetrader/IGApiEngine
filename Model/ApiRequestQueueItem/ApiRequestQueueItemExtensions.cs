@@ -6,24 +6,23 @@ namespace IGApi.Model
     internal static partial class DtoModelExtensions
     {
         public static ApiRequestQueueItem? SaveRestRequestQueue(
-            [NotNullAttribute] this IGApiDbContext iGApiDbContext,
+            [NotNullAttribute] this ApiDbContext apiDbContext,
             [NotNullAttribute] ApiRequestQueueItem apiRequestQueueItem
             )
         {
-            _ = iGApiDbContext.ApiRequestQueueItems ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.ApiRequestQueueItems));
+            _ = apiDbContext.ApiRequestQueueItems ?? throw new DBContextNullReferenceException(nameof(apiDbContext.ApiRequestQueueItems));
 
             var currentRestRequestQueueItem =
-                    Task.Run(() => iGApiDbContext.ApiRequestQueueItems
+                    Task.Run(() => apiDbContext.ApiRequestQueueItems
                         .FirstOrDefault(w => 
-                            w.IsRecurrent && w.Request == apiRequestQueueItem.Request ||
-                            !w.IsRecurrent &&  w.ExecuteAsap == apiRequestQueueItem.ExecuteAsap &&  w.Request == apiRequestQueueItem.Request
+                        w.Guid == apiRequestQueueItem.Guid
                             )).Result 
                     ;
 
             if (currentRestRequestQueueItem is not null)
                 currentRestRequestQueueItem.MapProperties(apiRequestQueueItem);
             else
-                currentRestRequestQueueItem = iGApiDbContext.ApiRequestQueueItems.Add(apiRequestQueueItem).Entity;
+                currentRestRequestQueueItem = apiDbContext.ApiRequestQueueItems.Add(apiRequestQueueItem).Entity;
 
             return currentRestRequestQueueItem;
         }

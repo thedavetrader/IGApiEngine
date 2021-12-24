@@ -40,11 +40,11 @@ namespace IGApi
                 var streamingAccountData = e.UpdateData;
                 string currentAccountId = LoginSessionInformation.currentAccountId;
 
-                using IGApiDbContext iGApiDbContext = new();
+                using ApiDbContext apiDbContext = new();
                 
-                iGApiDbContext.SaveAccount(streamingAccountData, currentAccountId);
+                apiDbContext.SaveAccount(streamingAccountData, currentAccountId);
                 
-                Task.Run(async () => await iGApiDbContext.SaveChangesAsync()).Wait(); // Use wait, avoiding object disposed DbContext operations are still running.
+                Task.Run(async () => await apiDbContext.SaveChangesAsync()).Wait(); // Use wait, avoiding object disposed DbContext operations are still running.
             }
             catch (Exception ex) 
             {

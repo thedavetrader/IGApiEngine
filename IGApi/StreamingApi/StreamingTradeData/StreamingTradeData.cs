@@ -207,27 +207,27 @@ namespace IGApi
 
                 static void SyncToDbOpenPositions(LsTradeSubscriptionData openPositionData, string accountId)
                 {
-                    IGApiDbContext iGApiDbContext = new();
-                    _ = iGApiDbContext.OpenPositions ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.OpenPositions));
+                    ApiDbContext apiDbContext = new();
+                    _ = apiDbContext.OpenPositions ?? throw new DBContextNullReferenceException(nameof(apiDbContext.OpenPositions));
 
                     if (
                         openPositionData.status == StreamingStatusEnum.OPEN ||
                         openPositionData.status == StreamingStatusEnum.UPDATED ||
                         openPositionData.status == StreamingStatusEnum.AMENDED)
                     {
-                        iGApiDbContext.SaveOpenPosition(openPositionData, accountId);
+                        apiDbContext.SaveOpenPosition(openPositionData, accountId);
                     }
                     else if (
                         openPositionData.status == StreamingStatusEnum.CLOSED ||
                         openPositionData.status == StreamingStatusEnum.DELETED)
                     {
-                        var openPosition = Task.Run(async () => await iGApiDbContext.OpenPositions.FindAsync(accountId, openPositionData.dealId)).Result;
+                        var openPosition = Task.Run(async () => await apiDbContext.OpenPositions.FindAsync(accountId, openPositionData.dealId)).Result;
 
                         if (openPosition != null)
-                            iGApiDbContext.Remove(openPosition);
+                            apiDbContext.Remove(openPosition);
                     }
 
-                    Task.Run(async () => await iGApiDbContext.SaveChangesAsync()).Wait();
+                    Task.Run(async () => await apiDbContext.SaveChangesAsync()).Wait();
                 }
 
                 static void SyncToDbWorkingOrders(
@@ -235,37 +235,37 @@ namespace IGApi
                     dto.endpoint.workingorders.get.v2.WorkingOrderData WorkingOrderData,
                     string accountId)
                 {
-                    IGApiDbContext iGApiDbContext = new();
-                    _ = iGApiDbContext.WorkingOrders ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.WorkingOrders));
+                    ApiDbContext apiDbContext = new();
+                    _ = apiDbContext.WorkingOrders ?? throw new DBContextNullReferenceException(nameof(apiDbContext.WorkingOrders));
 
                     if (
                         status == StreamingStatusEnum.OPEN ||
                         status == StreamingStatusEnum.UPDATED ||
                         status == StreamingStatusEnum.AMENDED)
                     {
-                        iGApiDbContext.SaveWorkingOrder(WorkingOrderData, accountId);
+                        apiDbContext.SaveWorkingOrder(WorkingOrderData, accountId);
                     }
                     else if (
                         status == StreamingStatusEnum.CLOSED ||
                         status == StreamingStatusEnum.DELETED)
                     {
-                        var WorkingOrder = Task.Run(async () => await iGApiDbContext.WorkingOrders.FindAsync(accountId, WorkingOrderData.dealId)).Result;
+                        var WorkingOrder = Task.Run(async () => await apiDbContext.WorkingOrders.FindAsync(accountId, WorkingOrderData.dealId)).Result;
 
                         if (WorkingOrder != null)
-                            iGApiDbContext.Remove(WorkingOrder);
+                            apiDbContext.Remove(WorkingOrder);
                     }
 
-                    Task.Run(async () => await iGApiDbContext.SaveChangesAsync()).Wait();
+                    Task.Run(async () => await apiDbContext.SaveChangesAsync()).Wait();
                 }
 
                 static void SyncToDbConfirms(dto.endpoint.confirms.ConfirmsResponse ConfirmData)
                 {
-                    IGApiDbContext iGApiDbContext = new();
-                    _ = iGApiDbContext.ConfirmResponses?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.ConfirmResponses));
+                    ApiDbContext apiDbContext = new();
+                    _ = apiDbContext.ConfirmResponses?? throw new DBContextNullReferenceException(nameof(apiDbContext.ConfirmResponses));
 
-                    iGApiDbContext.SaveConfirmResponse(ConfirmData);
+                    apiDbContext.SaveConfirmResponse(ConfirmData);
 
-                    Task.Run(async () => await iGApiDbContext.SaveChangesAsync()).Wait();
+                    Task.Run(async () => await apiDbContext.SaveChangesAsync()).Wait();
                 }
             }
 

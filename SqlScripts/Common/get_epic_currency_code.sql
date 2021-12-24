@@ -1,3 +1,6 @@
+
+go
+
 create or alter function get_epic_currency_code(@epic nvarchar(128))
 returns nvarchar(4000)
 as begin
@@ -15,3 +18,5 @@ as begin
                 order 
                 by      p.priority asc  )
 end
+
+go

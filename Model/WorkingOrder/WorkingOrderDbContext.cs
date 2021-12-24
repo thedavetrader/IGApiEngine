@@ -2,7 +2,7 @@
 
 namespace IGApi.Model
 {
-    public partial class IGApiDbContext
+    public partial class ApiDbContext
     {
         public DbSet<WorkingOrder>? WorkingOrders { get; set; }
         public static void WorkingOrderOnModelCreating(ModelBuilder modelBuilder)

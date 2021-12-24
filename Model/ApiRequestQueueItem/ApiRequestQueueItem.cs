@@ -8,6 +8,12 @@ namespace IGApi.Model
         [Column("id")]
         public int Id { get; set; }
 
+        [Column("guid")]
+        public Guid Guid { get; set; }
+
+        [Column("parent_guid")]
+        public Guid? ParentGuid { get; set; }
+
         [Column("timestamp")]
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
         
@@ -22,5 +28,8 @@ namespace IGApi.Model
         
         [Column("is_recurrent")]
         public bool IsRecurrent { get; set; }
+
+        [Column("is_running")]
+        public bool IsRunning { get; set; }
     }
 }

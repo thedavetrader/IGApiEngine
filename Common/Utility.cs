@@ -4,9 +4,10 @@
     {
         public static void WaitFor(int millisecond)
         {
-            var timer = new System.Timers.Timer(millisecond);
-            timer.Elapsed += delegate { timer.Stop(); };
-            timer.Start();
+            //var timer = new System.Timers.Timer(millisecond);
+            //timer.Elapsed += delegate { timer.Stop(); };
+            //timer.Start();
+            Thread.Sleep(millisecond);
         }
 
         /// <summary>
@@ -17,7 +18,12 @@
         /// <returns></returns>
         public static TimeSpan ConvertLocalTimeStringToUtcTimespan(string time)
         {
-            return TimeSpan.Parse(time) - DateTimeOffset.Now.Offset;
+            var timeSpanTime = TimeSpan.Parse(time);
+
+            DateTime dateTime = DateTime.Now.Date + timeSpanTime;
+
+            var timestampLocal = DateTime.SpecifyKind(dateTime, DateTimeKind.Local);
+            return TimeZoneInfo.ConvertTimeToUtc(timestampLocal, TimeZoneInfo.Local).TimeOfDay;
         }
 
         /// <summary>
@@ -28,6 +34,11 @@
         public static int CountTrue(params bool[] booleans)
         {
             return booleans.Count(t => t);
+        }
+
+        public static DateTime round_minute(DateTime dateTime, DateTimeKind kind = DateTimeKind.Utc)
+        {
+            return new DateTime(dateTime.Year, dateTime.Month, dateTime.Day, dateTime.Hour, dateTime.Minute, 0, kind: kind);
         }
     }
 }

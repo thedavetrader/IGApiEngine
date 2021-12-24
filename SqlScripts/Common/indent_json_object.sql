@@ -1,3 +1,6 @@
+
+go
+
 create or alter function indent_json_object(@json nvarchar(max))
 returns nvarchar(max)
 as begin
@@ -13,3 +16,5 @@ as begin
                         , '},', '},'  + @newline        )
 
 end
+
+go

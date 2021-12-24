@@ -9,36 +9,36 @@ namespace IGApi.Model
     {
         #region Session
         public static Account? SaveAccount(
-            [NotNullAttribute] this IGApiDbContext iGApiDbContext,
+            [NotNullAttribute] this ApiDbContext apiDbContext,
             [NotNullAttribute] dto.endpoint.auth.session.AccountDetails accountDetails
             )
         {
-            _ = iGApiDbContext.Accounts ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.Accounts));
+            _ = apiDbContext.Accounts ?? throw new DBContextNullReferenceException(nameof(apiDbContext.Accounts));
 
-            var currentAccount = Task.Run(async () => await iGApiDbContext.Accounts.FindAsync(accountDetails.accountId)).Result;
+            var currentAccount = Task.Run(async () => await apiDbContext.Accounts.FindAsync(accountDetails.accountId)).Result;
 
             if (currentAccount is not null)
                 currentAccount.MapProperties(accountDetails);
             else
-                currentAccount = iGApiDbContext.Accounts.Add(new Account(accountDetails)).Entity;
+                currentAccount = apiDbContext.Accounts.Add(new Account(accountDetails)).Entity;
 
             return currentAccount;
         }
 
         public static Account? SaveAccount(
-            [NotNullAttribute] this IGApiDbContext iGApiDbContext,
+            [NotNullAttribute] this ApiDbContext apiDbContext,
             [NotNullAttribute] dto.endpoint.auth.session.AccountDetails accountDetails,
             [NotNullAttribute] dto.endpoint.auth.session.AccountInfo accountBalance
         )
         {
-            _ = iGApiDbContext.Accounts ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.Accounts));
+            _ = apiDbContext.Accounts ?? throw new DBContextNullReferenceException(nameof(apiDbContext.Accounts));
 
-            var currentAccount = Task.Run(async () => await iGApiDbContext.Accounts.FindAsync(accountDetails.accountId)).Result;
+            var currentAccount = Task.Run(async () => await apiDbContext.Accounts.FindAsync(accountDetails.accountId)).Result;
 
             if (currentAccount is not null)
                 currentAccount.MapProperties(accountDetails, accountBalance);
             else
-                currentAccount = iGApiDbContext.Accounts.Add(new Account(accountDetails, accountBalance)).Entity;
+                currentAccount = apiDbContext.Accounts.Add(new Account(accountDetails, accountBalance)).Entity;
 
             return currentAccount;
         }
@@ -46,36 +46,36 @@ namespace IGApi.Model
 
         #region AccountBalance
         public static Account? SaveAccount(
-           [NotNullAttribute] this IGApiDbContext iGApiDbContext,
+           [NotNullAttribute] this ApiDbContext apiDbContext,
            [NotNullAttribute] dto.endpoint.accountbalance.AccountDetails accountDetails
            )
         {
-            _ = iGApiDbContext.Accounts ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.Accounts));
+            _ = apiDbContext.Accounts ?? throw new DBContextNullReferenceException(nameof(apiDbContext.Accounts));
 
-            var currentAccount = Task.Run(async () => await iGApiDbContext.Accounts.FindAsync(accountDetails.accountId)).Result;
+            var currentAccount = Task.Run(async () => await apiDbContext.Accounts.FindAsync(accountDetails.accountId)).Result;
 
             if (currentAccount is not null)
                 currentAccount.MapProperties(accountDetails);
             else
-                currentAccount = iGApiDbContext.Accounts.Add(new Account(accountDetails)).Entity;
+                currentAccount = apiDbContext.Accounts.Add(new Account(accountDetails)).Entity;
 
             return currentAccount;
         }
 
         public static Account? SaveAccount(
-            [NotNullAttribute] this IGApiDbContext iGApiDbContext,
+            [NotNullAttribute] this ApiDbContext apiDbContext,
             [NotNullAttribute] dto.endpoint.accountbalance.AccountDetails accountDetails,
             [NotNullAttribute] dto.endpoint.accountbalance.AccountBalance accountBalance
         )
         {
-            _ = iGApiDbContext.Accounts ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.Accounts));
+            _ = apiDbContext.Accounts ?? throw new DBContextNullReferenceException(nameof(apiDbContext.Accounts));
 
-            var currentAccount = Task.Run(async () => await iGApiDbContext.Accounts.FindAsync(accountDetails.accountId)).Result;
+            var currentAccount = Task.Run(async () => await apiDbContext.Accounts.FindAsync(accountDetails.accountId)).Result;
 
             if (currentAccount is not null)
                 currentAccount.MapProperties(accountDetails, accountBalance);
             else
-                currentAccount = iGApiDbContext.Accounts.Add(new Account(accountDetails, accountBalance)).Entity;
+                currentAccount = apiDbContext.Accounts.Add(new Account(accountDetails, accountBalance)).Entity;
 
             return currentAccount;
         }
@@ -83,21 +83,21 @@ namespace IGApi.Model
 
         #region StreamingAccountData
         public static Account? SaveAccount(
-           [NotNullAttribute] this IGApiDbContext iGApiDbContext,
+           [NotNullAttribute] this ApiDbContext apiDbContext,
            [NotNullAttribute] IGWebApiClient.StreamingAccountData streamingAccountData,
            [NotNullAttribute] string accountId
            )
         {
             try
             {
-                _ = iGApiDbContext.Accounts ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.Accounts));
+                _ = apiDbContext.Accounts ?? throw new DBContextNullReferenceException(nameof(apiDbContext.Accounts));
 
-                var currentAccount = Task.Run(async () => await iGApiDbContext.Accounts.FindAsync(accountId)).Result;
+                var currentAccount = Task.Run(async () => await apiDbContext.Accounts.FindAsync(accountId)).Result;
 
                 if (currentAccount is not null)
                     currentAccount.MapProperties(streamingAccountData, accountId);
                 else
-                    currentAccount = iGApiDbContext.Accounts.Add(new Account(streamingAccountData, accountId)).Entity;
+                    currentAccount = apiDbContext.Accounts.Add(new Account(streamingAccountData, accountId)).Entity;
 
                 return currentAccount;
             }

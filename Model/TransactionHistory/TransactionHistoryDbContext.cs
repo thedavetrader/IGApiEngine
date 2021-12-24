@@ -2,7 +2,7 @@
 
 namespace IGApi.Model
 {
-    public partial class IGApiDbContext
+    public partial class ApiDbContext
     {
         public DbSet<TransactionHistory>? TransactionsHistory { get; set; }
         public static void TransactionOnModelCreating(ModelBuilder modelBuilder)

@@ -8,20 +8,20 @@ namespace IGApi.Model
     internal static partial class DtoModelExtensions
     {
         public static EpicDetailOpeningHour? SaveEpicDetailOpeningHour(
-            [NotNullAttribute] this IGApiDbContext iGApiDbContext,
+            [NotNullAttribute] this ApiDbContext apiDbContext,
             [NotNullAttribute] EpicDetail epicDetail,
             [NotNullAttribute] TimeRange timeRange
             )
         {
-            _ = iGApiDbContext.EpicDetailsOpeningHour ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.EpicDetailsOpeningHour));
+            _ = apiDbContext.EpicDetailsOpeningHour ?? throw new DBContextNullReferenceException(nameof(apiDbContext.EpicDetailsOpeningHour));
 
             var openTime = Utility.ConvertLocalTimeStringToUtcTimespan(timeRange.openTime);
-            var epicDetailOpeningHour = Task.Run(async () => await iGApiDbContext.EpicDetailsOpeningHour.FindAsync(epicDetail.Epic, openTime)).Result;
+            var epicDetailOpeningHour = Task.Run(async () => await apiDbContext.EpicDetailsOpeningHour.FindAsync(epicDetail.Epic, openTime)).Result;
 
             if (epicDetailOpeningHour is not null)
                 epicDetailOpeningHour.MapProperties(epicDetail, timeRange);
             else
-                epicDetailOpeningHour = iGApiDbContext.EpicDetailsOpeningHour.Add(new EpicDetailOpeningHour(epicDetail, timeRange)).Entity;
+                epicDetailOpeningHour = apiDbContext.EpicDetailsOpeningHour.Add(new EpicDetailOpeningHour(epicDetail, timeRange)).Entity;
 
             return epicDetailOpeningHour;
         }

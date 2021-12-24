@@ -9,42 +9,42 @@ namespace IGApi.Model
     internal static partial class DtoModelExtensions
     {
         public static OpenPosition? SaveOpenPosition(
-            [NotNullAttribute] this IGApiDbContext iGApiDbContext,
+            [NotNullAttribute] this ApiDbContext apiDbContext,
             [NotNullAttribute] OpenPositionData openPositionData,
             [NotNullAttribute] string accountId,
             [NotNullAttribute] string epic
             )
         {
-            _ = iGApiDbContext.OpenPositions ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.OpenPositions));
+            _ = apiDbContext.OpenPositions ?? throw new DBContextNullReferenceException(nameof(apiDbContext.OpenPositions));
 
-            var currentOpenPosition = Task.Run(async () => await iGApiDbContext.OpenPositions.FindAsync(accountId, openPositionData.dealId)).Result;
+            var currentOpenPosition = Task.Run(async () => await apiDbContext.OpenPositions.FindAsync(accountId, openPositionData.dealId)).Result;
 
             if (currentOpenPosition is not null)
                 currentOpenPosition.MapProperties(openPositionData, accountId, epic);
             else
-                currentOpenPosition = iGApiDbContext.OpenPositions.Add(new OpenPosition(openPositionData, accountId, epic)).Entity;
+                currentOpenPosition = apiDbContext.OpenPositions.Add(new OpenPosition(openPositionData, accountId, epic)).Entity;
 
             return currentOpenPosition;
         }
 
         public static OpenPosition? SaveOpenPosition(
-        [NotNullAttribute] this IGApiDbContext iGApiDbContext,
+        [NotNullAttribute] this ApiDbContext apiDbContext,
         [NotNullAttribute] LsTradeSubscriptionData lsTradeSubscriptionData,
         [NotNullAttribute] string accountId
         )
         {
-            _ = iGApiDbContext.OpenPositions ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.OpenPositions));
+            _ = apiDbContext.OpenPositions ?? throw new DBContextNullReferenceException(nameof(apiDbContext.OpenPositions));
 
-            var currentOpenPosition = Task.Run(async () => await iGApiDbContext.OpenPositions.FindAsync(accountId, lsTradeSubscriptionData.dealId)).Result;
+            var currentOpenPosition = Task.Run(async () => await apiDbContext.OpenPositions.FindAsync(accountId, lsTradeSubscriptionData.dealId)).Result;
 
             if (currentOpenPosition is not null)
                 currentOpenPosition.MapProperties(lsTradeSubscriptionData, accountId);
             else
-                currentOpenPosition = iGApiDbContext.OpenPositions.Add(new OpenPosition(lsTradeSubscriptionData, accountId)).Entity;
+                currentOpenPosition = apiDbContext.OpenPositions.Add(new OpenPosition(lsTradeSubscriptionData, accountId)).Entity;
 
             //TODO:     ZEROPRIO Example of ChangeTracker.DebugView Just for reference.
-            //iGApiDbContext.ChangeTracker.DetectChanges();
-            //Debug.WriteLine(iGApiDbContext.ChangeTracker.DebugView.LongView);
+            //apiDbContext.ChangeTracker.DetectChanges();
+            //Debug.WriteLine(apiDbContext.ChangeTracker.DebugView.LongView);
 
             return currentOpenPosition;
         }

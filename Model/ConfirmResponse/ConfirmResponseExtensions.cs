@@ -6,17 +6,17 @@ namespace IGApi.Model
     internal static partial class DtoModelExtensions
     {
         public static ConfirmResponse? SaveConfirmResponse(
-            [NotNullAttribute] this IGApiDbContext iGApiDbContext,
+            [NotNullAttribute] this ApiDbContext apiDbContext,
             [NotNullAttribute] dto.endpoint.confirms.ConfirmsResponse confirmsResponse
             )
         {
-            _ = iGApiDbContext.ConfirmResponses ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.ConfirmResponses));
+            _ = apiDbContext.ConfirmResponses ?? throw new DBContextNullReferenceException(nameof(apiDbContext.ConfirmResponses));
 
             //  Cleanup any previous confirm responses for this dealreference (left overs from eg. crash)
-            iGApiDbContext.ConfirmResponses.RemoveRange(iGApiDbContext.ConfirmResponses.Where(w => w.DealReference == confirmsResponse.dealReference));
+            apiDbContext.ConfirmResponses.RemoveRange(apiDbContext.ConfirmResponses.Where(w => w.DealReference == confirmsResponse.dealReference));
 
             //  Confirm response are only added. They are deleted (consumed) by the calling db request procedure.
-            var currentConfirmResponse = iGApiDbContext.ConfirmResponses.Add(new ConfirmResponse(confirmsResponse)).Entity;
+            var currentConfirmResponse = apiDbContext.ConfirmResponses.Add(new ConfirmResponse(confirmsResponse)).Entity;
 
             return currentConfirmResponse;
         }

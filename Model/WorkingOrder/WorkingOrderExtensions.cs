@@ -7,19 +7,19 @@ namespace IGApi.Model
     internal static partial class DtoModelExtensions
     {
         public static WorkingOrder? SaveWorkingOrder(
-            [NotNullAttribute] this IGApiDbContext iGApiDbContext,
+            [NotNullAttribute] this ApiDbContext apiDbContext,
             [NotNullAttribute] WorkingOrderData WorkingOrderData,
             [NotNullAttribute] string accountId
             )
         {
-            _ = iGApiDbContext.WorkingOrders ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.WorkingOrders));
+            _ = apiDbContext.WorkingOrders ?? throw new DBContextNullReferenceException(nameof(apiDbContext.WorkingOrders));
 
-            var currentWorkingOrder = Task.Run(async () => await iGApiDbContext.WorkingOrders.FindAsync(accountId, WorkingOrderData.dealId)).Result;
+            var currentWorkingOrder = Task.Run(async () => await apiDbContext.WorkingOrders.FindAsync(accountId, WorkingOrderData.dealId)).Result;
 
             if (currentWorkingOrder is not null)
                 currentWorkingOrder.MapProperties(WorkingOrderData, accountId);
             else
-                currentWorkingOrder = iGApiDbContext.WorkingOrders.Add(new WorkingOrder(WorkingOrderData, accountId)).Entity;
+                currentWorkingOrder = apiDbContext.WorkingOrders.Add(new WorkingOrder(WorkingOrderData, accountId)).Entity;
 
             return currentWorkingOrder;
         }

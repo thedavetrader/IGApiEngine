@@ -2,7 +2,7 @@
 
 namespace IGApi.Model
 {
-    public partial class IGApiDbContext
+    public partial class ApiDbContext
     {
         public DbSet<ClientSentiment>? ClientSentiments { get; set; }
         public static void ClientSentimentOnModelCreating(ModelBuilder modelBuilder)

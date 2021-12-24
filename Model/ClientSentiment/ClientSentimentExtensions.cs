@@ -7,18 +7,18 @@ namespace IGApi.Model
     internal static partial class DtoModelExtensions
     {
         public static ClientSentiment? SaveClientSentiment(
-            [NotNullAttribute] this IGApiDbContext iGApiDbContext,
+            [NotNullAttribute] this ApiDbContext apiDbContext,
             [NotNullAttribute] dto.endpoint.clientsentiment.ClientSentiment clientSentiment
             )
         {
-            _ = iGApiDbContext.ClientSentiments ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.ClientSentiments));
+            _ = apiDbContext.ClientSentiments ?? throw new DBContextNullReferenceException(nameof(apiDbContext.ClientSentiments));
 
-            var currentClientSentiment = Task.Run(async () => await iGApiDbContext.ClientSentiments.FindAsync(clientSentiment.marketId)).Result;
+            var currentClientSentiment = Task.Run(async () => await apiDbContext.ClientSentiments.FindAsync(clientSentiment.marketId)).Result;
 
             if (currentClientSentiment is not null)
                 currentClientSentiment.MapProperties(clientSentiment);
             else
-                currentClientSentiment = iGApiDbContext.ClientSentiments.Add(new ClientSentiment(clientSentiment)).Entity;
+                currentClientSentiment = apiDbContext.ClientSentiments.Add(new ClientSentiment(clientSentiment)).Entity;
 
             return currentClientSentiment;
         }

@@ -8,18 +8,18 @@ namespace IGApi.Model
     internal static partial class DtoModelExtensions
     {
         public static Currency? SaveCurrency(
-            [NotNullAttribute] this IGApiDbContext iGApiDbContext,
+            [NotNullAttribute] this ApiDbContext apiDbContext,
             [NotNullAttribute] CurrencyData currencyData
             )
         {
-            _ = iGApiDbContext.Currencies ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.Currencies));
+            _ = apiDbContext.Currencies ?? throw new DBContextNullReferenceException(nameof(apiDbContext.Currencies));
 
-            var currentCurrency = Task.Run(async () => await iGApiDbContext.Currencies.FindAsync(currencyData.code)).Result;
+            var currentCurrency = Task.Run(async () => await apiDbContext.Currencies.FindAsync(currencyData.code)).Result;
 
             if (currentCurrency is not null)
                 currentCurrency.MapProperties(currencyData);
             else
-                currentCurrency = iGApiDbContext.Currencies.Add(new Currency(currencyData)).Entity;
+                currentCurrency = apiDbContext.Currencies.Add(new Currency(currencyData)).Entity;
 
             return currentCurrency;
         }

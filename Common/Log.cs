@@ -36,7 +36,27 @@ namespace IGApi.Common
 
     internal static class Log
     {
+        private static string? isLockedByCaller;
+
         internal static string[] Messages(params string[] messages) { return messages; }
+
+        /// <summary>
+        /// Allows to get exclusive rights to write to console output stream.
+        /// </summary>
+        /// <param name="caller"></param>
+        internal static void Lock([CallerMemberName] string? caller = null)
+        {
+            isLockedByCaller = caller;
+        }
+
+        /// <summary>
+        /// Make console output stream available again.
+        /// </summary>
+        internal static void UnLock([CallerMemberName] string? caller = null)
+        {
+            if (isLockedByCaller == caller)
+                isLockedByCaller = null;
+        }
 
         internal static void WriteLog([CallerMemberName] string? caller = null)
         {
@@ -44,7 +64,7 @@ namespace IGApi.Common
         }
         internal static void WriteLog(string[] messages, [CallerMemberName] string? caller = null)
         {
-            switch(messages.Length)
+            switch (messages.Length)
             {
                 case 1: WriteLog(LogFormat.FormatOneColumns, messages, caller); break;
                 case 2: WriteLog(LogFormat.FormatTwoColumns, messages, caller); break;
@@ -56,13 +76,15 @@ namespace IGApi.Common
 
         internal static void WriteLog(LogFormat logFormat, string[] messages, [CallerMemberName] string? caller = null)
         {
+            while (isLockedByCaller != caller && isLockedByCaller is not null) { Utility.WaitFor(100); }
+
             string[] finalMessages = new string[messages.Length + 1];
             finalMessages[0] = $"[{DateTime.UtcNow}][{caller}]";
             Array.Copy(messages, 0, finalMessages, 1, messages.Length);
 
             Console.WriteLine(string.Format(
-                provider: CultureInfo.InvariantCulture, 
-                format: logFormat.ToString(), 
+                provider: CultureInfo.InvariantCulture,
+                format: logFormat.ToString(),
                 args: finalMessages));
         }
 

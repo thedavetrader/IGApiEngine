@@ -2,7 +2,7 @@
 
 namespace IGApi.Model
 {
-    public partial class IGApiDbContext
+    public partial class ApiDbContext
     {
         public DbSet<ActivityHistory>? ActivitiesHistory { get; set; }
         public static void ActivityOnModelCreating(ModelBuilder modelBuilder)

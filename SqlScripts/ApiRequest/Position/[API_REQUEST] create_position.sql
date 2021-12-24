@@ -1,3 +1,6 @@
+
+go
+
 create or alter procedure create_position
         @epic                       nvarchar(4000)   
 ,       @direction                  nvarchar(4)           
@@ -172,10 +175,10 @@ end
 
 go
 
-exec create_position
-        @epic                       = 'CS.D.ETHUSD.CFE.IP'
-,       @direction                  = 'BUY'
-,       @size                       = 50.5
+--exec create_position
+--        @epic                       = 'CS.D.ETHUSD.CFE.IP'
+--,       @direction                  = 'BUY'
+--,       @size                       = 50.5
 --,       @order_type                 = 
 --,       @currency_code              = 
 --,       @force_open                 = 

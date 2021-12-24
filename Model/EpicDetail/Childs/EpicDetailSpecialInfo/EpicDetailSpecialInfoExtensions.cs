@@ -7,19 +7,19 @@ namespace IGApi.Model
     internal static partial class DtoModelExtensions
     {
         public static EpicDetailSpecialInfo? SaveEpicDetailSpecialInfo(
-            [NotNullAttribute] this IGApiDbContext iGApiDbContext,
+            [NotNullAttribute] this ApiDbContext apiDbContext,
             [NotNullAttribute] EpicDetail epicDetail,
             [NotNullAttribute] string specialInfo
             )
         {
-            _ = iGApiDbContext.EpicDetailsSpecialInfo ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.EpicDetailsSpecialInfo));
+            _ = apiDbContext.EpicDetailsSpecialInfo ?? throw new DBContextNullReferenceException(nameof(apiDbContext.EpicDetailsSpecialInfo));
 
-            var epicDetailSpecialInfo = Task.Run(async () => await iGApiDbContext.EpicDetailsSpecialInfo.FindAsync(epicDetail.Epic, specialInfo)).Result;
+            var epicDetailSpecialInfo = Task.Run(async () => await apiDbContext.EpicDetailsSpecialInfo.FindAsync(epicDetail.Epic, specialInfo)).Result;
 
             if (epicDetailSpecialInfo is not null)
                 epicDetailSpecialInfo.MapProperties(epicDetail, specialInfo);
             else
-                epicDetailSpecialInfo = iGApiDbContext.EpicDetailsSpecialInfo.Add(new EpicDetailSpecialInfo(epicDetail, specialInfo)).Entity;
+                epicDetailSpecialInfo = apiDbContext.EpicDetailsSpecialInfo.Add(new EpicDetailSpecialInfo(epicDetail, specialInfo)).Entity;
 
             return epicDetailSpecialInfo;
         }

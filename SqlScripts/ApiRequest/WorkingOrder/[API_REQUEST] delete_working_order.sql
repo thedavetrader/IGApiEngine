@@ -1,3 +1,6 @@
+
+go
+
 create or alter procedure delete_working_order
         @deal_id                    nvarchar(64)   
 as begin
@@ -50,5 +53,5 @@ end
 
 go
 
-exec    delete_working_order
-        @deal_id        = 'DIAAAAHACA7EPAZ'
+--exec    delete_working_order
+--        @deal_id        = 'DIAAAAHACA7EPAZ'

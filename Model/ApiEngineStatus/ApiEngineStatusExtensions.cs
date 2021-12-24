@@ -8,20 +8,20 @@ namespace IGApi.Model
     internal static partial class DtoModelExtensions
     {
         public static ApiEngineStatus? SaveApiEngineStatus(
-        [NotNullAttribute] this IGApiDbContext iGApiDbContext
+        [NotNullAttribute] this ApiDbContext apiDbContext
         )
         {
-            _ = iGApiDbContext.ApiEngineStatus ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.ApiEngineStatus));
+            _ = apiDbContext.ApiEngineStatus ?? throw new DBContextNullReferenceException(nameof(apiDbContext.ApiEngineStatus));
 
-            if (iGApiDbContext.ApiEngineStatus.Count() > 1)
-                iGApiDbContext.ApiEngineStatus.RemoveRange(iGApiDbContext.ApiEngineStatus);
+            if (apiDbContext.ApiEngineStatus.Count() > 1)
+                apiDbContext.ApiEngineStatus.RemoveRange(apiDbContext.ApiEngineStatus);
 
-            var currentApiEngineStatus = Task.Run(() => iGApiDbContext.ApiEngineStatus.FirstOrDefault()).Result;
+            var currentApiEngineStatus = Task.Run(() => apiDbContext.ApiEngineStatus.FirstOrDefault()).Result;
 
             if (currentApiEngineStatus is not null)
                 currentApiEngineStatus.MapProperties();
             else
-                currentApiEngineStatus = iGApiDbContext.ApiEngineStatus.Add(new ApiEngineStatus()).Entity;
+                currentApiEngineStatus = apiDbContext.ApiEngineStatus.Add(new ApiEngineStatus()).Entity;
 
             return currentApiEngineStatus;
         }

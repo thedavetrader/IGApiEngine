@@ -1,3 +1,6 @@
+
+go
+
 create or alter procedure close_position
         @deal_reference             nvarchar(36)    = null
 ,       @deal_id                    nvarchar(64)    = null
@@ -126,8 +129,8 @@ end
 
 go
 
-exec    close_position
-        @deal_reference = 'F8-F4CA-460C-9EA6-BCD6CEE482BB'
+--exec    close_position
+--        @deal_reference = 'F8-F4CA-460C-9EA6-BCD6CEE482BB'
 --,       @deal_id        = 
 --,       @direction      = 
 --,       @epic           = 
@@ -135,5 +138,5 @@ exec    close_position
 --,       @level          = 
 --,       @order_type     = 
 --,       @quote_id       = 
-,       @size           = 0.01  -- Partial close
+--,       @size           = 0.01  -- Partial close
 --,       @time_in_force  = 

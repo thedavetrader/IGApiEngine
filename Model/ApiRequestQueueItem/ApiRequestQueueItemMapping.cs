@@ -15,7 +15,10 @@ namespace IGApi.Model
                 IsRecurrent = restRequestQueueItem.IsRecurrent;
                 Parameters = restRequestQueueItem.Parameters;
                 Request = restRequestQueueItem.Request;
-                Timestamp = restRequestQueueItem.Timestamp; // Might be that in future Timestamp overwrite should be optional.
+                Timestamp = restRequestQueueItem.Timestamp;
+                IsRunning = restRequestQueueItem.IsRunning;
+                Guid = restRequestQueueItem.Guid;
+                ParentGuid = restRequestQueueItem.ParentGuid;
             }
         }
     }

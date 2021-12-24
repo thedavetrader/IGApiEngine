@@ -21,24 +21,26 @@
     <Compile Remove="Model\IGApiOpenPositions\**" />
     <Compile Remove="Model\IGApiStreamingAccountData\**" />
     <Compile Remove="obj\**" />
-    <Compile Remove="RequestQueue\RestApi\**" />
+    <Compile Remove="RequestQueueEngine\RestApi\**" />
     <EmbeddedResource Remove="bin\**" />
     <EmbeddedResource Remove="Model\IGApiAccountBalance\**" />
     <EmbeddedResource Remove="Model\IGApiOpenPositions\**" />
     <EmbeddedResource Remove="Model\IGApiStreamingAccountData\**" />
     <EmbeddedResource Remove="obj\**" />
-    <EmbeddedResource Remove="RequestQueue\RestApi\**" />
+    <EmbeddedResource Remove="RequestQueueEngine\RestApi\**" />
     <None Remove="bin\**" />
     <None Remove="Model\IGApiAccountBalance\**" />
     <None Remove="Model\IGApiOpenPositions\**" />
     <None Remove="Model\IGApiStreamingAccountData\**" />
     <None Remove="obj\**" />
-    <None Remove="RequestQueue\RestApi\**" />
+    <None Remove="RequestQueueEngine\RestApi\**" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Common\Extensions\ObservableCollectionExtension.cs" />
     <Compile Remove="Common\ObservableRangeCollection.cs" />
     <Compile Remove="Model\ModelExtensions.cs" />
+    <Compile Remove="RequestQueueEngine\RequestQueueEngineItem\RestRequest\SearchMarket.cs" />
+    <Compile Remove="RequestQueueEngine\RequestQueueEngineItem\RestRequest\Watchlist\Management\Watchlist\CreateWatchListStreamList.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="6.0.0" />

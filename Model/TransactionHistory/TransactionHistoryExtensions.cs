@@ -8,18 +8,18 @@ namespace IGApi.Model
     internal static partial class DtoModelExtensions
     {
         public static TransactionHistory? SaveTransactionHistory(
-            [NotNullAttribute] this IGApiDbContext iGApiDbContext,
+            [NotNullAttribute] this ApiDbContext apiDbContext,
             [NotNullAttribute] Transaction transaction
             )
         {
-            _ = iGApiDbContext.TransactionsHistory ?? throw new DBContextNullReferenceException(nameof(iGApiDbContext.TransactionsHistory));
+            _ = apiDbContext.TransactionsHistory ?? throw new DBContextNullReferenceException(nameof(apiDbContext.TransactionsHistory));
 
-            var currentTransaction = Task.Run(async () => await iGApiDbContext.TransactionsHistory.FindAsync(transaction.GetDate(), transaction.reference)).Result;
+            var currentTransaction = Task.Run(async () => await apiDbContext.TransactionsHistory.FindAsync(transaction.GetDate(), transaction.reference)).Result;
 
             if (currentTransaction is not null)
                 currentTransaction.MapProperties(transaction);
             else
-                currentTransaction = iGApiDbContext.TransactionsHistory.Add(new TransactionHistory(transaction)).Entity;
+                currentTransaction = apiDbContext.TransactionsHistory.Add(new TransactionHistory(transaction)).Entity;
 
             return currentTransaction;
         }

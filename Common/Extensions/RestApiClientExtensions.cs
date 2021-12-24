@@ -21,7 +21,7 @@ namespace IGApi
 
             while (retry)
             {
-                response = Task.Run(async () => await callTask).Result;
+                response = Task.Run(async () => await callTask).Result;               
 
                 _ = response ?? throw new RestCallNullReferenceException();
 

@@ -1,3 +1,6 @@
+
+go
+
 create or alter procedure edit_working_order
         @deal_id                    nvarchar(64)    
 ,       @time_in_force              nvarchar(4000)  = null
@@ -112,13 +115,13 @@ end
 
 go
 
-exec    edit_working_order
-        @deal_id                    = 'DIAAAAHACAN36AH'
-,       @level                      = 3800
+--exec    edit_working_order
+--        @deal_id                    = 'DIAAAAHACAN36AH'
+--,       @level                      = 3800
 --,       @time_in_force              = 'GOOD_TILL_CANCELLED'
 --,       @good_during_minutes        = 1
 --,       @limit_level                = 3000
-,       @limit_distance             = 50
+--,       @limit_distance             = 50
 --,       @stop_level                 = 0
 
 --,       @guaranteed_stop            

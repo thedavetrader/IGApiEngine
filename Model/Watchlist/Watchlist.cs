@@ -8,8 +8,8 @@ namespace IGApi.Model
 		[Column("account_id")]
 		public string AccountId { get; set; }
 
-		[Column("id")]
-		public string Id { get; set; }
+		[Column("watchlist_id")]
+		public string WatchlistId { get; set; }
 
 		[Column("name")]
 		public string Name { get; set; }
@@ -25,5 +25,8 @@ namespace IGApi.Model
 
 		[Column("api_last_update")]
         public DateTime ApiLastUpdate { get; set; } = DateTime.UtcNow;
+
+		//	Linked
+		public List<WatchlistEpicDetail> WatchlistEpicDetails { get; set; }
     }
 }

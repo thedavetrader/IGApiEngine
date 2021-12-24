@@ -1,3 +1,6 @@
+
+go
+
 create or alter procedure edit_position
 
         @deal_id                    nvarchar(64)    
@@ -103,10 +106,10 @@ end
 
 go
 
-exec    edit_position
-        @deal_id                    = 'DIAAAAG9UCFNVAL'
-,       @limit_level                = 4500
-,       @stop_level                 = 0
+--exec    edit_position
+--        @deal_id                    = 'DIAAAAG9UCFNVAL'
+--,       @limit_level                = 4500
+--,       @stop_level                 = 0
 --,       @guaranteed_stop            
 --,       @trailing_stop           
 --,       @trailing_stop_distance  

@@ -1,3 +1,6 @@
+
+go
+
 create or alter procedure create_working_order
         @epic                       nvarchar(4000)   
 ,       @direction                  nvarchar(4)           
@@ -166,12 +169,12 @@ end
 
 go
 
-exec create_working_order
-        @epic                       = 'CS.D.ETHUSD.CFE.IP'
-,       @direction                  = 'SELL'
-,       @size                       = 0.5
-,       @level                      = 4210
-,       @good_during_minutes        = 10
-,       @limit_level                = 4000
-,       @stop_level                 = 4500
+--exec create_working_order
+--        @epic                       = 'CS.D.ETHUSD.CFE.IP'
+--,       @direction                  = 'SELL'
+--,       @size                       = 0.5
+--,       @level                      = 4210
+--,       @good_during_minutes        = 10
+--,       @limit_level                = 4000
+--,       @stop_level                 = 4500
 --,       @good_till_date             = '2021/12/18 17:16:00'
