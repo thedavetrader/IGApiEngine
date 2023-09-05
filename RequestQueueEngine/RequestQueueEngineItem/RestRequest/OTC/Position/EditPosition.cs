@@ -9,14 +9,14 @@ namespace IGApi.RequestQueue
     {
         public static event EventHandler? EditPositionCompleted;
 
-        [RequestType(isRestRequest: true, isTradingRequest: true)]
         private class CustomEditPositionRequest
         {
-            public string? dealId { get; set; }
+            public string? DealId { get; set; }
 
             public dto.endpoint.positions.edit.v2.EditPositionRequest? EditPositionRequest { get; set; }
         }
 
+        [RequestType(isRestRequest: true, isTradingRequest: true)]
         public void EditPosition()
         {
             try
@@ -26,14 +26,11 @@ namespace IGApi.RequestQueue
 
                 var editPositionRequest = JsonConvert.DeserializeObject<CustomEditPositionRequest>(request);
 
-                if (!string.IsNullOrEmpty(editPositionRequest.dealId) && editPositionRequest.EditPositionRequest is not null)
+                if (!string.IsNullOrEmpty(editPositionRequest.DealId) && editPositionRequest.EditPositionRequest is not null)
                 {
-                    var response = _apiEngine.IGRestApiClient.editPositionV2(editPositionRequest.dealId, editPositionRequest.EditPositionRequest).UseManagedCall();
+                    var response = _apiEngine.IGRestApiClient.editPositionV2(editPositionRequest.DealId, editPositionRequest.EditPositionRequest).UseManagedCall();
 
-                    if (response is not null)
-                        checkConfirmationReceived(response.Response.dealReference);
-                    else
-                        throw new RestCallNullReferenceException();
+                    checkConfirmationReceived(response.Response.dealReference);
                 }
             }
             catch (Exception ex)

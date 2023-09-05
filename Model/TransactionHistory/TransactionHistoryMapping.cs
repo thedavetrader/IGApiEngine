@@ -14,7 +14,7 @@ TransactionHistory
             )
         {
 
-            Date = transaction.GetDate();
+            DateTime = transaction.GetDateTime();
             Reference = transaction.reference;
             TransactionType = transaction.transactionType;
             CashTransaction = transaction.cashTransaction;

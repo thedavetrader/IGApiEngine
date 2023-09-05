@@ -14,76 +14,78 @@ namespace IGApi.RequestQueue
     {
         public static event EventHandler? GetEpicDetailsCompleted;
 
-        //TODO: GetEpicDetails Make version that refresh epics in epicstreamlist UNION existing epic details on db.
-        //      Use restapiqueue to queue the request and split over max limit 50.
-        [Obsolete("Make version that recurrently refresh epics in epicstreamlist UNION existing epic details on db + all watchlists. Use restapiqueue to queue the request and split over max limit 50.")]
         [RequestType(isRestRequest: true, isTradingRequest: false)]
         public void GetEpicDetails()
         {
             bool finalize = true;
+            const int splitSize = 50;
+
             try
             {
                 _ = ApiRequestQueueItem.Parameters ?? throw new InvalidRequestMissingParametersException();
-                string request = ApiRequestQueueItem.Parameters;
+                var request = ApiRequestQueueItem.Parameters;
 
-                var jsonEpicArray = JArray.Parse(request).ToList();
-                string epicString;
-                var split = jsonEpicArray.Count > 50;
-
-                if (!split)
+                if (request is not null)
                 {
-                    finalize = true;
+                    var jsonEpicArray = JArray.Parse(request).ToList();
+                    var split = jsonEpicArray.Count > splitSize;
 
-                    epicString = String.Join(",", jsonEpicArray.Select(item => ((JObject)item).GetValue("epic", StringComparison.OrdinalIgnoreCase)?.Value<string>()));
-
-                    var response = _apiEngine.IGRestApiClient.marketDetailsMulti(epicString).UseManagedCall();
-
-                    SyncToDbEpicDetails(response);
-                }
-                else
-                {
-                    finalize = false;
-
-                    foreach (var jsonEpicArraySplitList in jsonEpicArray.Split(50))
+                    if (!split)
                     {
-                        var parameters = jsonEpicArraySplitList.Select(item => new { epic = ((JObject)item).GetValue("epic", StringComparison.OrdinalIgnoreCase)?.Value<string>() }).Distinct();
+                        finalize = true;
 
-                        if (parameters.Any())
+                        var epicString = String.Join(",", jsonEpicArray.Select(item => ((JObject)item).GetValue("epic", StringComparison.OrdinalIgnoreCase)?.Value<string>()));
+
+                        var response = _apiEngine.IGRestApiClient.marketDetailsMulti(epicString).UseManagedCall();
+
+                        SyncToDbEpicDetails(response);
+                    }
+                    else
+                    {
+                        finalize = false;
+
+                        foreach (var jsonEpicArraySplitList in jsonEpicArray.Split(splitSize))
                         {
-                            var childGuid = Guid.NewGuid();
+                            var parameters = jsonEpicArraySplitList.Select(item => new { epic = ((JObject)item).GetValue("epic", StringComparison.OrdinalIgnoreCase)?.Value<string>() }).Distinct();
 
-                            string? jsonParameters = null;
-
-                            jsonParameters = JsonConvert.SerializeObject(
-                                parameters,
-                                Formatting.None);
-
-                            // Keeping this object hooked until all childs have finished task.
-                            void GetEpicDetailsCompleted(object? sender, EventArgs e)
+                            if (parameters.Any())
                             {
-                                if (sender is not null)
+                                var childGuid = Guid.NewGuid();
+
+                                string? jsonParameters = null;
+
+                                jsonParameters = JsonConvert.SerializeObject(
+                                    parameters,
+                                    Formatting.None);
+
+                                if (jsonParameters is not null)
                                 {
-                                    var senderEngineItem = (RequestQueueEngineItem)sender;
-
-                                    if (senderEngineItem.ApiRequestQueueItem.Guid == childGuid &&
-                                        senderEngineItem.ApiRequestQueueItem.ParentGuid == ApiRequestQueueItem.Guid)
+                                    // Keeping this object hooked until all childs have finished task.
+                                    void GetEpicDetailsCompleted(object? sender, EventArgs e)
                                     {
-                                        ApiDbContext apiDbContext = new();
+                                        if (sender is not null)
+                                        {
+                                            var senderEngineItem = (RequestQueueEngineItem)sender;
 
-                                        _ = apiDbContext.ApiRequestQueueItems ?? throw new DBContextNullReferenceException(nameof(apiDbContext.ApiRequestQueueItems));  // critical exception. Should not rise.
+                                            if (senderEngineItem.ApiRequestQueueItem.Guid == childGuid &&
+                                                senderEngineItem.ApiRequestQueueItem.ParentGuid == ApiRequestQueueItem.Guid)
+                                            {
+                                                ApiDbContext apiDbContext = new();
 
-                                        if (!apiDbContext.ApiRequestQueueItems.Any(a => a.ParentGuid == ApiRequestQueueItem.Guid))
-                                            QueueItemComplete(GetEpicDetailsCompleted);
+                                                if (!apiDbContext.ApiRequestQueueItems.Any(a => a.ParentGuid == ApiRequestQueueItem.Guid))
+                                                    QueueItemComplete(GetEpicDetailsCompleted);
 
-                                        RequestQueueEngineItem.GetEpicDetailsCompleted -= GetEpicDetailsCompleted;
+                                                RequestQueueEngineItem.GetEpicDetailsCompleted -= GetEpicDetailsCompleted;
+                                            }
+                                        }
                                     }
                                 }
+
+                                RequestQueueEngineItem.GetEpicDetailsCompleted -= GetEpicDetailsCompleted;    // Prevent event is subscribed more then once.
+                                RequestQueueEngineItem.GetEpicDetailsCompleted += GetEpicDetailsCompleted;
+
+                                RequestQueueEngineItem.QueueItem(nameof(RequestQueueEngineItem.GetEpicDetails), executeAsap: false, isRecurrent: false, guid: childGuid, parentGuid: ApiRequestQueueItem.Guid, parameters: jsonParameters, cancellationToken: _cancellationToken);
                             }
-
-                            RequestQueueEngineItem.GetEpicDetailsCompleted -= GetEpicDetailsCompleted;    // Prevent event is subscribed more then once.
-                            RequestQueueEngineItem.GetEpicDetailsCompleted += GetEpicDetailsCompleted;
-
-                            RequestQueueEngineItem.QueueItem(nameof(RequestQueueEngineItem.GetEpicDetails), executeAsap: true, isRecurrent: false, guid: childGuid, parentGuid: ApiRequestQueueItem.Guid, parameters: jsonParameters);
                         }
                     }
                 }
@@ -99,23 +101,20 @@ namespace IGApi.RequestQueue
                     QueueItemComplete(GetEpicDetailsCompleted);
             }
 
-            static void SyncToDbEpicDetails(IgResponse<MarketDetailsListResponse>? response)
+            void SyncToDbEpicDetails(IgResponse<MarketDetailsListResponse> response)
             {
                 try
                 {
-                    ApiDbContext apiDbContext = new();
-
-                    _ = apiDbContext.EpicDetails ?? throw new DBContextNullReferenceException(nameof(apiDbContext.EpicDetails));
-
-                    if (response is not null)
+                    if (response.Response is not null)
                     {
+                        ApiDbContext apiDbContext = new();
+
                         response.Response.marketDetails.ForEach(MarketDetail =>
                         {
                             if (MarketDetail is not null)
-                                apiDbContext.SaveEpicDetail(MarketDetail.instrument, MarketDetail.dealingRules);
+                                apiDbContext.SaveEpicDetail(MarketDetail.instrument, MarketDetail.snapshot, MarketDetail.dealingRules);
                         });
-
-                        Task.Run(async () => await apiDbContext.SaveChangesAsync()).Wait();  // Use wait to prevent the Task object is disposed while still saving the changes.
+                        Task.Run(async () => await apiDbContext.SaveChangesAsync(_cancellationToken), _cancellationToken).ContinueWith(task => TaskException.CatchTaskIsCanceledException(task)).Wait();  // Use wait to prevent the Task object is disposed while still saving the changes.
                     }
                 }
                 catch (Exception ex)

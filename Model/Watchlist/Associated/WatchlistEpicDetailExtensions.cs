@@ -22,12 +22,10 @@ namespace IGApi.Model
             [NotNullAttribute] string epic
             )
         {
-            _ = apiDbContext.WatchlistEpicDetails ?? throw new DBContextNullReferenceException(nameof(apiDbContext.WatchlistEpicDetails));
-
             var currentWatchlistEpicDetail = Task.Run(async () => await apiDbContext.WatchlistEpicDetails.FindAsync(accountId, id, epic)).Result;
 
             if (currentWatchlistEpicDetail is null)
-                currentWatchlistEpicDetail = apiDbContext.WatchlistEpicDetails.Add(new WatchlistEpicDetail() { AccountId = accountId, WatchlistId = id, Epic = epic }).Entity;
+                currentWatchlistEpicDetail = apiDbContext.WatchlistEpicDetails.Add(new WatchlistEpicDetail(accountId: accountId, watchlistId: id, epic: epic)).Entity;
 
             return currentWatchlistEpicDetail;
         }

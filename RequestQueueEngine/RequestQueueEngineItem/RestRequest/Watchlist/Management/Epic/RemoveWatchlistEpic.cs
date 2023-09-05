@@ -10,8 +10,8 @@ namespace IGApi.RequestQueue
         public static event EventHandler? RemoveWatchlistEpicCompleted;
         private class CustomRemoveWatchlistEpicRequest
         {
-            public string? watchlistId { get; set; }
-            public string? epic { get; set; }
+            public string? WatchlistId { get; set; }
+            public string? Epic { get; set; }
         }
 
         [RequestType(isRestRequest: true, isTradingRequest: false)]
@@ -24,26 +24,19 @@ namespace IGApi.RequestQueue
 
                 CustomRemoveWatchlistEpicRequest removeWatchlistEpicRequest = JsonConvert.DeserializeObject<CustomRemoveWatchlistEpicRequest>(request);
 
-                if (!string.IsNullOrEmpty(removeWatchlistEpicRequest.watchlistId) && !string.IsNullOrEmpty(removeWatchlistEpicRequest.epic))
+                if (!string.IsNullOrEmpty(removeWatchlistEpicRequest.WatchlistId) && !string.IsNullOrEmpty(removeWatchlistEpicRequest.Epic))
                 {
-                    var response = _apiEngine.IGRestApiClient.removeInstrumentFromWatchlist(removeWatchlistEpicRequest.watchlistId, removeWatchlistEpicRequest.epic).UseManagedCall();
+                    var response = _apiEngine.IGRestApiClient.removeInstrumentFromWatchlist(removeWatchlistEpicRequest.WatchlistId, removeWatchlistEpicRequest.Epic).UseManagedCall();
 
-                    if (response is not null)
-                    {
                         using ApiDbContext apiDbContext = new();
-                        _ = apiDbContext.WatchlistEpicDetails ?? throw new DBContextNullReferenceException(nameof(apiDbContext.WatchlistEpicDetails));
 
-                        var removeWatchlistEpic = apiDbContext.WatchlistEpicDetails.Find(_currentAccountId, removeWatchlistEpicRequest.watchlistId, removeWatchlistEpicRequest.epic);
+                        var removeWatchlistEpic = apiDbContext.WatchlistEpicDetails.Find(_currentAccountId, removeWatchlistEpicRequest.WatchlistId, removeWatchlistEpicRequest.Epic);
 
                         if (removeWatchlistEpic is not null)
                         {
                             apiDbContext.Remove(removeWatchlistEpic);
-                            Task.Run(async () => await apiDbContext.SaveChangesAsync()).Wait();  // Use wait to prevent the Task object is disposed while still saving the changes.
+                            Task.Run(async () => await apiDbContext.SaveChangesAsync(_cancellationToken), _cancellationToken).ContinueWith(task => TaskException.CatchTaskIsCanceledException(task)).Wait();  // Use wait to prevent the Task object is disposed while still saving the changes.
                         }
-                    }
-                    else
-                        throw new RestCallNullReferenceException();
-
                 }
             }
             catch (Exception ex)

@@ -15,8 +15,8 @@ namespace IGApi.Model
         public string Epic { get; set; }
 
         #region Relations
-        public Watchlist Watchlist { get; set; }
-        public EpicDetail EpicDetail { get; set; }
+        public Watchlist? Watchlist { get; set; } 
+        public EpicDetail? EpicDetail { get; set; }
         #endregion
     }
 }

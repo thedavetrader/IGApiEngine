@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+	<configSections>
+		<section name="IgWebApiConnection" type="System.Configuration.NameValueSectionHandler" />
+		<section name="IgWebApiLiveConnection" type="System.Configuration.NameValueSectionHandler" />
+		<section name="QueueEngine" type="System.Configuration.NameValueSectionHandler" />
+		<section name="Settings" type="System.Configuration.NameValueSectionHandler" />
+	</configSections>
+	<system.diagnostics>
+		<assert assertuienabled="true" />
+	</system.diagnostics>
+	<runtime>
+		<assemblyBinding xmlns="urn:schemas-microsoft-com:asm.v1">
+			<dependentAssembly>
+				<assemblyIdentity name="Microsoft.Practices.ServiceLocation" publicKeyToken="31bf3856ad364e35" culture="neutral" />
+				<bindingRedirect oldVersion="0.0.0.0-1.2.0.0" newVersion="1.2.0.0" />
+			</dependentAssembly>
+			<dependentAssembly>
+				<assemblyIdentity name="System.Net.Http.Primitives" publicKeyToken="b03f5f7f11d50a3a" culture="neutral" />
+				<bindingRedirect oldVersion="0.0.0.0-4.2.29.0" newVersion="4.2.29.0" />
+			</dependentAssembly>
+			<!-- !!!NOTE!!! Do not forget to add validation to the project that depends on "IGWebApiClient". Else PCLCrypto won't work (de/encryption while logging in).  -->
+			<dependentAssembly>
+				<assemblyIdentity name="Validation" publicKeyToken="2fc06f0d701809a7" culture="neutral" />
+				<bindingRedirect oldVersion="0.0.0.0-2.4.0.0" newVersion="2.4.0.0" />
+			</dependentAssembly>
+			<dependentAssembly>
+				<assemblyIdentity name="CommonServiceLocator" publicKeyToken="489b6accfaf20ef0" culture="neutral" />
+				<bindingRedirect oldVersion="0.0.0.0-2.0.5.0" newVersion="2.0.5.0" />
+			</dependentAssembly>
+		</assemblyBinding>
+	</runtime>
+	<IgWebApiConnection>
+		<!-- environment = demo|live -->
+		<add key="environment" value="demo" />
+		<add key="username" value="TheDaveApiTrader" />
+		<add key="password" value="Inactiefaccount13!" />
+		<add key="apikey" value="92f01176b667bc2a4436783c264530d0bc40376d" />
+	</IgWebApiConnection>
+	<IgWebApiLiveConnection>
+		<!-- environment = demo|live -->
+		<add key="environment" value="live" />
+		<add key="username" value="thedavetrader" />
+		<add key="password" value="#GHRSugiHF!shn5eVEho" />
+		<add key="apikey" value="1cdeb0c68cb15ad647855cec1e4ab9308902f4bb" />
+	</IgWebApiLiveConnection>
+	<QueueEngine>
+		<add key="IGAllowedApiCallsPerMinute" value="25"/>
+	</QueueEngine>
+  <Settings>
+    <add key="VerboseLog" value="False"/>
+  </Settings>
+</configuration>

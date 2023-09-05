@@ -19,17 +19,14 @@ namespace IGApi.RequestQueue
 
                 var response = _apiEngine.IGRestApiClient.deleteWatchlist(request).UseManagedCall();
 
-                if (response is not null)
+                if (response.Response.status == "SUCCESS")
                 {
-                    if (response.Response.status == "SUCCESS")
-                    {
-                        WriteLog(Messages($"Watchlist with id \"{request}\" is deleted."));                       
-                    }
-                    else
-                        WriteLog(Messages($"Watchlist request did not result status \"SUCCESS\"."));
+                    WriteLog(Columns($"Watchlist with id \"{request}\" is deleted."));
                 }
                 else
-                    throw new RestCallNullReferenceException();
+                    WriteLog(Columns($"Watchlist request did not result status \"SUCCESS\"."));
+
+                RemoveFromDb(request);
             }
             catch (Exception ex)
             {
@@ -40,6 +37,21 @@ namespace IGApi.RequestQueue
             {
                 QueueItemComplete(DeleteWatchlistCompleted);
             }
+
+            void RemoveFromDb(string watchlistId)
+            {
+                using ApiDbContext apiDbContext = new();
+
+                var removeWatchlist = apiDbContext.Watchlists.Find(_currentAccountId, watchlistId);
+
+                if (removeWatchlist != null)
+                {
+                    apiDbContext.Watchlists.Remove(removeWatchlist);
+
+                    Task.Run(async () => await apiDbContext.SaveChangesAsync(_cancellationToken), _cancellationToken).ContinueWith(task => TaskException.CatchTaskIsCanceledException(task)).Wait();  // Use wait to prevent the Task object is disposed while still saving the changes.
+                }
+            }
+
         }
     }
 }

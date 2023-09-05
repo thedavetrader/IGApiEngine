@@ -1,7 +1,8 @@
 ﻿using IGApi.Common;
 using IGApi.Model;
 using IGWebApiClient;
-using dto.endpoint.accountactivity.activity;
+using dto.endpoint.accountactivity.activity_v3;
+using System.Globalization;
 
 namespace IGApi.RequestQueue
 {
@@ -15,19 +16,22 @@ namespace IGApi.RequestQueue
         {
             try
             {
+                string timePattern = CultureInfo.GetCultureInfo("en-US").DateTimeFormat.SortableDateTimePattern;
+
                 string fromDate;
-                string toDate = DateTime.Now.Date.ToString();   // Explicetly use local time, as IG rest call expects local time.
+                string toDate = DateTime.UtcNow.ToString(timePattern);   // Explicitly use local time, as IG rest call expects local time.
 
                 using (ApiDbContext apiDbContext = new())
                 {
-                    _ = apiDbContext.ActivitiesHistory ?? throw new DBContextNullReferenceException(nameof(apiDbContext.EpicDetails));
                     if (apiDbContext.ActivitiesHistory.Any())
-                        fromDate = apiDbContext.ActivitiesHistory.Max(p => p.Timestamp).Date.ToString();
+                        fromDate = TimeZoneInfo.ConvertTimeToUtc(
+                            apiDbContext.ActivitiesHistory.Max(p => p.Timestamp)
+                            , TimeZoneInfo.Local).ToString(timePattern);
                     else
-                        fromDate = DateTime.MinValue.ToString();
+                        fromDate = DateTime.MinValue.ToString(timePattern);
                 }
 
-                var response = _apiEngine.IGRestApiClient.lastActivityTimeRange(fromDate, toDate).UseManagedCall();
+                var response = _apiEngine.IGRestApiClient.lastActivityTimeRange_v3(fromDate, toDate).UseManagedCall();
 
                 SyncToDbActivitiesHistory(response);
             }
@@ -41,20 +45,20 @@ namespace IGApi.RequestQueue
                 QueueItemComplete(GetActivityHistoryCompleted);
             }
 
-            void SyncToDbActivitiesHistory(IgResponse<ActivityHistoryResponse>? response)
+            void SyncToDbActivitiesHistory(IgResponse<ActivityHistoryResponse_v3> response)
             {
-                ApiDbContext apiDbContext = new();
-                _ = apiDbContext.ActivitiesHistory ?? throw new DBContextNullReferenceException(nameof(apiDbContext.ActivitiesHistory));
 
-                if (response is not null)
+                if (response.Response is not null)
                 {
-                    response.Response.activities.ForEach(activity =>
-                    {
-                        if (activity is not null)
-                            apiDbContext.SaveActivityHistory(activity);
-                    });
+                    ApiDbContext apiDbContext = new();
 
-                    Task.Run(async () => await apiDbContext.SaveChangesAsync()).Wait();  // Use wait to prevent the Task object is disposed while still saving the changes.
+                    response.Response.activities.ForEach(activity =>
+                        {
+                            if (activity is not null)
+                                apiDbContext.SaveActivityHistory(activity);
+                        });
+
+                    Task.Run(async () => await apiDbContext.SaveChangesAsync(_cancellationToken), _cancellationToken).ContinueWith(task => TaskException.CatchTaskIsCanceledException(task)).Wait();  // Use wait to prevent the Task object is disposed while still saving the changes.
                 }
             }
         }

@@ -15,10 +15,11 @@ namespace IGApi.Model
 
         public EpicDetail(
             [NotNullAttribute] InstrumentData instrumentData,
-            DealingRulesData? dealingRulesData
+            DealingRulesData? dealingRulesData,
+            MarketSnapshotData? marketSnapshotData
             )
         {
-            MapProperties(instrumentData, dealingRulesData);
+            MapProperties(instrumentData, dealingRulesData, marketSnapshotData);
 
             _ = Epic ?? throw new PrimaryKeyNullReferenceException(nameof(Epic));
         }

@@ -10,7 +10,7 @@ namespace IGApi.RequestQueue
         public static event EventHandler? AddWatchlistEpicCompleted;
         private class CustomAddWatchlistEpicRequest
         {
-            public string? watchlistId { get; set; }
+            public string? WatchlistId { get; set; }
 
             public dto.endpoint.watchlists.manage.edit.AddInstrumentToWatchlistRequest? AddInstrumentToWatchlistRequest { get; set; }
         }
@@ -25,18 +25,13 @@ namespace IGApi.RequestQueue
 
                 CustomAddWatchlistEpicRequest addWatchlistEpicRequest = JsonConvert.DeserializeObject<CustomAddWatchlistEpicRequest>(request);
 
-                if (!string.IsNullOrEmpty(addWatchlistEpicRequest.watchlistId) && addWatchlistEpicRequest.AddInstrumentToWatchlistRequest is not null) 
+                if (!string.IsNullOrEmpty(addWatchlistEpicRequest.WatchlistId) && addWatchlistEpicRequest.AddInstrumentToWatchlistRequest is not null)
                 {
-                    var response = _apiEngine.IGRestApiClient.addInstrumentToWatchlist(addWatchlistEpicRequest.watchlistId, addWatchlistEpicRequest.AddInstrumentToWatchlistRequest).UseManagedCall();
+                    var response = _apiEngine.IGRestApiClient.addInstrumentToWatchlist(addWatchlistEpicRequest.WatchlistId, addWatchlistEpicRequest.AddInstrumentToWatchlistRequest).UseManagedCall();
 
-                    if (response is not null)
-                    {
-                        using ApiDbContext apiDbContext = new();
-                        apiDbContext.SaveWatchlistEpicDetail(_currentAccountId, addWatchlistEpicRequest.watchlistId, addWatchlistEpicRequest.AddInstrumentToWatchlistRequest.epic);
-                        Task.Run(async () => await apiDbContext.SaveChangesAsync()).Wait();  // Use wait to prevent the Task object is disposed while still saving the changes.
-                    }
-                    else
-                        throw new RestCallNullReferenceException();
+                    using ApiDbContext apiDbContext = new();
+                    apiDbContext.SaveWatchlistEpicDetail(_currentAccountId, addWatchlistEpicRequest.WatchlistId, addWatchlistEpicRequest.AddInstrumentToWatchlistRequest.epic);
+                    Task.Run(async () => await apiDbContext.SaveChangesAsync(_cancellationToken), _cancellationToken).ContinueWith(task => TaskException.CatchTaskIsCanceledException(task)).Wait();  // Use wait to prevent the Task object is disposed while still saving the changes.
                 }
             }
             catch (Exception ex)

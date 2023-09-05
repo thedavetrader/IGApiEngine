@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using IGApi.Common;
 using dto.endpoint.marketdetails.v2;
+using IGApi.Common.Extensions;
 
 namespace IGApi.Model
 {
@@ -20,8 +21,8 @@ namespace IGApi.Model
 
                 Currency = DepositBand.currency;
                 Margin = DepositBand.margin;
-                Min = DepositBand.min ?? throw new EssentialPropertyNullReferenceException(nameof(DepositBand.min)); ;
-                Max = DepositBand.max;
+                Min = DepositBand.min.TryParseSqlDecimal(epicDetail.Epic) ?? throw new EssentialPropertyNullReferenceException(nameof(DepositBand.min)); ;
+                Max = DepositBand.max.TryParseSqlDecimal(epicDetail.Epic);
             }
         }
     }

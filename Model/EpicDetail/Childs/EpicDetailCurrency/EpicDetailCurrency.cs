@@ -12,7 +12,7 @@ namespace IGApi.Model
 		[Column("code")]
 		public string Code { get; set; }
 
-		[Column("api_last_update")]
+        [Column("api_last_update")]
         public DateTime ApiLastUpdate { get; set; } = DateTime.UtcNow;
 
 		// Navigation property.

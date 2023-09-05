@@ -13,8 +13,6 @@ namespace IGApi.Model
             [NotNullAttribute] dto.endpoint.auth.session.AccountDetails accountDetails
             )
         {
-            _ = apiDbContext.Accounts ?? throw new DBContextNullReferenceException(nameof(apiDbContext.Accounts));
-
             var currentAccount = Task.Run(async () => await apiDbContext.Accounts.FindAsync(accountDetails.accountId)).Result;
 
             if (currentAccount is not null)
@@ -28,17 +26,16 @@ namespace IGApi.Model
         public static Account? SaveAccount(
             [NotNullAttribute] this ApiDbContext apiDbContext,
             [NotNullAttribute] dto.endpoint.auth.session.AccountDetails accountDetails,
-            [NotNullAttribute] dto.endpoint.auth.session.AccountInfo accountBalance
+            [NotNullAttribute] dto.endpoint.auth.session.AccountInfo accountBalance,
+            bool isCurrent
         )
         {
-            _ = apiDbContext.Accounts ?? throw new DBContextNullReferenceException(nameof(apiDbContext.Accounts));
-
             var currentAccount = Task.Run(async () => await apiDbContext.Accounts.FindAsync(accountDetails.accountId)).Result;
 
             if (currentAccount is not null)
-                currentAccount.MapProperties(accountDetails, accountBalance);
+                currentAccount.MapProperties(accountDetails, accountBalance, isCurrent);
             else
-                currentAccount = apiDbContext.Accounts.Add(new Account(accountDetails, accountBalance)).Entity;
+                currentAccount = apiDbContext.Accounts.Add(new Account(accountDetails, accountBalance, isCurrent)).Entity;
 
             return currentAccount;
         }
@@ -50,8 +47,6 @@ namespace IGApi.Model
            [NotNullAttribute] dto.endpoint.accountbalance.AccountDetails accountDetails
            )
         {
-            _ = apiDbContext.Accounts ?? throw new DBContextNullReferenceException(nameof(apiDbContext.Accounts));
-
             var currentAccount = Task.Run(async () => await apiDbContext.Accounts.FindAsync(accountDetails.accountId)).Result;
 
             if (currentAccount is not null)
@@ -68,8 +63,6 @@ namespace IGApi.Model
             [NotNullAttribute] dto.endpoint.accountbalance.AccountBalance accountBalance
         )
         {
-            _ = apiDbContext.Accounts ?? throw new DBContextNullReferenceException(nameof(apiDbContext.Accounts));
-
             var currentAccount = Task.Run(async () => await apiDbContext.Accounts.FindAsync(accountDetails.accountId)).Result;
 
             if (currentAccount is not null)
@@ -90,8 +83,6 @@ namespace IGApi.Model
         {
             try
             {
-                _ = apiDbContext.Accounts ?? throw new DBContextNullReferenceException(nameof(apiDbContext.Accounts));
-
                 var currentAccount = Task.Run(async () => await apiDbContext.Accounts.FindAsync(accountId)).Result;
 
                 if (currentAccount is not null)

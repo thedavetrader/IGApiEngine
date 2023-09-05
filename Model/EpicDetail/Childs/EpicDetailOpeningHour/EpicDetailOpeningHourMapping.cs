@@ -12,16 +12,14 @@ namespace IGApi.Model
             [NotNullAttribute] TimeRange timeRange
             )
         {
-            {
-                #region parent details
-                Epic = epicDetail.Epic;
-                ApiLastUpdate = DateTime.UtcNow;
-                EpicDetail = epicDetail;
-                #endregion
+            #region parent details
+            Epic = epicDetail.Epic;
+            ApiLastUpdate = DateTime.UtcNow;
+            EpicDetail = epicDetail;
+            #endregion
 
-                OpenTime = Utility.ConvertLocalTimeStringToUtcTimespan(timeRange.openTime);
-                CloseTime = Utility.ConvertLocalTimeStringToUtcTimespan(timeRange.closeTime);
-            }
+            OpenTime = Utility.ConvertLocalTimeStringToUtcTimespan(timeRange.openTime);
+            CloseTime = Utility.ConvertLocalTimeStringToUtcTimespan(timeRange.closeTime);
         }
     }
 }

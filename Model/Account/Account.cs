@@ -61,6 +61,9 @@ namespace IGApi.Model
         
         [Column("available_cash")]
         public decimal? AvailableCash { get; set; }
+
+        [Column("is_current")]
+        public bool IsCurrent { get; set; }
         #endregion AccountBalance
     }
 }

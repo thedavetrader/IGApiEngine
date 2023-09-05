@@ -13,9 +13,6 @@ namespace IGApi.Model
             [NotNullAttribute] CurrencyData currencyData
             )
         {
-            _ = apiDbContext.EpicDetailsCurrency ?? throw new DBContextNullReferenceException(nameof(apiDbContext.EpicDetailsCurrency));
-            _ = apiDbContext.Currencies ?? throw new DBContextNullReferenceException(nameof(apiDbContext.Currencies));
-
             #region SyncToDb Referencing entity
             var currency = apiDbContext.SaveCurrency(currencyData);
             #endregion

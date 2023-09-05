@@ -20,10 +20,11 @@ namespace IGApi.Model
         /// <param name="accountBalance"></param>
         public Account(
             [NotNullAttribute] dto.endpoint.auth.session.AccountDetails accountDetails,
-            [NotNullAttribute] dto.endpoint.auth.session.AccountInfo accountBalance
+            [NotNullAttribute] dto.endpoint.auth.session.AccountInfo accountBalance,
+            bool isCurrent
             )
         {
-            MapProperties(accountDetails, accountBalance);
+            MapProperties(accountDetails, accountBalance, isCurrent);
             _ = AccountId ?? throw new PrimaryKeyNullReferenceException(nameof(AccountId));
         }
 

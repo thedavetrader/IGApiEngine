@@ -5,8 +5,8 @@ namespace IGApi.Model
     [Table("transaction_history")]
     public partial class TransactionHistory
     {
-        [Column("date")]
-        public DateTime Date { get; set; }
+        [Column("date_time")]
+        public DateTime DateTime { get; set; }
         
         [Column("instrument_name")]
         public string InstrumentName { get; set; }

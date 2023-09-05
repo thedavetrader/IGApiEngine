@@ -12,8 +12,6 @@ namespace IGApi.Model
             [NotNullAttribute] string specialInfo
             )
         {
-            _ = apiDbContext.EpicDetailsSpecialInfo ?? throw new DBContextNullReferenceException(nameof(apiDbContext.EpicDetailsSpecialInfo));
-
             var epicDetailSpecialInfo = Task.Run(async () => await apiDbContext.EpicDetailsSpecialInfo.FindAsync(epicDetail.Epic, specialInfo)).Result;
 
             if (epicDetailSpecialInfo is not null)

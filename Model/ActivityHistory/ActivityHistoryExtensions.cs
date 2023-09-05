@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using IGApi.Common;
-using dto.endpoint.accountactivity.activity;
+using dto.endpoint.accountactivity.activity_v3;
 
 namespace IGApi.Model
 {
@@ -9,12 +9,10 @@ namespace IGApi.Model
     {
         public static ActivityHistory? SaveActivityHistory(
             [NotNullAttribute] this ApiDbContext apiDbContext,
-            [NotNullAttribute] Activity activity
+            [NotNullAttribute] Activity_v3 activity
             )
         {
-            _ = apiDbContext.ActivitiesHistory ?? throw new DBContextNullReferenceException(nameof(apiDbContext.ActivitiesHistory));
-
-            var currentActivity = Task.Run(async () => await apiDbContext.ActivitiesHistory.FindAsync(activity.GetTimestamp(), activity.dealId)).Result;
+            var currentActivity = Task.Run(async () => await apiDbContext.ActivitiesHistory.FindAsync(activity.GetTimeStamp(), activity.dealId)).Result;
 
             if (currentActivity is not null)
                 currentActivity.MapProperties(activity);
@@ -24,32 +22,12 @@ namespace IGApi.Model
             return currentActivity;
         }
 
-        public static DateTime GetTimestamp(this Activity activity)
+        public static DateTime GetTimeStamp(this Activity_v3 activity)
         {
-
-            if (
-                DateTime.TryParseExact(
+            return DateTime.Parse(
                 activity.date,
-                "dd/MM/yy",
-                CultureInfo.InvariantCulture,
-                DateTimeStyles.AssumeUniversal |
-                DateTimeStyles.AdjustToUniversal,
-                out DateTime date)
-
-                &&
-
-                TimeSpan.TryParseExact(
-                activity.time,
-                "hh\\:mm",
-                CultureInfo.InvariantCulture,
-                TimeSpanStyles.None,
-                out TimeSpan time))
-            {
-                var timestampLocal = DateTime.SpecifyKind(date + time, DateTimeKind.Local);
-                return TimeZoneInfo.ConvertTimeToUtc(timestampLocal, TimeZoneInfo.Local);
-            }
-            else
-                throw new EssentialPropertyNullReferenceException(nameof(GetTimestamp));
+            CultureInfo.InvariantCulture,
+            DateTimeStyles.AssumeUniversal); //TODO: Local or UTC?
         }
     }
 }

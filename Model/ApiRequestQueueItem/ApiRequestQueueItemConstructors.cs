@@ -11,6 +11,7 @@ namespace IGApi.Model
         [Obsolete("Do not use this constructor. It's intended use is for EF-Core only.", true)]      
         public ApiRequestQueueItem()
         {
+            Request = string.Format(Constants.InvalidEntry, nameof(ApiRequestQueueItem));
         }
 
         public ApiRequestQueueItem(
@@ -27,7 +28,6 @@ namespace IGApi.Model
             Parameters = parameters;
             ExecuteAsap = executeAsap;
             IsRecurrent = isRecurrent;
-            IsRunning = false;
             Guid = guid;
             ParentGuid = parentGuid;
 

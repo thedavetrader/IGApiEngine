@@ -56,5 +56,8 @@ namespace IGApi.Model
         //TODO:     ZEROPRIO For now store affected_deals as json, until its purpose is clear.
         [Column("affected_deals")]
         public string? AffectedDeals { get; set; }
+
+        [Column("is_consumeable")]
+        public bool IsConsumable { get; set; }
     }
 }

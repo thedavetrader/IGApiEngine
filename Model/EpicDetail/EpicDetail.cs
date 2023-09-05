@@ -73,7 +73,7 @@ namespace IGApi.Model
         public DateTime ApiLastUpdate { get; set; } = DateTime.UtcNow;
 
         #region Class contained properties
-        #region ExpirtyDetails
+        #region ExpiryDetails
         [Column("expiry_last_dealingdate")]
         public DateTime? ExpirylastDealingDate { get; set; }
 
@@ -134,6 +134,49 @@ namespace IGApi.Model
         [Column("dealing_rule_trailing_stop_preference")]
         public string? DealingRuleTrailingStopsPreference { get; set; }
         #endregion
+
+        #region MarketSnapshotData
+
+        [Column("market_status")]
+        public string? MarketStatus { get; set; }
+        [Column("net_change")]
+        public decimal? NetChange { get; set; }
+        [Column("percentage_change")]
+        public decimal? PercentageChange { get; set; }
+        [Column("update_time")]
+        public string? UpdateTime { get; set; }
+        [Column("delay_time")]
+        public int? DelayTime { get; set; }
+        [Column("bid")]
+        public decimal? Bid { get; set; }
+        [Column("offer")]
+        public decimal? Offer { get; set; }
+        [Column("high")]
+        public decimal? High { get; set; }
+        [Column("low")]
+        public decimal? Low { get; set; }
+        [Column("binary_odds")]
+        public decimal? BinaryOdds { get; set; }
+        [Column("decimal_places_factor")]
+        public int? DecimalPlacesFactor { get; set; }
+        [Column("scaling_factor")]
+        public int? ScalingFactor { get; set; }
+        [Column("controlled_risk_extra_spread")]
+        public decimal? ControlledRiskExtraSpread { get; set; }
+
+        [Column("spread")]
+        public decimal? Spread { get; set; }
+
+        [Column("median")]
+        public decimal? Median { get; set; }
+        #endregion
+
+        [Column("is_import_autorized")]
+        public bool IsImportAutorized { get; set; }
+        
+        [Column("is_timed_out")]
+        public bool IsTimedOut { get; set; }
+
         #endregion
 
         #region Childs
@@ -144,10 +187,12 @@ namespace IGApi.Model
         public virtual List<EpicDetailSpecialInfo>? SpecialInfo { get; set; }
 
         public virtual List<EpicDetailCurrency>? Currencies { get; set; }
+
+        //public virtual EpicDetailSnapshot Snapshot { get; set; }
         #endregion
 
         //	Linked
-        public virtual List<WatchlistEpicDetail> watchlistEpicDetails { get; set; }
+        public virtual List<WatchlistEpicDetail>? WatchlistEpicDetails { get; set; }
     }
 }
 

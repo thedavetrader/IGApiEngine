@@ -12,9 +12,7 @@ namespace IGApi.Model
             [NotNullAttribute] Transaction transaction
             )
         {
-            _ = apiDbContext.TransactionsHistory ?? throw new DBContextNullReferenceException(nameof(apiDbContext.TransactionsHistory));
-
-            var currentTransaction = Task.Run(async () => await apiDbContext.TransactionsHistory.FindAsync(transaction.GetDate(), transaction.reference)).Result;
+            var currentTransaction = Task.Run(async () => await apiDbContext.TransactionsHistory.FindAsync(transaction.GetDateTime(), transaction.reference)).Result;
 
             if (currentTransaction is not null)
                 currentTransaction.MapProperties(transaction);
@@ -24,21 +22,12 @@ namespace IGApi.Model
             return currentTransaction;
         }
 
-        public static DateTime GetDate(this Transaction transaction)
+        public static DateTime GetDateTime(this Transaction transaction)
         {
-
-            if (
-                DateTime.TryParseExact(
-                transaction.date,
-                "dd/MM/yy",
-                CultureInfo.InvariantCulture,
-                DateTimeStyles.AssumeLocal,
-                out DateTime date))
-            {
-                return TimeZoneInfo.ConvertTimeToUtc(date, TimeZoneInfo.Local).Date; // Use .Date to get the Midnight value <date> 00:00:00.
-            }
-            else
-                throw new EssentialPropertyNullReferenceException(nameof(GetDate));
+            return DateTime.Parse(
+                transaction.dateUtc,
+            CultureInfo.InvariantCulture,
+            DateTimeStyles.AssumeUniversal);
         }
     }
 }

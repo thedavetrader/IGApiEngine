@@ -5,7 +5,7 @@ namespace IGApi.Common
 {
     internal class LogFormat
     {
-        private string _logFormat;
+        private readonly string _logFormat;
 
         private LogFormat(string logFormat)
         {
@@ -16,21 +16,11 @@ namespace IGApi.Common
         {
             return _logFormat;
         }
-
-        public static bool operator ==(LogFormat left, LogFormat right)
-        {
-            return (left._logFormat == right._logFormat);
-        }
-
-        public static bool operator !=(LogFormat left, LogFormat right)
-        {
-            return (left._logFormat != right._logFormat);
-        }
-
-        public static LogFormat FormatOneColumns = new("{0, -50} {1, 150}");
-        public static LogFormat FormatTwoColumns = new("{0, -50} {1, 75} {2, 75}");
-        public static LogFormat FormatThreeColumns = new("{0, -50} {1, 50} {2, 50} {3, 50}");
-        public static LogFormat FormatFourColumns = new("{0, -50} {1, 37} {2, 37} {3, 37} {4, 37}");
+        
+        public static LogFormat FormatOneColumns = new("{0, -50}{1, 120}");
+        public static LogFormat FormatTwoColumns = new("{0, -50}{1, 60}{2, 60}");
+        public static LogFormat FormatThreeColumns = new("{0, -50}{1, 40}{2, 40}{3, 40}");
+        public static LogFormat FormatFourColumns = new("{0, -50}{1, 30}{2, 30}{3, 30}{4, 30}");
     }
 
 
@@ -38,7 +28,7 @@ namespace IGApi.Common
     {
         private static string? isLockedByCaller;
 
-        internal static string[] Messages(params string[] messages) { return messages; }
+        internal static string[] Columns(params string[] messages) { return messages; }
 
         /// <summary>
         /// Allows to get exclusive rights to write to console output stream.
@@ -46,6 +36,11 @@ namespace IGApi.Common
         /// <param name="caller"></param>
         internal static void Lock([CallerMemberName] string? caller = null)
         {
+            while (isLockedByCaller is not null)
+            {
+                Utility.WaitFor(15);
+            }
+
             isLockedByCaller = caller;
         }
 
@@ -60,8 +55,69 @@ namespace IGApi.Common
 
         internal static void WriteLog([CallerMemberName] string? caller = null)
         {
-            Log.WriteLog(Messages(""), caller);
+            Log.WriteLog(Columns(""), caller);
         }
+
+        internal static void WriteOk(string[] messages, [CallerMemberName] string? caller = null)
+        {
+            Lock(caller);
+
+            var curForegroundColor = Console.ForegroundColor;
+
+            Console.ForegroundColor = ConsoleColor.Green;
+
+            Log.WriteLog(Columns(messages), caller);
+
+            Console.ForegroundColor = curForegroundColor;
+
+            UnLock(caller);
+        }
+
+        internal static void WriteWarning(string[] messages, [CallerMemberName] string? caller = null)
+        {
+            Lock(caller);
+
+            var curForegroundColor = Console.ForegroundColor;
+
+            Console.ForegroundColor = ConsoleColor.DarkYellow;
+
+            Log.WriteLog(Columns(messages), caller);
+
+            Console.ForegroundColor = curForegroundColor;
+
+            UnLock(caller);
+        }
+
+        internal static void WriteError(string[] messages, [CallerMemberName] string? caller = null)
+        {
+            Lock(caller);
+
+            var curForegroundColor = Console.ForegroundColor;
+
+            Console.ForegroundColor = ConsoleColor.Red;
+
+            Log.WriteLog(Columns(messages), caller);
+
+            Console.ForegroundColor = curForegroundColor;
+
+            UnLock(caller);
+        }
+
+        internal static void WriteInformational(string[] messages, [CallerMemberName] string? caller = null)
+        {
+            Lock(caller);
+
+            var curForegroundColor = Console.ForegroundColor;
+
+            Console.ForegroundColor = ConsoleColor.Yellow;
+
+            Log.WriteLog(Columns(messages), caller);
+
+            Console.ForegroundColor = curForegroundColor;
+
+            UnLock(caller);
+        }
+
         internal static void WriteLog(string[] messages, [CallerMemberName] string? caller = null)
         {
             switch (messages.Length)
@@ -74,7 +130,7 @@ namespace IGApi.Common
             }
         }
 
-        internal static void WriteLog(LogFormat logFormat, string[] messages, [CallerMemberName] string? caller = null)
+        private static void WriteLog(LogFormat logFormat, string[] messages, [CallerMemberName] string? caller = null)
         {
             while (isLockedByCaller != caller && isLockedByCaller is not null) { Utility.WaitFor(100); }
 
@@ -90,7 +146,7 @@ namespace IGApi.Common
 
         internal static void WriteException(Exception ex, [CallerMemberName] string? caller = null)
         {
-            WriteLog(Messages(ex.ToString()), caller);
+            WriteError(Columns(ex.ToString()), caller);
         }
     }
 }

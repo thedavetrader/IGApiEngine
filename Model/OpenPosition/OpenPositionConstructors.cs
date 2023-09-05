@@ -15,6 +15,7 @@ namespace IGApi.Model
         {
             AccountId = string.Format(Constants.InvalidEntry, nameof(OpenPosition));
             DealId = string.Format(Constants.InvalidEntry, nameof(OpenPosition));
+            DealReference = string.Format(Constants.InvalidEntry, nameof(OpenPosition));
         }
 
         /// <summary>
@@ -38,6 +39,7 @@ namespace IGApi.Model
             _ = DealId ?? throw new EssentialPropertyNullReferenceException(nameof(DealId));
             _ = Direction ?? throw new EssentialPropertyNullReferenceException(nameof(Direction));
             _ = Currency ?? throw new EssentialPropertyNullReferenceException(nameof(Currency));
+            _ = DealReference ?? throw new EssentialPropertyNullReferenceException(nameof(DealReference));
         }
 
         public OpenPosition(
@@ -52,6 +54,7 @@ namespace IGApi.Model
             _ = DealId ?? throw new EssentialPropertyNullReferenceException(nameof(DealId));
             _ = Direction ?? throw new EssentialPropertyNullReferenceException(nameof(Direction));
             _ = Currency ?? throw new EssentialPropertyNullReferenceException(nameof(Currency));
+            _ = DealReference ?? throw new EssentialPropertyNullReferenceException(nameof(DealReference));
         }
 
     }

@@ -11,8 +11,6 @@ namespace IGApi.Model
             [NotNullAttribute] string accountId
             )
         {
-            _ = apiDbContext.Watchlists ?? throw new DBContextNullReferenceException(nameof(apiDbContext.Watchlists));
-
             var currentWatchlist = Task.Run(async () => await apiDbContext.Watchlists.FindAsync(accountId, watchlist.id)).Result;
 
             if (currentWatchlist is not null)

@@ -4,7 +4,7 @@ namespace IGApi.Model
 {
     public partial class ApiDbContext
     {
-        public DbSet<ActivityHistory>? ActivitiesHistory { get; set; }
+        public DbSet<ActivityHistory> ActivitiesHistory { get; set; }
         public static void ActivityOnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ActivityHistory>().Property(p => p.DealId).HasMaxLength(64);
@@ -15,6 +15,10 @@ namespace IGApi.Model
                     p.Timestamp,
                     p.DealId
                 });
+
+            modelBuilder.Entity<ActivityHistory>()
+                .Property(p => p.reference)
+                .HasComputedColumnSql("right(deal_id, 8)", stored: true);
         }
     }
 }

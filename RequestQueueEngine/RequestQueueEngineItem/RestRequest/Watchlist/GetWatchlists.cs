@@ -11,18 +11,17 @@ namespace IGApi.RequestQueue
     public partial class RequestQueueEngineItem
     {
         public static event EventHandler? GetWatchlistsCompleted;
-        //TODO: Make functionality that can create auto watchlists based on signals (let's begin with trending i.c.w. clientsentiment)
+
         [RequestType(isRestRequest: true, isTradingRequest: false)]
         public void GetWatchlists()
         {
             try
             {
                 using ApiDbContext apiDbContext = new();
-                _ = apiDbContext.Watchlists ?? throw new DBContextNullReferenceException(nameof(apiDbContext.Watchlists));
 
                 var response = _apiEngine.IGRestApiClient.listOfWatchlists().UseManagedCall();
 
-                if (response is not null)
+                if (response.Response is not null)
                 {
                     response.Response.watchlists.ForEach(watchlist =>
                     {
@@ -36,7 +35,7 @@ namespace IGApi.RequestQueue
                         .Where(y => !response.Response.watchlists.Any(a => a.id == y.WatchlistId))
                         );
 
-                    Task.Run(async () => await apiDbContext.SaveChangesAsync()).Wait();  // Use wait to prevent the Task object is disposed while still saving the changes.
+                    Task.Run(async () => await apiDbContext.SaveChangesAsync(_cancellationToken), _cancellationToken).ContinueWith(task => TaskException.CatchTaskIsCanceledException(task)).Wait();  // Use wait to prevent the Task object is disposed while still saving the changes.
                 }
             }
             catch (Exception ex)

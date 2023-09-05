@@ -12,9 +12,14 @@ namespace IGApi.Model
         /// <summary>
         /// Also provide normal constructor for EF-Core.
         /// </summary>
+        [Obsolete("Do not use this constructor. It's intended use is for EF-Core only.", true)]      
         public ApiEngineStatus()
         {
-            MapProperties();
+        }
+
+        public ApiEngineStatus(DateTime timestamp)
+        {
+            MapProperties(timestamp);
         }
     }
 }

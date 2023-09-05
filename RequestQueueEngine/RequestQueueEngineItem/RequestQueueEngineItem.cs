@@ -2,6 +2,7 @@
 using IGApi.Common;
 using IGApi.Common.Extensions;
 using IGApi.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace IGApi.RequestQueue
 {
@@ -9,32 +10,34 @@ namespace IGApi.RequestQueue
 
     public partial class RequestQueueEngineItem
     {
-        public bool IsTradingRequest;
-
-        public bool IsRestRequest;
-
         public ApiRequestQueueItem ApiRequestQueueItem;
 
-        private readonly Task? _restRequestCallTask;
+        private readonly Task? _requestCallTask;
 
         private readonly ApiEngine _apiEngine = ApiEngine.Instance;
 
         private readonly string _currentAccountId;
 
-        private DateTime _dequeueTimestamp;
+        private readonly DateTime _dequeueTimestamp;
+
+        private readonly CancellationToken _cancellationToken;
 
         public RequestQueueEngineItem(
             [NotNullAttribute] ApiRequestQueueItem apiRequestQueueItem,
-            [NotNullAttribute] DateTime dequeueTimestamp
+            [NotNullAttribute] DateTime dequeueTimestamp,
+            [NotNullAttribute] CancellationToken cancellationToken
             )
         {
-            if (!_apiEngine.IsLoggedIn) throw new IGApiConncectionError();
+            _cancellationToken = cancellationToken;
+
+            if (!_apiEngine.IsLoggedIn && !_cancellationToken.IsCancellationRequested) throw new IGApiConncectionError();
 
             ApiRequestQueueItem = apiRequestQueueItem;
-            
+
             _dequeueTimestamp = dequeueTimestamp;
 
             _currentAccountId = _apiEngine.LoginSessionInformation.currentAccountId;
+
 
             var request = this.GetType().GetMethod(ApiRequestQueueItem.Request);
 
@@ -44,11 +47,7 @@ namespace IGApi.RequestQueue
 
                 if (requestTypeAttribute is not null)
                 {
-                    IsRestRequest = requestTypeAttribute.IsRestRequest;
-
-                    IsTradingRequest = requestTypeAttribute.IsTradingRequest;
-
-                    _restRequestCallTask = new Task(() => request.Invoke(this, new object[] { }));
+                    _requestCallTask = new Task(() => request.Invoke(this, Array.Empty<object>()));
                 }
                 else
                     throw new Exception($"Could not find RequestTypeAttribute of request {ApiRequestQueueItem.Request}");
@@ -59,16 +58,14 @@ namespace IGApi.RequestQueue
 
         public void Execute()
         {
-            if (_restRequestCallTask is not null)
-                _restRequestCallTask.FireAndForget();
+            if (_requestCallTask is not null)
+                _requestCallTask.FireAndForget();
             else
-                WriteLog(Messages($"Execution of the rest request {ApiRequestQueueItem.Request} is not implemented yet."));
+                WriteLog(Columns($"Execution of the rest request {ApiRequestQueueItem.Request} is not implemented yet."));
         }
 
         private void RemoveObsoleteEpicTicks(ApiDbContext apiDbContext)
         {
-            _ = apiDbContext.EpicTicks ?? throw new DBContextNullReferenceException(nameof(apiDbContext.EpicTicks));
-
             var obsoleteEpicTicks = apiDbContext.EpicTicks
                     .ToList()   // Use ToList() to prevent that Linq constructs a predicate that can not be sent to db.
                     .Where(w => !ApiEngine.EpicStreamPriceAvailableCheck(w.Epic));
@@ -78,27 +75,13 @@ namespace IGApi.RequestQueue
             apiDbContext.EpicTicks.RemoveRange(obsoleteEpicTicks);
 
             //  Remove from list
-            _apiEngine.RemoveEpicStreamListItems(_apiEngine.EpicStreamList.Where(f => obsoleteEpicTicks.Any(s => s.Epic == f.Epic)));
+            _apiEngine.RemoveEpicStreamListItems(_apiEngine.EpicStreamList.ToList().Where(f => obsoleteEpicTicks.Any(s => s.Epic == f.Epic)));
         }
 
         private void QueueItemComplete(EventHandler? eventHandler)
         {
-            using ApiDbContext apiDbContext = new();
-
-            _ = apiDbContext.ApiRequestQueueItems ?? throw new DBContextNullReferenceException(nameof(apiDbContext.ApiRequestQueueItems));
-
-            apiDbContext.ApiRequestQueueItems.Attach(ApiRequestQueueItem);
-
-            if (ApiRequestQueueItem.IsRecurrent && !IsTradingRequest && !ApiRequestQueueItem.ExecuteAsap)
-            {
-                ApiRequestQueueItem.Timestamp = _dequeueTimestamp;
-                ApiRequestQueueItem.IsRunning = false;
-            }
-            else
-                apiDbContext.ApiRequestQueueItems.Remove(ApiRequestQueueItem);
-
-            Task.Run(async () => await apiDbContext.SaveChangesAsync()).Wait();  // Use wait to prevent the Task object is disposed while still saving the changes.
-
+            // Formerly used for deleting request item from apirequest queue.
+            // Now obsolete, but method pattern is kept for future functionality/events.
             eventHandler?.Invoke(this, EventArgs.Empty);
         }
 
@@ -108,23 +91,24 @@ namespace IGApi.RequestQueue
             [NotNull] bool isRecurrent,
             Guid guid,
             Guid? parentGuid = null,
-            string? parameters = null)
+            string? parameters = null,
+            CancellationToken cancellationToken = default
+            )
         {
             using ApiDbContext apiDbContext = new();
 
-            _ = apiDbContext.ApiRequestQueueItems ?? throw new DBContextNullReferenceException(nameof(apiDbContext.ApiRequestQueueItems));
+            if (!apiDbContext.ApiRequestQueueItems.Any(a => a.Guid == guid))
+            {
+                ApiRequestQueueItem apiRequestQueueItem = new(
+                    restRequest: restRequest,
+                    parameters: parameters,
+                    executeAsap: executeAsap,
+                    isRecurrent: isRecurrent,
+                    guid: guid,
+                    parentGuid: parentGuid);
 
-            ApiRequestQueueItem apiRequestQueueItem = new(
-                restRequest: restRequest, 
-                parameters: parameters,
-                executeAsap: executeAsap,
-                isRecurrent: isRecurrent,
-                guid: guid,
-                parentGuid: parentGuid);
-
-            apiDbContext.SaveRestRequestQueue(apiRequestQueueItem);
-
-            Task.Run(async () => await apiDbContext.SaveChangesAsync()).Wait();
+                apiRequestQueueItem.SaveApiRequestQueueItem(apiDbContext.ConnectionString);
+            }
         }
     }
 }

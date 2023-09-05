@@ -15,8 +15,6 @@ namespace IGApi.Model
             [NotNullAttribute] string epic
             )
         {
-            _ = apiDbContext.OpenPositions ?? throw new DBContextNullReferenceException(nameof(apiDbContext.OpenPositions));
-
             var currentOpenPosition = Task.Run(async () => await apiDbContext.OpenPositions.FindAsync(accountId, openPositionData.dealId)).Result;
 
             if (currentOpenPosition is not null)
@@ -33,8 +31,6 @@ namespace IGApi.Model
         [NotNullAttribute] string accountId
         )
         {
-            _ = apiDbContext.OpenPositions ?? throw new DBContextNullReferenceException(nameof(apiDbContext.OpenPositions));
-
             var currentOpenPosition = Task.Run(async () => await apiDbContext.OpenPositions.FindAsync(accountId, lsTradeSubscriptionData.dealId)).Result;
 
             if (currentOpenPosition is not null)

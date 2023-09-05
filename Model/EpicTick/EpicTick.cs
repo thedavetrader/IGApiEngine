@@ -37,6 +37,12 @@ namespace IGApi.Model
         
         [Column("offer")]
         public decimal? Offer{ get; set; }
+
+        [Column("spread")]
+        public decimal? Spread { get; set; }
+        
+        [Column("median")]
+        public decimal? Median { get; set; }
     }
 }
 

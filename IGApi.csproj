@@ -17,23 +17,29 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="bin\**" />
+    <Compile Remove="Model\EpicDetail\Childs\EpicDetailSnapshot\**" />
     <Compile Remove="Model\IGApiAccountBalance\**" />
     <Compile Remove="Model\IGApiOpenPositions\**" />
     <Compile Remove="Model\IGApiStreamingAccountData\**" />
     <Compile Remove="obj\**" />
     <Compile Remove="RequestQueueEngine\RestApi\**" />
+    <Compile Remove="SqlScripts\**" />
     <EmbeddedResource Remove="bin\**" />
+    <EmbeddedResource Remove="Model\EpicDetail\Childs\EpicDetailSnapshot\**" />
     <EmbeddedResource Remove="Model\IGApiAccountBalance\**" />
     <EmbeddedResource Remove="Model\IGApiOpenPositions\**" />
     <EmbeddedResource Remove="Model\IGApiStreamingAccountData\**" />
     <EmbeddedResource Remove="obj\**" />
     <EmbeddedResource Remove="RequestQueueEngine\RestApi\**" />
+    <EmbeddedResource Remove="SqlScripts\**" />
     <None Remove="bin\**" />
+    <None Remove="Model\EpicDetail\Childs\EpicDetailSnapshot\**" />
     <None Remove="Model\IGApiAccountBalance\**" />
     <None Remove="Model\IGApiOpenPositions\**" />
     <None Remove="Model\IGApiStreamingAccountData\**" />
     <None Remove="obj\**" />
     <None Remove="RequestQueueEngine\RestApi\**" />
+    <None Remove="SqlScripts\**" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="Common\Extensions\ObservableCollectionExtension.cs" />
@@ -43,12 +49,21 @@
     <Compile Remove="RequestQueueEngine\RequestQueueEngineItem\RestRequest\Watchlist\Management\Watchlist\CreateWatchListStreamList.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="6.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.0" />
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
-    <PackageReference Include="Validation" Version="2.5.42" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" Version="7.0.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.4" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="7.0.0" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
+    <PackageReference Include="System.Speech" Version="7.0.0" />
+    <PackageReference Include="Validation" Version="2.5.51" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ig-webapi-dotnet-sample\IGWebApiClient\IGWebApiClient.csproj">

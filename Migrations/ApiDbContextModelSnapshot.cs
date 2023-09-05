@@ -17,10 +17,10 @@ namespace IGApi.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.0")
+                .HasAnnotation("ProductVersion", "7.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("IGApi.Model.Account", b =>
                 {
@@ -91,6 +91,10 @@ namespace IGApi.Migrations
                         .HasColumnType("decimal(38,19)")
                         .HasColumnName("equity_used");
 
+                    b.Property<bool>("IsCurrent")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_current");
+
                     b.Property<bool?>("Preferred")
                         .HasColumnType("bit")
                         .HasColumnName("preferred");
@@ -126,23 +130,6 @@ namespace IGApi.Migrations
                         .HasColumnType("nvarchar(64)")
                         .HasColumnName("deal_id");
 
-                    b.Property<string>("ActionStatus")
-                        .IsRequired()
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)")
-                        .HasColumnName("action_status");
-
-                    b.Property<string>("Activity")
-                        .IsRequired()
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)")
-                        .HasColumnName("activity");
-
-                    b.Property<string>("ActivityHistoryId")
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)")
-                        .HasColumnName("activity_history_id");
-
                     b.Property<string>("Channel")
                         .IsRequired()
                         .HasMaxLength(4000)
@@ -150,10 +137,25 @@ namespace IGApi.Migrations
                         .HasColumnName("channel");
 
                     b.Property<string>("Currency")
-                        .IsRequired()
                         .HasMaxLength(4000)
                         .HasColumnType("nvarchar(4000)")
                         .HasColumnName("currency");
+
+                    b.Property<string>("DealReference")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("deal_reference");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("descpription");
+
+                    b.Property<string>("Direction")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("direction");
 
                     b.Property<string>("Epic")
                         .IsRequired()
@@ -161,18 +163,31 @@ namespace IGApi.Migrations
                         .HasColumnType("nvarchar(4000)")
                         .HasColumnName("epic");
 
+                    b.Property<string>("GoodTillDate")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("good_till_date");
+
+                    b.Property<bool>("GuaranteedStop")
+                        .HasColumnType("bit")
+                        .HasColumnName("guaranteed_stop");
+
                     b.Property<decimal?>("Level")
                         .HasPrecision(38, 19)
                         .HasColumnType("decimal(38,19)")
                         .HasColumnName("level");
 
-                    b.Property<decimal?>("Limit")
+                    b.Property<decimal?>("LimitDistance")
                         .HasPrecision(38, 19)
                         .HasColumnType("decimal(38,19)")
-                        .HasColumnName("limit");
+                        .HasColumnName("limit_distance");
+
+                    b.Property<decimal?>("LimitLevel")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("limit_level");
 
                     b.Property<string>("MarketName")
-                        .IsRequired()
                         .HasMaxLength(4000)
                         .HasColumnType("nvarchar(4000)")
                         .HasColumnName("market_name");
@@ -182,33 +197,50 @@ namespace IGApi.Migrations
                         .HasColumnType("nvarchar(4000)")
                         .HasColumnName("period");
 
-                    b.Property<string>("Reference")
-                        .IsRequired()
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)")
-                        .HasColumnName("reference");
-
-                    b.Property<string>("Result")
-                        .IsRequired()
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)")
-                        .HasColumnName("result");
-
-                    b.Property<string>("Size")
-                        .IsRequired()
-                        .HasMaxLength(4000)
-                        .HasColumnType("nvarchar(4000)")
-                        .HasColumnName("size");
-
-                    b.Property<decimal?>("Stop")
+                    b.Property<decimal?>("Size")
                         .HasPrecision(38, 19)
                         .HasColumnType("decimal(38,19)")
-                        .HasColumnName("stop");
+                        .HasColumnName("size");
 
-                    b.Property<string>("StopType")
+                    b.Property<string>("Status")
+                        .IsRequired()
                         .HasMaxLength(4000)
                         .HasColumnType("nvarchar(4000)")
-                        .HasColumnName("stop_type");
+                        .HasColumnName("status");
+
+                    b.Property<decimal?>("StopDistance")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("stop_distance");
+
+                    b.Property<decimal?>("StopLevel")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("stop_level");
+
+                    b.Property<decimal?>("TrailingStep")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("trailing_step");
+
+                    b.Property<decimal?>("TrailingStopDistance")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("trailing_stop_distance");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("type");
+
+                    b.Property<string>("reference")
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("reference")
+                        .HasComputedColumnSql("right(deal_id, 8)", true);
 
                     b.HasKey("Timestamp", "DealId");
 
@@ -222,7 +254,7 @@ namespace IGApi.Migrations
                         .HasColumnType("int")
                         .HasColumnName("id");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("IsAlive")
                         .HasColumnType("datetime2")
@@ -230,11 +262,33 @@ namespace IGApi.Migrations
 
                     b.HasKey("Id");
 
-                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("Id"), false);
-
                     b.ToTable("api_engine_status");
+                });
 
-                    SqlServerEntityTypeBuilderExtensions.IsMemoryOptimized(b);
+            modelBuilder.Entity("IGApi.Model.ApiEventHandler", b =>
+                {
+                    b.Property<string>("Sender")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("sender");
+
+                    b.Property<string>("Delegate")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("delegate");
+
+                    b.Property<int>("Priority")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0)
+                        .HasColumnName("priority");
+
+                    b.HasKey("Sender", "Delegate");
+
+                    b.ToTable("api_event_handler", t =>
+                        {
+                            t.HasCheckConstraint("sender", "sender in ('Account','ActivityHistory','ApiEngineStatus','ApiEventHandler','ApiRequestQueueItem','ClientSentiment','ConfirmResponse','Currency','EpicDetail','EpicDetailCurrency','EpicDetailMarginDepositBand','EpicDetailOpeningHour','EpicDetailSpecialInfo','EpicTick','MarketNode','OpenPosition','SearchResult','TransactionHistory','Watchlist','WatchlistEpicDetail','WorkingOrder')");
+                        });
                 });
 
             modelBuilder.Entity("IGApi.Model.ApiRequestQueueItem", b =>
@@ -257,10 +311,6 @@ namespace IGApi.Migrations
                         .HasDefaultValue(false)
                         .HasColumnName("is_recurrent");
 
-                    b.Property<bool>("IsRunning")
-                        .HasColumnType("bit")
-                        .HasColumnName("is_running");
-
                     b.Property<string>("Parameters")
                         .HasMaxLength(4000)
                         .HasColumnType("nvarchar(max)")
@@ -269,6 +319,12 @@ namespace IGApi.Migrations
                     b.Property<Guid?>("ParentGuid")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("parent_guid");
+
+                    b.Property<int>("RecurrencyInterval")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(1)
+                        .HasColumnName("recurrency_interval");
 
                     b.Property<string>("Request")
                         .IsRequired()
@@ -284,17 +340,31 @@ namespace IGApi.Migrations
 
                     b.HasKey("Guid");
 
-                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("Guid"), false);
-
                     b.HasIndex("ExecuteAsap", "Timestamp");
 
-                    SqlServerIndexBuilderExtensions.IsClustered(b.HasIndex("ExecuteAsap", "Timestamp"), false);
+                    b.ToTable("api_request_queue_item", t =>
+                        {
+                            t.HasCheckConstraint("request", "request in ('AddStreamListEpic','RemoveStreamListEpic','WriteToFile','BrowseEpics','GetAccountDetails','GetActivityHistory','GetClientSentiment','GetEpicDetails','GetPrice','GetTransactionHistory','ClosePosition','CreatePosition','EditPosition','GetOpenPositions','CreateWorkingOrder','DeleteWorkingOrder','EditWorkingOrder','GetWorkingOrders','Search','GetWatchlists','AddWatchlistEpic','GetWatchListEpics','RemoveWatchlistEpic','CreateWatchlist','DeleteWatchlist','ExecuteSqlScript','Restart','Shutdown','Speak')");
+                        });
+                });
 
-                    b.ToTable("api_request_queue_item");
+            modelBuilder.Entity("IGApi.Model.BaseCurrencyConvertRatio", b =>
+                {
+                    b.Property<string>("Epic")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("epic");
 
-                    SqlServerEntityTypeBuilderExtensions.IsMemoryOptimized(b);
+                    b.Property<decimal?>("BaseExchangeRate")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("base_exchange_rate");
 
-                    b.HasCheckConstraint("request", "request in ('GetAccountDetails','GetOpenPositions','GetWorkingOrders','GetEpicDetails','GetActivityHistory','GetTransactionHistory','GetClientSentiment','CreatePosition','EditPosition','ClosePosition','CreateWorkingOrder','EditWorkingOrder','DeleteWorkingOrder','GetWatchlists','CreateWatchlist','DeleteWatchlist','GetWatchListEpics','AddWatchlistEpic','RemoveWatchlistEpic','Search')");
+                    b.HasKey("Epic");
+
+                    b.ToTable("base_currency_convert_ratio");
+
+                    b.ToView("Base64FormattingOptions", (string)null);
                 });
 
             modelBuilder.Entity("IGApi.Model.ClientSentiment", b =>
@@ -369,6 +439,10 @@ namespace IGApi.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("guaranteed_stop");
 
+                    b.Property<bool>("IsConsumable")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_consumeable");
+
                     b.Property<decimal?>("Level")
                         .HasPrecision(38, 19)
                         .HasColumnType("decimal(38,19)")
@@ -411,11 +485,7 @@ namespace IGApi.Migrations
 
                     b.HasKey("Timestamp", "DealReference");
 
-                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("Timestamp", "DealReference"), false);
-
                     b.ToTable("confirm_response");
-
-                    SqlServerEntityTypeBuilderExtensions.IsMemoryOptimized(b);
                 });
 
             modelBuilder.Entity("IGApi.Model.Currency", b =>
@@ -459,6 +529,16 @@ namespace IGApi.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("api_last_update");
 
+                    b.Property<decimal?>("Bid")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("bid");
+
+                    b.Property<decimal?>("BinaryOdds")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("binary_odds");
+
                     b.Property<string>("ChartCode")
                         .HasMaxLength(4000)
                         .HasColumnType("nvarchar(4000)")
@@ -472,6 +552,11 @@ namespace IGApi.Migrations
                     b.Property<bool>("ControlledRiskAllowed")
                         .HasColumnType("bit")
                         .HasColumnName("controlled_risk_allowed");
+
+                    b.Property<decimal?>("ControlledRiskExtraSpread")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("controlled_risk_extra_spread");
 
                     b.Property<string>("Country")
                         .HasMaxLength(4000)
@@ -538,6 +623,14 @@ namespace IGApi.Migrations
                         .HasColumnType("decimal(38,19)")
                         .HasColumnName("dealing_rule_value_min_step_distance");
 
+                    b.Property<int?>("DecimalPlacesFactor")
+                        .HasColumnType("int")
+                        .HasColumnName("decimal_places_factor");
+
+                    b.Property<int?>("DelayTime")
+                        .HasColumnType("int")
+                        .HasColumnName("delay_time");
+
                     b.Property<string>("Expiry")
                         .IsRequired()
                         .HasMaxLength(4000)
@@ -557,6 +650,23 @@ namespace IGApi.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("force_open_allowed");
 
+                    b.Property<decimal?>("High")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("high");
+
+                    b.Property<bool>("IsImportAutorized")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true)
+                        .HasColumnName("is_import_autorized");
+
+                    b.Property<bool>("IsTimedOut")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_timed_out");
+
                     b.Property<DateTime?>("LastRolloverTime")
                         .HasColumnType("datetime2")
                         .HasColumnName("last_rollover_time");
@@ -565,6 +675,11 @@ namespace IGApi.Migrations
                         .HasPrecision(38, 19)
                         .HasColumnType("decimal(38,19)")
                         .HasColumnName("lot_size");
+
+                    b.Property<decimal?>("Low")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("low");
 
                     b.Property<decimal?>("MarginFactor")
                         .HasPrecision(38, 19)
@@ -582,21 +697,48 @@ namespace IGApi.Migrations
                         .HasColumnType("nvarchar(4000)")
                         .HasColumnName("market_id");
 
+                    b.Property<string>("MarketStatus")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("market_status");
+
+                    b.Property<decimal?>("Median")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("median")
+                        .HasComputedColumnSql("(offer + bid) / 2.0", true);
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(4000)
                         .HasColumnType("nvarchar(4000)")
                         .HasColumnName("name");
 
+                    b.Property<decimal?>("NetChange")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("net_change");
+
                     b.Property<string>("NewsCode")
                         .HasMaxLength(4000)
                         .HasColumnType("nvarchar(4000)")
                         .HasColumnName("news_code");
 
+                    b.Property<decimal?>("Offer")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("offer");
+
                     b.Property<string>("OnePipMeans")
                         .HasMaxLength(4000)
                         .HasColumnType("nvarchar(4000)")
                         .HasColumnName("one_pip_means");
+
+                    b.Property<decimal?>("PercentageChange")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("percentage_change");
 
                     b.Property<string>("PositionSizeUnit")
                         .IsRequired()
@@ -609,6 +751,10 @@ namespace IGApi.Migrations
                         .HasColumnType("nvarchar(4000)")
                         .HasColumnName("rollover_info");
 
+                    b.Property<int?>("ScalingFactor")
+                        .HasColumnType("int")
+                        .HasColumnName("scaling_factor");
+
                     b.Property<string>("SlippageFactorUnit")
                         .HasMaxLength(4000)
                         .HasColumnType("nvarchar(4000)")
@@ -618,6 +764,13 @@ namespace IGApi.Migrations
                         .HasPrecision(38, 19)
                         .HasColumnType("decimal(38,19)")
                         .HasColumnName("slippage_factor_value");
+
+                    b.Property<decimal?>("Spread")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("spread")
+                        .HasComputedColumnSql("offer - bid", true);
 
                     b.Property<int>("SprintMarketsMaximumExpiryTime")
                         .HasColumnType("int")
@@ -640,6 +793,11 @@ namespace IGApi.Migrations
                         .HasMaxLength(4000)
                         .HasColumnType("nvarchar(4000)")
                         .HasColumnName("type");
+
+                    b.Property<string>("UpdateTime")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("update_time");
 
                     b.Property<string>("ValueOfOnePip")
                         .HasMaxLength(4000)
@@ -755,6 +913,166 @@ namespace IGApi.Migrations
                     b.ToTable("epic_detail_special_info");
                 });
 
+            modelBuilder.Entity("IGApi.Model.EpicSnapshot", b =>
+                {
+                    b.Property<string>("Resolution")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("resolution");
+
+                    b.Property<DateTime>("OpenTimeUTC")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("open_time_utc");
+
+                    b.Property<string>("Epic")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)")
+                        .HasColumnName("epic");
+
+                    b.Property<decimal?>("CloseAsk")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("close_ask");
+
+                    b.Property<decimal?>("CloseBid")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("close_bid");
+
+                    b.Property<decimal?>("CloseLastTraded")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("close_last_traded");
+
+                    b.Property<decimal?>("CloseMedian")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("close_median")
+                        .HasComputedColumnSql("(close_ask - close_bid) / 2.0", true);
+
+                    b.Property<DateTime>("CloseTime")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("close_time");
+
+                    b.Property<DateTime>("CloseTimeUTC")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("close_time_utc");
+
+                    b.Property<decimal?>("DailyMovementPercentage")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("daily_movement_percentage")
+                        .HasComputedColumnSql("  (((high_ask - high_bid) / 2.0) - ((low_ask - low_bid) / 2.0)) / ((low_ask - low_bid) / 2.0))", true);
+
+                    b.Property<decimal?>("HighAsk")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("high_ask");
+
+                    b.Property<decimal?>("HighBid")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("high_bid");
+
+                    b.Property<decimal?>("HighLastTraded")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("high_last_traded");
+
+                    b.Property<decimal?>("HighMedian")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("high_median")
+                        .HasComputedColumnSql("(high_ask - high_bid) / 2.0", true);
+
+                    b.Property<decimal?>("LowAsk")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("low_ask");
+
+                    b.Property<decimal?>("LowBid")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("low_bid");
+
+                    b.Property<decimal?>("LowLastTraded")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("low_last_traded");
+
+                    b.Property<decimal?>("LowMedian")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("low_median")
+                        .HasComputedColumnSql("(low_ask - low_bid) / 2.0", true);
+
+                    b.Property<decimal?>("OpenAsk")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("open_ask");
+
+                    b.Property<decimal?>("OpenBid")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("open_bid");
+
+                    b.Property<decimal?>("OpenLastTraded")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("open_last_traded");
+
+                    b.Property<decimal?>("OpenMedian")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("open_median")
+                        .HasComputedColumnSql("(open_ask - open_bid) / 2.0", true);
+
+                    b.Property<DateTime>("OpenTime")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("open_time");
+
+                    b.Property<decimal?>("lastTradedVolume")
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("last_traded_volume");
+
+                    b.HasKey("Resolution", "OpenTimeUTC", "Epic");
+
+                    b.HasIndex("Resolution", "OpenTime", "Epic");
+
+                    b.ToTable("epic_snapshot");
+                });
+
+            modelBuilder.Entity("IGApi.Model.EpicSnapshotAllowance", b =>
+                {
+                    b.Property<int>("AllowanceExpiry")
+                        .HasColumnType("int")
+                        .HasColumnName("allowance_expiry");
+
+                    b.Property<int>("RemainingAllowance")
+                        .HasColumnType("int")
+                        .HasColumnName("remaining_allowance");
+
+                    b.Property<int>("TotalAllowance")
+                        .HasColumnType("int")
+                        .HasColumnName("total_allowance");
+
+                    b.Property<DateTime>("AllowanceExpiryDate")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime2")
+                        .HasColumnName("allowance_expiry_date")
+                        .HasComputedColumnSql("dateadd(second, allowance_expiry, getdate())");
+
+                    b.HasKey("AllowanceExpiry", "RemainingAllowance", "TotalAllowance");
+
+                    b.ToTable("epic_snapshot_allowance");
+                });
+
             modelBuilder.Entity("IGApi.Model.EpicTick", b =>
                 {
                     b.Property<string>("Epic")
@@ -797,6 +1115,13 @@ namespace IGApi.Migrations
                         .HasColumnType("nvarchar(4000)")
                         .HasColumnName("market_state");
 
+                    b.Property<decimal?>("Median")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("median")
+                        .HasComputedColumnSql("(offer + bid) / 2.0", true);
+
                     b.Property<decimal?>("MidOpen")
                         .HasPrecision(38, 19)
                         .HasColumnType("decimal(38,19)")
@@ -806,6 +1131,13 @@ namespace IGApi.Migrations
                         .HasPrecision(38, 19)
                         .HasColumnType("decimal(38,19)")
                         .HasColumnName("offer");
+
+                    b.Property<decimal?>("Spread")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasPrecision(38, 19)
+                        .HasColumnType("decimal(38,19)")
+                        .HasColumnName("spread")
+                        .HasComputedColumnSql("offer - bid", true);
 
                     b.Property<DateTime>("UpdateTime")
                         .HasColumnType("datetime2")
@@ -818,6 +1150,37 @@ namespace IGApi.Migrations
                     b.ToTable("epic_tick");
 
                     SqlServerEntityTypeBuilderExtensions.IsMemoryOptimized(b);
+                });
+
+            modelBuilder.Entity("IGApi.Model.MarketNode", b =>
+                {
+                    b.Property<string>("MarketNodeId")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("market_node_id");
+
+                    b.Property<DateTime>("ApiLastUpdate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("api_last_update");
+
+                    b.Property<bool>("IsBrowsed")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_browsed");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("name");
+
+                    b.Property<string>("ParentMarketNodeId")
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("parent_market_node_id");
+
+                    b.HasKey("MarketNodeId");
+
+                    b.ToTable("market_node");
                 });
 
             modelBuilder.Entity("IGApi.Model.OpenPosition", b =>
@@ -922,9 +1285,9 @@ namespace IGApi.Migrations
 
             modelBuilder.Entity("IGApi.Model.TransactionHistory", b =>
                 {
-                    b.Property<DateTime>("Date")
+                    b.Property<DateTime>("DateTime")
                         .HasColumnType("datetime2")
-                        .HasColumnName("date");
+                        .HasColumnName("date_time");
 
                     b.Property<string>("Reference")
                         .HasMaxLength(4000)
@@ -978,7 +1341,7 @@ namespace IGApi.Migrations
                         .HasColumnType("nvarchar(4000)")
                         .HasColumnName("transaction_type");
 
-                    b.HasKey("Date", "Reference");
+                    b.HasKey("DateTime", "Reference");
 
                     b.ToTable("transaction_history");
                 });
@@ -1187,7 +1550,7 @@ namespace IGApi.Migrations
             modelBuilder.Entity("IGApi.Model.WatchlistEpicDetail", b =>
                 {
                     b.HasOne("IGApi.Model.EpicDetail", "EpicDetail")
-                        .WithMany("watchlistEpicDetails")
+                        .WithMany("WatchlistEpicDetails")
                         .HasForeignKey("Epic")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -1218,7 +1581,7 @@ namespace IGApi.Migrations
 
                     b.Navigation("SpecialInfo");
 
-                    b.Navigation("watchlistEpicDetails");
+                    b.Navigation("WatchlistEpicDetails");
                 });
 
             modelBuilder.Entity("IGApi.Model.Watchlist", b =>

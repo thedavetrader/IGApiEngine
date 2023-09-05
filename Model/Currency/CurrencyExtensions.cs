@@ -12,8 +12,6 @@ namespace IGApi.Model
             [NotNullAttribute] CurrencyData currencyData
             )
         {
-            _ = apiDbContext.Currencies ?? throw new DBContextNullReferenceException(nameof(apiDbContext.Currencies));
-
             var currentCurrency = Task.Run(async () => await apiDbContext.Currencies.FindAsync(currencyData.code)).Result;
 
             if (currentCurrency is not null)

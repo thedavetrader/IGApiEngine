@@ -4,7 +4,7 @@ namespace IGApi.Model
 {
     public partial class ApiDbContext
     {
-        public DbSet<Watchlist>? Watchlists { get; set; }
+        public DbSet<Watchlist> Watchlists { get; set; }
         public static void WatchlistOnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Watchlist>().Property(p => p.WatchlistId).ValueGeneratedNever();

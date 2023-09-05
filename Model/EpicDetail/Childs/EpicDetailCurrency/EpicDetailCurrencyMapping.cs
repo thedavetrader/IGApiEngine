@@ -11,16 +11,14 @@ namespace IGApi.Model
             [NotNullAttribute] Currency currency
             )
         {
-            {
-                #region parent details
-                Epic = epicDetail.Epic;
-                ApiLastUpdate = DateTime.UtcNow;
-                EpicDetail = epicDetail;
-                Currency = currency;
-                #endregion
+            #region parent details
+            Epic = epicDetail.Epic;
+            ApiLastUpdate = DateTime.UtcNow;
+            EpicDetail = epicDetail;
+            Currency = currency;
+            #endregion
 
-                Code = currency.Code;
-            }
+            Code = currency.Code;
         }
     }
 }

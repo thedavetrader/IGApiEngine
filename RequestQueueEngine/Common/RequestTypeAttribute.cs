@@ -3,8 +3,8 @@
     [AttributeUsage(AttributeTargets.All)]
     public class RequestTypeAttribute : Attribute
     {
-        private bool _isRestRequest;
-        private bool _isTradingRequest;
+        private readonly bool _isRestRequest;
+        private readonly bool _isTradingRequest;
 
         public RequestTypeAttribute(bool isRestRequest, bool isTradingRequest)
         {

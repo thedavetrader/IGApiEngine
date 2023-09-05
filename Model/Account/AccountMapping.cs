@@ -9,7 +9,8 @@ namespace IGApi.Model
         #region Session
         public void MapProperties(
             [NotNullAttribute] dto.endpoint.auth.session.AccountDetails accountDetails,
-            [NotNullAttribute] dto.endpoint.auth.session.AccountInfo accountBalance
+            [NotNullAttribute] dto.endpoint.auth.session.AccountInfo accountBalance,
+            bool isCurrent
             )
         {
             MapProperties(accountDetails);
@@ -18,6 +19,7 @@ namespace IGApi.Model
             ProfitAndLoss = accountBalance.profitLoss ?? ProfitAndLoss;
             AvailableCash = accountBalance.available ?? AvailableCash;
             ApiLastUpdate = DateTime.UtcNow;
+            IsCurrent = isCurrent;
         }
 
         public void MapProperties([NotNullAttribute] dto.endpoint.auth.session.AccountDetails accountDetails)

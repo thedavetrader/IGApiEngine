@@ -12,7 +12,10 @@ namespace IGApi.Model
         /// </summary>
         [Obsolete("Do not use this constructor. It's intended use is for EF-Core only.", true)]
         public EpicTick()
-        { Epic = string.Format(Constants.InvalidEntry, nameof(EpicTick)); }
+        { 
+            Epic = string.Format(Constants.InvalidEntry, nameof(EpicTick)); 
+            MarketState = string.Format(Constants.InvalidEntry, nameof(EpicTick)); 
+        }
 
         /// <summary>
         /// For creating new accounts using L1LsPriceData
@@ -27,6 +30,7 @@ namespace IGApi.Model
             MapProperties(l1LsPriceData, epic);
 
             _ = Epic ?? throw new PrimaryKeyNullReferenceException(nameof(Epic));
+            _ = MarketState ?? throw new PrimaryKeyNullReferenceException(nameof(MarketState));
         }
 
         /// <summary>
@@ -41,6 +45,7 @@ namespace IGApi.Model
             MapProperties(marketData);
 
             _ = Epic ?? throw new PrimaryKeyNullReferenceException(nameof(Epic));
+            _ = MarketState ?? throw new PrimaryKeyNullReferenceException(nameof(MarketState));
         }
 
         /// <summary>
@@ -55,6 +60,7 @@ namespace IGApi.Model
             MapProperties(marketData);
 
             _ = Epic ?? throw new PrimaryKeyNullReferenceException(nameof(Epic));
+            _ = MarketState ?? throw new PrimaryKeyNullReferenceException(nameof(MarketState));
         }
     }
 }

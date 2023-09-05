@@ -4,7 +4,7 @@ namespace IGApi.Model
 {
     public partial class ApiDbContext
     {
-        public DbSet<EpicDetailCurrency>? EpicDetailsCurrency { get; set; }
+        public DbSet<EpicDetailCurrency> EpicDetailsCurrency { get; set; }
         public static void EpicDetailCurrencyOnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<EpicDetailCurrency>().Property(p => p.Epic).HasMaxLength(128);

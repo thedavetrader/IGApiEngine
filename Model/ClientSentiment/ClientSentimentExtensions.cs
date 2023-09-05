@@ -11,8 +11,6 @@ namespace IGApi.Model
             [NotNullAttribute] dto.endpoint.clientsentiment.ClientSentiment clientSentiment
             )
         {
-            _ = apiDbContext.ClientSentiments ?? throw new DBContextNullReferenceException(nameof(apiDbContext.ClientSentiments));
-
             var currentClientSentiment = Task.Run(async () => await apiDbContext.ClientSentiments.FindAsync(clientSentiment.marketId)).Result;
 
             if (currentClientSentiment is not null)

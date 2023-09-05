@@ -13,20 +13,19 @@ namespace IGApi.RequestQueue
         {
             try
             {
-                using ApiDbContext apiDbContext = new();
-
-                _ = apiDbContext.Accounts ?? throw new DBContextNullReferenceException(nameof(apiDbContext.Accounts));
 
                 var response = _apiEngine.IGRestApiClient.accountBalance().UseManagedCall();
 
-                if (response is not null)
+                if (response.Response is not null)
                 {
+                    using ApiDbContext apiDbContext = new();
+
                     response.Response.accounts.ForEach(account =>
-                    {
-                        if (account is not null)
-                            apiDbContext.SaveAccount(account, account.balance);
-                    });
-                    Task.Run(async () => await apiDbContext.SaveChangesAsync()).Wait();  // Use wait to prevent the Task object is disposed while still saving the changes.
+                        {
+                            if (account is not null)
+                                apiDbContext.SaveAccount(account, account.balance);
+                        });
+                    Task.Run(async () => await apiDbContext.SaveChangesAsync(_cancellationToken), _cancellationToken).ContinueWith(task => TaskException.CatchTaskIsCanceledException(task)).Wait();  // Use wait to prevent the Task object is disposed while still saving the changes.
                 }
             }
             catch (Exception ex)

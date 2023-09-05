@@ -12,8 +12,6 @@ namespace IGApi.Model
             [NotNullAttribute] string accountId
             )
         {
-            _ = apiDbContext.WorkingOrders ?? throw new DBContextNullReferenceException(nameof(apiDbContext.WorkingOrders));
-
             var currentWorkingOrder = Task.Run(async () => await apiDbContext.WorkingOrders.FindAsync(accountId, WorkingOrderData.dealId)).Result;
 
             if (currentWorkingOrder is not null)

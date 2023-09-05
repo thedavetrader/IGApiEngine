@@ -10,40 +10,22 @@ namespace IGApi.RequestQueue
     {
         public static event EventHandler? GetOpenPositionsCompleted;
 
-        [RequestType(isRestRequest: true, isTradingRequest: true)]
+        [RequestType(isRestRequest: true, isTradingRequest: false)]
         public void GetOpenPositions()
         {
             try
             {
-                var response = _apiEngine.IGRestApiClient.getOTCOpenPositionsV2().UseManagedCall(); 
+                var response = _apiEngine.IGRestApiClient.getOTCOpenPositionsV2().UseManagedCall();
 
-                if (response is not null)
-                {
-                    using ApiDbContext apiDbContext = new();
-                    _ = apiDbContext.OpenPositions ?? throw new DBContextNullReferenceException(nameof(apiDbContext.OpenPositions));
-                    _ = apiDbContext.EpicTicks ?? throw new DBContextNullReferenceException(nameof(apiDbContext.EpicTicks));
+                using ApiDbContext apiDbContext = new();
 
-                    var currentApiOpenPositions = response.Response.positions;
+                var currentApiOpenPositions = response.Response.positions;
 
-                    RemoveObsoleteEpicTicks(apiDbContext);
+                RemoveObsoleteEpicTicks(apiDbContext);
 
-                    SyncToDbOpenPositions(_currentAccountId, apiDbContext, currentApiOpenPositions);
-
-                    SyncToEpicStreamList(currentApiOpenPositions);
-
-                    var parameters = currentApiOpenPositions.Select(s => new { s.market.epic }).Distinct();
-
-                    if (parameters.Any())
-                    {
-                        string? jsonParameters = null;
-
-                        jsonParameters = JsonConvert.SerializeObject(
-                            parameters,
-                            Formatting.None);
-
-                        RequestQueueEngineItem.QueueItem(nameof(RequestQueueEngineItem.GetEpicDetails), true, false, Guid.NewGuid(), null, jsonParameters);
-                    }
-                }
+                SyncToDbOpenPositions(_currentAccountId, apiDbContext, currentApiOpenPositions);
+                
+                SyncToEpicStreamList(currentApiOpenPositions);
             }
             catch (Exception ex)
             {
@@ -55,7 +37,7 @@ namespace IGApi.RequestQueue
                 QueueItemComplete(GetOpenPositionsCompleted);
             }
 
-            static void SyncToDbOpenPositions(string currentAccountId, ApiDbContext apiDbContext, List<dto.endpoint.positions.get.otc.v2.OpenPosition> currentApiOpenPositions)
+            void SyncToDbOpenPositions(string currentAccountId, ApiDbContext apiDbContext, List<dto.endpoint.positions.get.otc.v2.OpenPosition> currentApiOpenPositions)
             {
                 if (currentApiOpenPositions.Any())
                 {
@@ -64,12 +46,10 @@ namespace IGApi.RequestQueue
                     {
                         if (openPosition is not null)
                         {
-                            // Upsert OpenPosition
+                            // DO NOT Save market data (only Epics where streamingpricesavailable.)
+                            //      It appears this data is often out of date or incomplete (no offer and bid prices)
+                            //new EpicTick(openPosition.market).SaveEpicTick(new ApiDbContext().ConnectionString); // !!! IMPORTANT NOTICE: this snapshot data is the marketdata @time of execution NOT @time of creation position
                             apiDbContext.SaveOpenPosition(openPosition.position, currentAccountId, openPosition.market.epic);
-
-                            // Save market data (only Epics where streamingpricesavailable.)
-                            if (ApiEngine.EpicStreamPriceAvailableCheck(openPosition.market.epic))
-                                apiDbContext.SaveEpicTick(openPosition.market);
                         }
                     });
                 }
@@ -80,20 +60,21 @@ namespace IGApi.RequestQueue
                         .Where(w => w.AccountId == currentAccountId).ToList()   // Use ToList() to prevent that Linq constructs a predicate that can not be sent to db.
                         .Where(a => !currentApiOpenPositions.Any(b => b.position.dealId == a.DealId)));
 
-                Task.Run(async () => await apiDbContext.SaveChangesAsync()).Wait();  // Use wait to prevent the Task object is disposed while still saving the changes.
+                Task.Run(async () => await apiDbContext.SaveChangesAsync(_cancellationToken), _cancellationToken).ContinueWith(task => TaskException.CatchTaskIsCanceledException(task)).Wait();  // Use wait to prevent the Task object is disposed while still saving the changes.
             }
 
             void SyncToEpicStreamList(List<dto.endpoint.positions.get.otc.v2.OpenPosition> currentApiOpenPositions)
             {
                 if (currentApiOpenPositions.Any())
                 {
-                    var epicStreamListItems = currentApiOpenPositions
+                    var epicStreamListItems = currentApiOpenPositions.ToList()
                         .Where(w => w.market.streamingPricesAvailable)
-                        .Select(s => new EpicStreamListItem(s.market.epic, EpicStreamListItem.EpicStreamListItemSource.SourceOpenPositions))
-                        .Distinct()
-                        .ToList();
+                        .GroupBy(g => g.market.epic)
+                        .Select(s => new EpicStreamListItem(s.First().market.epic, EpicStreamListItem.EpicStreamListItemSource.OpenPositions))
+                        .ToList()
+                        ;
 
-                    _apiEngine.SyncEpicStreamListItems(epicStreamListItems, EpicStreamListItem.EpicStreamListItemSource.SourceOpenPositions);
+                    _apiEngine.SyncEpicStreamListItems(epicStreamListItems, EpicStreamListItem.EpicStreamListItemSource.OpenPositions);                   
                 }
             }
         }

@@ -11,14 +11,14 @@ namespace IGApi.Model
             )
         {
             Epic = epic;
-            Offer = l1LsPriceData.Offer;
-            Bid = l1LsPriceData.Bid;
-            High = l1LsPriceData.High;
-            Low = l1LsPriceData.Low;
-            MidOpen = l1LsPriceData.MidOpen;
-            Change = l1LsPriceData.Change;
-            ChangePct = l1LsPriceData.ChangePct;
-            MarketDelay = l1LsPriceData.MarketDelay;
+            Offer = l1LsPriceData.Offer ?? Offer;
+            Bid = l1LsPriceData.Bid ?? Bid;
+            High = l1LsPriceData.High ?? High;
+            Low = l1LsPriceData.Low ?? Low;
+            MidOpen = l1LsPriceData.MidOpen ?? MidOpen;
+            Change = l1LsPriceData.Change ?? Change;
+            ChangePct = l1LsPriceData.ChangePct ?? ChangePct;
+            MarketDelay = l1LsPriceData.MarketDelay ?? MarketDelay;
             MarketState = l1LsPriceData.MarketState ?? MarketState ?? String.Empty;
             UpdateTime = DateTime.UtcNow;
         }
@@ -28,12 +28,12 @@ namespace IGApi.Model
             )
         {
             Epic = marketData.epic;
-            Offer = marketData.offer;
-            Bid = marketData.bid;
-            High = marketData.high;
-            Low = marketData.low;
-            Change = marketData.netChange;
-            ChangePct = marketData.percentageChange;
+            Offer = marketData.offer ?? Offer;
+            Bid = marketData.bid ?? Bid;
+            High = marketData.high ?? High;
+            Low = marketData.low ?? Low;
+            Change = marketData.netChange ?? Change;
+            ChangePct = marketData.percentageChange ?? ChangePct;
             MarketDelay = marketData.delayTime;
             MarketState = marketData.marketStatus ?? MarketState ?? String.Empty;
             UpdateTime = DateTime.UtcNow;
@@ -44,12 +44,12 @@ namespace IGApi.Model
             )
         {
             Epic = marketData.epic;
-            Offer = marketData.offer;
-            Bid = marketData.bid;
-            High = marketData.high;
-            Low = marketData.low;
-            Change = marketData.netChange;
-            ChangePct = marketData.percentageChange;
+            Offer = marketData.offer ?? Offer;
+            Bid = marketData.bid ?? Bid;
+            High = marketData.high ?? High;
+            Low = marketData.low ?? Low;
+            Change = marketData.netChange ?? Change;
+            ChangePct = marketData.percentageChange ?? ChangePct;
             MarketDelay = marketData.delayTime;
             MarketState = marketData.marketStatus ?? MarketState ?? String.Empty;
             UpdateTime = DateTime.UtcNow;

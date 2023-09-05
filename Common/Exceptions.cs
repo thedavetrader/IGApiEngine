@@ -15,11 +15,15 @@ namespace IGApi.Common
         }
     }
 
-    internal class RestCallHttpRequestException : HttpRequestException
+    internal class DBContextConnectionStringNullException : NullReferenceException
     {
-        internal RestCallHttpRequestException(HttpStatusCode httpStatusCode, [CallerMemberName] string? caller = null)
-            : base($"The restcall \"{caller}\" failed. Check internet connection or IG api service status. HttpStatusCode: \"{httpStatusCode}\".", null, httpStatusCode) { }
+        internal DBContextConnectionStringNullException() : base($"The dbcontext does not have a connection string.") { }
+    }
 
+    internal class RestCallHttpResponseNullException : NullReferenceException
+    {
+        internal RestCallHttpResponseNullException([CallerMemberName] string? caller = null)
+            : base($"The restcall \"{caller}\" failed. Check internet connection or IG api service status.") { }
     }
 
     internal class RestCallNullReferenceException : NullReferenceException
@@ -52,5 +56,33 @@ namespace IGApi.Common
     internal class IGApiConncectionError : Exception
     {
         public IGApiConncectionError([CallerMemberName] string? caller = null) : base($"Error while executing {caller ?? "UNKNOWN_CALLER"}. Not, or no longer logged in. Check internet or IG Api service status.") { }
+    }
+
+    internal class AsyncTaskException : AggregateException
+    {
+        internal AsyncTaskException(string? message = null, [CallerMemberName] string? task = null)
+            : base($"Task \"{task}\"stopped unexpectedly withouth exception. {message ?? ""}") { }
+    }
+
+    internal static class TaskException
+    {
+        /// <summary>
+        /// Handles exceptions raised by a running task. Cancellation exceptions will be logged, but will not rethrow. All other exceptions will be rethrowed.
+        /// </summary>
+        /// <param name="task"></param>
+        public static void CatchTaskIsCanceledException(Task task)
+        {
+            const string unknownException = "Critical error. The task refers to an empty exception. This should never happen after an exception was raised within a task.";
+
+            if (task.IsFaulted)
+            {
+                if (!task.IsCanceled)
+                {
+                    throw task.Exception ?? new AggregateException(unknownException);
+                }
+                else
+                    Log.WriteException(new AsyncTaskException((task.Exception ?? new AggregateException(unknownException)).Message));
+            }
+        }
     }
 }

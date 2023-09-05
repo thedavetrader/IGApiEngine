@@ -13,8 +13,6 @@ namespace IGApi.Model
             [NotNullAttribute] TimeRange timeRange
             )
         {
-            _ = apiDbContext.EpicDetailsOpeningHour ?? throw new DBContextNullReferenceException(nameof(apiDbContext.EpicDetailsOpeningHour));
-
             var openTime = Utility.ConvertLocalTimeStringToUtcTimespan(timeRange.openTime);
             var epicDetailOpeningHour = Task.Run(async () => await apiDbContext.EpicDetailsOpeningHour.FindAsync(epicDetail.Epic, openTime)).Result;
 

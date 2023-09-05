@@ -20,10 +20,9 @@ namespace IGApi.RequestQueue
 
                 var response = _apiEngine.IGRestApiClient.closePosition(closePositionRequest).UseManagedCall();
 
-                if (response is not null)
-                    checkConfirmationReceived(response.Response.dealReference);
-                else
-                    throw new RestCallNullReferenceException();
+                checkConfirmationReceived(response.Response.dealReference);
+
+                RequestQueueEngineItem.QueueItem(nameof(RequestQueueEngineItem.GetOpenPositions), executeAsap: true, isRecurrent: false, Guid.NewGuid(), cancellationToken: _cancellationToken);
             }
             catch (Exception ex)
             {

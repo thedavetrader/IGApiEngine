@@ -9,15 +9,13 @@ namespace IGApi.Model
             [NotNullAttribute] string specialInfo
             )
         {
-            {
-                #region parent details
-                Epic = epicDetail.Epic;
-                ApiLastUpdate = DateTime.UtcNow;
-                EpicDetail = epicDetail;
-                #endregion
+            #region parent details
+            Epic = epicDetail.Epic;
+            ApiLastUpdate = DateTime.UtcNow;
+            EpicDetail = epicDetail;
+            #endregion
 
-                SpecialInfo = specialInfo;
-            }
+            SpecialInfo = specialInfo;
         }
     }
 }

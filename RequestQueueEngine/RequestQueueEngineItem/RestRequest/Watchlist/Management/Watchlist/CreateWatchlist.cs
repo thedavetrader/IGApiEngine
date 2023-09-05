@@ -19,28 +19,25 @@ namespace IGApi.RequestQueue
 
                 dto.endpoint.watchlists.manage.create.CreateWatchlistRequest createWatchlistRequest = JsonConvert.DeserializeObject<dto.endpoint.watchlists.manage.create.CreateWatchlistRequest>(request);
 
-                var response = _apiEngine.IGRestApiClient.createWatchlist(createWatchlistRequest).UseManagedCall();
+                var response = _apiEngine.IGRestApiClient.createWatchlist(createWatchlistRequest).UseManagedCall();               
 
-                if (response is not null)
+                if (response.Response.status == "SUCCESS" || response.Response.status == "SUCCESS_NOT_ALL_INSTRUMENTS_ADDED")
                 {
-                    if (response.Response.status == "SUCCESS" || response.Response.status == "SUCCESS_NOT_ALL_INSTRUMENTS_ADDED")
+                    if (response.Response.status == "SUCCESS")
                     {
-                        if (response.Response.status == "SUCCESS")
-                        {
-                            WriteLog(Messages($"Watchlist with id \"{response.Response.watchlistId}\" is created."));
-                        }
-                        else if (response.Response.status == "SUCCESS_NOT_ALL_INSTRUMENTS_ADDED")
-                        {
-                            WriteLog(Messages($"Watchlist with id \"{response.Response.watchlistId}\" is created, but not all instruments were added."));
-                        }
-                    }
-                    else
-                        WriteLog(Messages($"Watchlist request did not result status \"SUCCESS\"."));
 
+                        WriteLog(Columns($"Watchlist with id \"{response.Response.watchlistId}\" is created."));
+                    }
+                    else if (response.Response.status == "SUCCESS_NOT_ALL_INSTRUMENTS_ADDED")
+                    {
+                        WriteLog(Columns($"Watchlist with id \"{response.Response.watchlistId}\" is created, but not all instruments were added."));
+                    }
+
+                    SaveToDb(createWatchlistRequest, response);
 
                 }
                 else
-                    throw new RestCallNullReferenceException();
+                    WriteLog(Columns($"Watchlist request did not result status \"SUCCESS\"."));
             }
             catch (Exception ex)
             {
@@ -51,6 +48,25 @@ namespace IGApi.RequestQueue
             {
                 QueueItemComplete(CreateWatchlistCompleted);
             }
+
+            void SaveToDb(dto.endpoint.watchlists.manage.create.CreateWatchlistRequest createWatchlistRequest, IGWebApiClient.IgResponse<dto.endpoint.watchlists.manage.create.CreateWatchlistResponse> response)
+            {
+                using ApiDbContext apiDbContext = new();
+
+                apiDbContext.Watchlists.Add(new Watchlist(
+                                            new dto.endpoint.watchlists.retrieve.Watchlist()
+                                            {
+                                                id = response.Response.watchlistId,
+                                                name = createWatchlistRequest.name,
+                                                editable = true,
+                                                deleteable = true,
+                                                defaultSystemWatchlist = false
+                                            },
+                                            _currentAccountId));
+
+                Task.Run(async () => await apiDbContext.SaveChangesAsync(_cancellationToken), _cancellationToken).ContinueWith(task => TaskException.CatchTaskIsCanceledException(task)).Wait();  // Use wait to prevent the Task object is disposed while still saving the changes.
+            }
+
         }
     }
 }

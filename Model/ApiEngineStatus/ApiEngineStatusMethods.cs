@@ -1,15 +1,15 @@
 ﻿using IGApi.Common;
+using Microsoft.EntityFrameworkCore;
 
 namespace IGApi.Model
 {
     public partial class ApiEngineStatus
     {
-        public static void SetIsAlive()
+        public static void SetIsAlive(DateTime timestamp)
         {
             ApiDbContext apiDbContext = new();
-            _ = apiDbContext.ApiEngineStatus ?? throw new DBContextNullReferenceException(nameof(apiDbContext.ApiEngineStatus));
 
-            apiDbContext.SaveApiEngineStatus();
+            apiDbContext.SaveApiEngineStatus(timestamp);
 
             Task.Run(async ()=> await apiDbContext.SaveChangesAsync()).Wait();
         }

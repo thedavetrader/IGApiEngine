@@ -26,6 +26,7 @@ namespace IGApi.Model
             StopLevel = confirmsResponse.stopLevel;
             Timestamp = DateTime.UtcNow;
             AffectedDeals = JsonConvert.SerializeObject(confirmsResponse.affectedDeals, Formatting.None);
+            IsConsumable = false;
         }
     }
 }

@@ -26,10 +26,12 @@ namespace IGApi.Model
         /// <exception cref="EssentialPropertyNullReferenceException"></exception>
         public
         ConfirmResponse(
-            [NotNullAttribute] dto.endpoint.confirms.ConfirmsResponse confirmsResponse
+            [NotNullAttribute] dto.endpoint.confirms.ConfirmsResponse confirmsResponse,
+            [NotNullAttribute] bool isConsumable = false
             )
         {
             MapProperties(confirmsResponse);
+            IsConsumable = IsConsumable;
 
             _ = DealReference ?? throw new PrimaryKeyNullReferenceException(nameof(DealReference));
             _ = DealId ?? throw new EssentialPropertyNullReferenceException(nameof(DealId));

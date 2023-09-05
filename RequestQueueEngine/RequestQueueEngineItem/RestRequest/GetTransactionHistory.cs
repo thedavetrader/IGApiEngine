@@ -2,6 +2,7 @@
 using IGApi.Model;
 using IGWebApiClient;
 using dto.endpoint.accountactivity.transaction;
+using System.Globalization;
 
 namespace IGApi.RequestQueue
 {
@@ -15,19 +16,22 @@ namespace IGApi.RequestQueue
         {
             try
             {
+                string timePattern = CultureInfo.GetCultureInfo("en-US").DateTimeFormat.SortableDateTimePattern;
+
                 string fromDate;
-                string toDate = DateTime.Now.Date.ToString();   // Explicetly use local time, as IG rest call expects local time.
+                string toDate = DateTime.UtcNow.ToString(timePattern);   // Explicitly use local time, as IG rest call expects local time.
 
                 using (ApiDbContext apiDbContext = new())
                 {
-                    _ = apiDbContext.TransactionsHistory ?? throw new DBContextNullReferenceException(nameof(apiDbContext.EpicDetails));
                     if (apiDbContext.TransactionsHistory.Any())
-                        fromDate = apiDbContext.TransactionsHistory.Max(p => p.Date).Date.ToString();
+                        fromDate = TimeZoneInfo.ConvertTimeToUtc(
+                            apiDbContext.TransactionsHistory.Max(p => p.DateTime)
+                            , TimeZoneInfo.Local).ToString(timePattern);
                     else
-                        fromDate = DateTime.MinValue.ToString();
+                        fromDate = DateTime.MinValue.ToString(timePattern);
                 }
 
-                var response = _apiEngine.IGRestApiClient.lastTransactionTimeRange("ALL", fromDate, toDate).UseManagedCall();
+                var response = _apiEngine.IGRestApiClient.lastTransactionTimeRange_v2("ALL", fromDate, toDate).UseManagedCall();
 
                 SyncToDbTransactionsHistory(response);
             }
@@ -41,20 +45,20 @@ namespace IGApi.RequestQueue
                 QueueItemComplete(GetTransactionHistoryCompleted);
             }
 
-            void SyncToDbTransactionsHistory(IgResponse<TransactionHistoryResponse>? response)
+            void SyncToDbTransactionsHistory(IgResponse<TransactionHistoryResponse> response)
             {
-                ApiDbContext apiDbContext = new();
-                _ = apiDbContext.TransactionsHistory ?? throw new DBContextNullReferenceException(nameof(apiDbContext.TransactionsHistory));
-
-                if (response is not null)
+                if (response.Response is not null)
                 {
+
+                    ApiDbContext apiDbContext = new();
+
                     response.Response.transactions.ForEach(transaction =>
                     {
                         if (transaction is not null)
                             apiDbContext.SaveTransactionHistory(transaction);
                     });
 
-                    Task.Run(async () => await apiDbContext.SaveChangesAsync()).Wait();  // Use wait to prevent the Task object is disposed while still saving the changes.
+                    Task.Run(async () => await apiDbContext.SaveChangesAsync(_cancellationToken), _cancellationToken).ContinueWith(task => TaskException.CatchTaskIsCanceledException(task)).Wait();  // Use wait to prevent the Task object is disposed while still saving the changes.
                 }
             }
         }

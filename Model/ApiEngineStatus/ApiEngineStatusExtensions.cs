@@ -8,20 +8,19 @@ namespace IGApi.Model
     internal static partial class DtoModelExtensions
     {
         public static ApiEngineStatus? SaveApiEngineStatus(
-        [NotNullAttribute] this ApiDbContext apiDbContext
+        [NotNullAttribute] this ApiDbContext apiDbContext,
+        [NotNullAttribute] DateTime timestamp
         )
         {
-            _ = apiDbContext.ApiEngineStatus ?? throw new DBContextNullReferenceException(nameof(apiDbContext.ApiEngineStatus));
+            if (apiDbContext.ApiEngineState.Count() > 1)
+                apiDbContext.ApiEngineState.RemoveRange(apiDbContext.ApiEngineState);
 
-            if (apiDbContext.ApiEngineStatus.Count() > 1)
-                apiDbContext.ApiEngineStatus.RemoveRange(apiDbContext.ApiEngineStatus);
-
-            var currentApiEngineStatus = Task.Run(() => apiDbContext.ApiEngineStatus.FirstOrDefault()).Result;
+            var currentApiEngineStatus = Task.Run(() => apiDbContext.ApiEngineState.FirstOrDefault()).Result;
 
             if (currentApiEngineStatus is not null)
-                currentApiEngineStatus.MapProperties();
+                currentApiEngineStatus.MapProperties(timestamp);
             else
-                currentApiEngineStatus = apiDbContext.ApiEngineStatus.Add(new ApiEngineStatus()).Entity;
+                currentApiEngineStatus = apiDbContext.ApiEngineState.Add(new ApiEngineStatus(timestamp)).Entity;
 
             return currentApiEngineStatus;
         }

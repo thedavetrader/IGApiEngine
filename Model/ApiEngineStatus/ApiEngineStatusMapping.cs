@@ -2,9 +2,9 @@
 {
     public partial class ApiEngineStatus
     {
-        public void MapProperties()
+        public void MapProperties(DateTime timestamp)
         {
-            IsAlive = DateTime.UtcNow;
+            IsAlive = timestamp;
         }
     }
 }

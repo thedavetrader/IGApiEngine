@@ -1,37 +1,38 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using IGApi.Common;
-using dto.endpoint.accountactivity.activity;
+﻿using dto.endpoint.accountactivity.activity_v3;
+using System.Diagnostics.CodeAnalysis;
 
 namespace IGApi.Model
 {
-    public partial class
-ActivityHistory
+    public partial class ActivityHistory
     {
         public void MapProperties(
-            [NotNullAttribute] Activity activity
+            [NotNullAttribute] Activity_v3 activity
             )
         {
-            ActionStatus = activity.actionStatus;
-            Activity = activity.activity;
-            ActivityHistoryId = activity.activityHistoryId;
-            Channel = activity.channel;
-            Currency = activity.currency;
-            DealId = activity.dealId;
+            Timestamp = activity.GetTimeStamp();
             Epic = activity.epic;
-            decimal.TryParse(activity.level, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out decimal level);
-            Level = level;
-            decimal.TryParse(activity.stop, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out decimal stop);
-            Stop = stop;
-            decimal.TryParse(activity.limit, NumberStyles.AllowDecimalPoint | NumberStyles.AllowLeadingSign, CultureInfo.InvariantCulture, out decimal limit);
-            Limit = limit;
-            MarketName = activity.marketName;
             Period = activity.period;
-            Result = activity.result;
-            Size = activity.size;
-            StopType = activity.stopType;
-            Timestamp = activity.GetTimestamp();
-            Reference = DealId.Substring(7, 8);
+            DealId = activity.dealId;
+            Channel = activity.channel;
+            Type = activity.type;
+            Status = activity.status;
+            Description = activity.description;
+
+            // DETAILS
+            DealReference = activity.details.dealReference;
+            MarketName = activity.details.marketName;
+            GoodTillDate = activity.details.goodTillDate;
+            Currency = activity.details.currency;
+            Size = activity.details.size;
+            Direction = activity.details.direction;
+            Level = activity.details.level;
+            StopLevel = activity.details.stopLevel;
+            StopDistance = activity.details.stopDistance;
+            GuaranteedStop = activity.details.guaranteedStop;
+            TrailingStopDistance = activity.details.trailingStopDistance;
+            TrailingStep = activity.details.trailingStep;
+            LimitLevel = activity.details.limitLevel;
+            LimitDistance = activity.details.limitDistance;
         }
     }
 }

@@ -1,166 +1,159 @@
-﻿using IGApi.Common;
+﻿using System.Collections.Specialized;
+using System.Configuration;
+using System.Data;
+using System.Data.SqlClient;
+using IGApi.Common;
 using IGApi.Model;
+using Microsoft.EntityFrameworkCore;
 
 namespace IGApi.RequestQueue
 {
     using static Log;
 
-    internal static class RequestQueueEngine
+    internal static partial class RequestQueueEngine
     {
         private static DateTime _lastExecutionCycleTimestamp = DateTime.UtcNow;
+        private static CancellationToken _cancellationToken;
 
-        private const int heartBeat = 10; //TODO: Make heartbeat configurable
-
-        internal static void StartListening(CancellationToken cancellationToken)
-        {
-            int _cycleTime = 60 / ApiEngine.AllowedApiCallsPerMinute;
-            int _cycleCount;
-
-            InitCleanVolatileTables();
-            InitApiRequestQueueItems();
-
-            WriteLog(Messages("QueueEngine starts listening for requests."));
-
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                try
-                {
-                    var dequeueTimestamp = DateTime.UtcNow;
-                    bool allowExecution = false;
-
-                    using ApiDbContext apiDbContext = new();
-
-                    _ = apiDbContext.ApiRequestQueueItems ?? throw new DBContextNullReferenceException(nameof(apiDbContext.ApiRequestQueueItems));
-
-                    if (apiDbContext.ApiRequestQueueItems.Any())
-                    {
-                        var queueItemsList = apiDbContext.ApiRequestQueueItems.Where(w => !w.IsRunning).Select(item => new RequestQueueEngineItem(item, dequeueTimestamp)).ToList();
-
-                        if (queueItemsList.Any())
-                        {
-                            var restRequestItem = queueItemsList.OrderByDescending(o => o.IsTradingRequest).ThenByDescending(o => o.ApiRequestQueueItem.ExecuteAsap).ThenBy(o => o.ApiRequestQueueItem.Timestamp).FirstOrDefault();
-
-                            if (restRequestItem is not null)
-                            {
-                                if (restRequestItem.IsTradingRequest || !restRequestItem.IsRestRequest)
-                                {
-                                    allowExecution = true;  // Trading request and non rest-calls always have the highest priorty, will be executed immediately and do not affect the IG api call limit.
-                                }
-                                else if (
-                                    restRequestItem.IsRestRequest && ApiEngine.Instance.IsLoggedIn &&
-                                    dequeueTimestamp.CompareTo(_lastExecutionCycleTimestamp.AddSeconds(_cycleTime)) > 0)
-                                {
-                                    allowExecution = true;
-                                    _lastExecutionCycleTimestamp = dequeueTimestamp;
-                                }
-                                else
-                                    allowExecution = false;
-
-                                if (allowExecution)
-                                {
-                                    // TODO:
-                                    // when starting app, remove all restrequest
-                                    //  set non restrequest runnin = false (so they can be picked up asap).
-
-                                    restRequestItem.ApiRequestQueueItem.IsRunning = true;
-                                    apiDbContext.SaveChangesAsync().Wait();
-
-                                    _cycleCount = queueItemsList.Where(w => !w.IsTradingRequest).Count();
-
-                                    WriteLog();
-                                    WriteLog(Messages($"Executing \"{restRequestItem.ApiRequestQueueItem.Request}\""));
-                                    WriteLog(Messages("Queuesize", "Cycletime(*s)"));
-                                    WriteLog(Messages(new string('_', 40), new string('_', 40)));
-                                    WriteLog(Messages($"{_cycleCount}", $"{_cycleCount * _cycleTime}"));
-                                    WriteLog();
-
-                                    restRequestItem.Execute();
-                                    //RestQueueItemComplete(apiDbContext, restRequestItem);   // Use Wait, preventing the loop from popping the same queue item, while the current is beeing deleted.
-                                }
-                            }
-                        }
-                    }
-
-                    Utility.WaitFor(heartBeat);    // Give the cpu a break.
-                }
-                catch (Exception ex)
-                {
-                    WriteException(ex);
-                    throw;
-                }
-            }
-
-            if (cancellationToken.IsCancellationRequested)
-                WriteLog(Messages("Cancellation request received. QueueEngine has stopped listening for requests."));
-        }
-
-        /// <summary>
-        /// Open positions and working orders could be changed during the time the API was not running. 
-        /// Therefor assume the current state invalid and regard them as obsolete and to be removed.
-        /// </summary>
-        /// <exception cref="DBContextNullReferenceException"></exception>
-        private static void InitCleanVolatileTables()
-        {
-            using ApiDbContext apiDbContext = new();
-
-            _ = apiDbContext.ApiRequestQueueItems ?? throw new DBContextNullReferenceException(nameof(apiDbContext.ApiRequestQueueItems));
-            _ = apiDbContext.ConfirmResponses ?? throw new DBContextNullReferenceException(nameof(apiDbContext.ConfirmResponses));
-            _ = apiDbContext.WorkingOrders ?? throw new DBContextNullReferenceException(nameof(apiDbContext.WorkingOrders));
-            _ = apiDbContext.OpenPositions ?? throw new DBContextNullReferenceException(nameof(apiDbContext.OpenPositions));
-            _ = apiDbContext.Watchlists ?? throw new DBContextNullReferenceException(nameof(apiDbContext.Watchlists));
-
-            apiDbContext.ApiRequestQueueItems.RemoveRange(apiDbContext.ApiRequestQueueItems.ToList().Where(r => new RequestQueueEngineItem(r, DateTime.Now).IsRestRequest)); apiDbContext.SaveChanges(); // Only remove restrequests.
-            apiDbContext.ConfirmResponses.RemoveRange(apiDbContext.ConfirmResponses); apiDbContext.SaveChanges();
-            apiDbContext.WorkingOrders.RemoveRange(apiDbContext.WorkingOrders); apiDbContext.SaveChanges();
-            apiDbContext.OpenPositions.RemoveRange(apiDbContext.OpenPositions); apiDbContext.SaveChanges();
-            apiDbContext.Watchlists.RemoveRange(apiDbContext.Watchlists); apiDbContext.SaveChanges();
-
-
-        }
+        private const int heartBeat = 16; //TODO: Make heartbeat configurable
 
         /*  Status of essential entity initialization   */
         private static bool _getAccountDetailsCompleted = false;
         private static bool _getOpenPositionsCompleted = false;
         private static bool _getWorkingOrdersCompleted = false;
         private static bool _getWatchlistsCompleted = false;
-
-        public static bool IsInitialized
+        public class RequestListItem
         {
-            get
+            public string Request { get; }
+            public RequestTypeAttribute RequestTypeAttribute { get; }
+
+            public RequestListItem(string request, RequestTypeAttribute? requestTypeAttribute)
             {
-                return
-                    _getAccountDetailsCompleted &&
-                    _getOpenPositionsCompleted &&
-                    _getWorkingOrdersCompleted &&
-                    _getWatchlistsCompleted;
+                _ = requestTypeAttribute ?? throw new ArgumentNullException(nameof(requestTypeAttribute));
+
+                Request = request;
+                RequestTypeAttribute = requestTypeAttribute;
             }
         }
 
-        /// <summary>
-        /// Make sure essential details are queued to recurrently refresh.
-        /// </summary>
-        private static void InitApiRequestQueueItems()
+        private static readonly IEnumerable<RequestListItem> ExposedRequests = typeof(RequestQueueEngineItem)
+                                                                        .GetMethods()
+                                                                        .Where(method => Attribute.GetCustomAttribute(method, typeof(RequestTypeAttribute)) is not null)
+                                                                        .Select(method => new RequestListItem(request: method.Name, requestTypeAttribute: (RequestTypeAttribute?)Attribute.GetCustomAttribute(method, typeof(RequestTypeAttribute))));
+
+        internal static void StartListening(CancellationToken cancellationToken)
         {
-            static void GetAccountDetailsCompleted(object? sender, EventArgs e) { _getAccountDetailsCompleted = true; RequestQueueEngineItem.GetAccountDetailsCompleted -= GetAccountDetailsCompleted; }
-            static void GetOpenPositionsCompleted(object? sender, EventArgs e) { _getOpenPositionsCompleted = true; RequestQueueEngineItem.GetOpenPositionsCompleted -= GetOpenPositionsCompleted; }
-            static void GetWorkingOrdersCompleted(object? sender, EventArgs e) { _getWorkingOrdersCompleted = true; RequestQueueEngineItem.GetWorkingOrdersCompleted -= GetWorkingOrdersCompleted; }
-            static void GetWatchlistsCompleted(object? sender, EventArgs e) { _getWatchlistsCompleted = true; RequestQueueEngineItem.GetWatchlistsCompleted -= GetWatchlistsCompleted; }
+            int _cycleTime = 60 / ApiEngine.AllowedApiCallsPerMinute;
 
-            RequestQueueEngineItem.GetAccountDetailsCompleted += GetAccountDetailsCompleted;
-            RequestQueueEngineItem.GetOpenPositionsCompleted += GetOpenPositionsCompleted;
-            RequestQueueEngineItem.GetWorkingOrdersCompleted += GetWorkingOrdersCompleted;
-            RequestQueueEngineItem.GetWatchlistsCompleted += GetWatchlistsCompleted;
+            _cancellationToken = cancellationToken;
 
-            /*  Essential entities  */
-            RequestQueueEngineItem.QueueItem(nameof(RequestQueueEngineItem.GetAccountDetails), false, true, Guid.NewGuid());
-            RequestQueueEngineItem.QueueItem(nameof(RequestQueueEngineItem.GetOpenPositions), false, true, Guid.NewGuid());
-            RequestQueueEngineItem.QueueItem(nameof(RequestQueueEngineItem.GetWorkingOrders), false, true, Guid.NewGuid());
-            RequestQueueEngineItem.QueueItem(nameof(RequestQueueEngineItem.GetWatchlists), false, false, Guid.NewGuid());   // Init only, not recurrent. One-way, api point of view. Only update watchlists when changes are initiated by api.
+            InitDbObjects();
+            InitTables();
+            InitApiRequestQueueItems();
 
-            /*  Non-essential entities  */
-            RequestQueueEngineItem.QueueItem(nameof(RequestQueueEngineItem.GetActivityHistory), false, true, Guid.NewGuid());
-            RequestQueueEngineItem.QueueItem(nameof(RequestQueueEngineItem.GetTransactionHistory), false, true, Guid.NewGuid());
-            RequestQueueEngineItem.QueueItem(nameof(RequestQueueEngineItem.GetClientSentiment), false, true, Guid.NewGuid());
+            WriteOk(Columns("QueueEngine starts listening for requests."));
+
+            while (!_cancellationToken.IsCancellationRequested)
+            {
+                try
+                {
+                    var dequeueTimestamp = DateTime.UtcNow;
+
+                    using ApiDbContext apiDbContext = new();
+                    var connectionString = apiDbContext.Database.GetDbConnection().ConnectionString;
+
+                    var isNewCycle = dequeueTimestamp.CompareTo(_lastExecutionCycleTimestamp.AddSeconds(_cycleTime)) > 0;
+
+                    if (isNewCycle)
+                        _lastExecutionCycleTimestamp = dequeueTimestamp;
+
+                    var restRequestItem = PopApiRequestQueueItem(connectionString, ExposedRequests, isNewCycle, dequeueTimestamp, _cancellationToken).Result;
+
+                    if (restRequestItem is not null)
+                    {
+                        if (Common.Configuration.VerboseLog)
+                            WriteLog(Columns(
+                                $"Executing",
+                                $"[{restRequestItem.ApiRequestQueueItem.Request}][{restRequestItem.ApiRequestQueueItem.Guid}]"
+                                ));
+
+                        restRequestItem.Execute();
+                    }
+
+                    Utility.WaitFor(500);
+                }
+                catch (Exception ex)
+                {
+                    WriteException(ex);
+                    //TODO: Enable auto restart. Current implementation does not login again correctly for datastream objects. Therefor just exit for now.
+                    ApiEngine.Instance.Stop();
+                    Environment.Exit(0);
+                }
+            }
+
+            if (cancellationToken.IsCancellationRequested)
+                WriteLog(Columns("Cancellation request received. QueueEngine has stopped listening for requests."));
+
+            static async Task<RequestQueueEngineItem?> PopApiRequestQueueItem(string connectionString, IEnumerable<RequestListItem> requests, bool OnCycle, DateTime dequeueTimestamp, CancellationToken cancellationToken)
+            {
+                if (requests.Any())
+                {
+                    RequestQueueEngineItem? requestQueueEngineItem = null;
+
+                    using SqlConnection connection = new(connectionString);
+                    await connection.OpenAsync(CancellationToken.None);
+
+                    DataTable requestList = new();
+                    requestList.Columns.Add("request", typeof(string));
+                    requestList.Columns.Add("is_rest_request", typeof(bool));
+                    requestList.Columns.Add("is_trading_request", typeof(bool));
+
+                    foreach (RequestListItem request in requests)
+                    {
+                        requestList.Rows.Add(
+                            request.Request,
+                            request.RequestTypeAttribute.IsRestRequest,
+                            request.RequestTypeAttribute.IsTradingRequest);
+                    }
+
+                    SqlCommand command = new("dbo.pop_api_request_queue_item", connection)
+                    {
+                        CommandType = CommandType.StoredProcedure
+                    };
+
+                    SqlParameter paramRequests = command.Parameters.AddWithValue("@request_list", requestList);
+                    paramRequests.SqlDbType = SqlDbType.Structured;
+                    paramRequests.TypeName = "request_list";
+
+                    SqlParameter paramOnCycle = command.Parameters.AddWithValue("@on_cycle", OnCycle);
+                    paramOnCycle.SqlDbType = SqlDbType.Bit;
+
+                    using (var reader = await command.ExecuteReaderAsync(CancellationToken.None))
+                    {
+                        if (await reader.ReadAsync(CancellationToken.None))   // Only 1 row expected, so no use of while
+                        {
+                            if (!reader.IsDBNull(reader.GetOrdinal("request")))
+                            {
+                                ApiRequestQueueItem apiRequestQueueItem = new(
+                                    restRequest: reader.GetString("request"),
+                                    parameters: reader.IsDBNull(reader.GetOrdinal("parameter")) ? null : reader.GetString("parameter"),
+                                    executeAsap: reader.GetBoolean("execute_asap"),
+                                    isRecurrent: reader.GetBoolean("is_recurrent"),
+                                    guid: reader.GetGuid("guid"),
+                                    parentGuid: reader.IsDBNull(reader.GetOrdinal("parent_guid")) ? null : reader.GetGuid("parent_guid"));
+
+                                requestQueueEngineItem = new RequestQueueEngineItem(apiRequestQueueItem, dequeueTimestamp, _cancellationToken);
+                            }
+                        }
+                    }
+
+                    await connection.CloseAsync();
+
+                    return requestQueueEngineItem;
+                }
+                else
+                    return null;
+            }
         }
     }
 }

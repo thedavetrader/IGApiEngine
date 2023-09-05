@@ -4,7 +4,7 @@ namespace IGApi.Model
 {
     public partial class ApiDbContext
     {
-        public DbSet<EpicDetailMarginDepositBand>? EpicDetailsMarginDepositBand { get; set; }
+        public DbSet<EpicDetailMarginDepositBand> EpicDetailsMarginDepositBand { get; set; }
         public static void EpicDetailDepositBandOnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<EpicDetailMarginDepositBand>().Property(p => p.Epic).HasMaxLength(128);

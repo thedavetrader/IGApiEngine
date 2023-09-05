@@ -27,6 +27,6 @@ namespace IGApi.Model
         public DateTime ApiLastUpdate { get; set; } = DateTime.UtcNow;
 
 		//	Linked
-		public List<WatchlistEpicDetail> WatchlistEpicDetails { get; set; }
+		public List<WatchlistEpicDetail>? WatchlistEpicDetails { get; set; }
     }
 }

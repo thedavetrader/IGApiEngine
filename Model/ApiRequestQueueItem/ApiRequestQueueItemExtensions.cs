@@ -1,30 +1,22 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Data;
+using System.Data.SqlClient;
+using System.Diagnostics.CodeAnalysis;
 using IGApi.Common;
+using Microsoft.EntityFrameworkCore;
 
 namespace IGApi.Model
 {
+    using static Log;
+
     internal static partial class DtoModelExtensions
     {
-        public static ApiRequestQueueItem? SaveRestRequestQueue(
-            [NotNullAttribute] this ApiDbContext apiDbContext,
+        [Obsolete("Use natively compiled stored prcedure call \"ApiRequestQueueItem.SaveApiRequestQueueItem\" for saving to RequestQueue.", true)]
+        public static ApiRequestQueueItem? SaveApiRequestQueueItem(
+            [NotNullAttribute] string connectionString,
             [NotNullAttribute] ApiRequestQueueItem apiRequestQueueItem
             )
         {
-            _ = apiDbContext.ApiRequestQueueItems ?? throw new DBContextNullReferenceException(nameof(apiDbContext.ApiRequestQueueItems));
-
-            var currentRestRequestQueueItem =
-                    Task.Run(() => apiDbContext.ApiRequestQueueItems
-                        .FirstOrDefault(w => 
-                        w.Guid == apiRequestQueueItem.Guid
-                            )).Result 
-                    ;
-
-            if (currentRestRequestQueueItem is not null)
-                currentRestRequestQueueItem.MapProperties(apiRequestQueueItem);
-            else
-                currentRestRequestQueueItem = apiDbContext.ApiRequestQueueItems.Add(apiRequestQueueItem).Entity;
-
-            return currentRestRequestQueueItem;
+            throw new NotImplementedException("Use natively compiled stored prcedure call \"ApiRequestQueueItem.SaveApiRequestQueueItem\" for saving to RequestQueue.");
         }
     }
 

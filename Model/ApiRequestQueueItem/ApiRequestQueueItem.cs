@@ -15,7 +15,7 @@ namespace IGApi.Model
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
         
         [Column("request")]
-        public string Request { get; set; } = "[ERROR] RestRequest is required.";
+        public string Request { get; set; }
         
         [Column("parameter")]
         public string? Parameters { get; set; } = string.Empty;
@@ -26,7 +26,7 @@ namespace IGApi.Model
         [Column("is_recurrent")]
         public bool IsRecurrent { get; set; }
 
-        [Column("is_running")]
-        public bool IsRunning { get; set; }
+        [Column("recurrency_interval")]
+        public int RecurrencyInterval { get; set; }
     }
 }

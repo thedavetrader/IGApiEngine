@@ -4,10 +4,10 @@ namespace IGApi.Model
 {
     public partial class ApiDbContext
     {
-        public DbSet<ConfirmResponse>? ConfirmResponses { get; set; }
+        public DbSet<ConfirmResponse> ConfirmResponses { get; set; }
         public static void ConfirmResponseOnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<ConfirmResponse>().IsMemoryOptimized(true);
+            //modelBuilder.Entity<ConfirmResponse>().IsMemoryOptimized(true);
 
             modelBuilder.Entity<ConfirmResponse>().Property(p => p.DealReference).HasMaxLength(30);
             modelBuilder.Entity<ConfirmResponse>().Property(p => p.DealId).HasMaxLength(64);

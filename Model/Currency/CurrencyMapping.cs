@@ -10,14 +10,12 @@ namespace IGApi.Model
             [NotNullAttribute] CurrencyData currencyData
             )
         {
-            {
-                ApiLastUpdate = DateTime.UtcNow;
+            ApiLastUpdate = DateTime.UtcNow;
 
-                Code = currencyData.code;
-                Symbol = currencyData.symbol;
-                BaseExchangeRate = currencyData.baseExchangeRate;
-                IsDefault = currencyData.isDefault;
-            }
+            Code = currencyData.code;
+            Symbol = currencyData.symbol;
+            BaseExchangeRate = currencyData.baseExchangeRate;
+            IsDefault = currencyData.isDefault;
         }
     }
 }

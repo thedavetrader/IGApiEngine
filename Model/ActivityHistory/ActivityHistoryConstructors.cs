@@ -1,7 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using dto.endpoint.accountactivity.activity_v3;
 using IGApi.Common;
-using IGWebApiClient;
-using dto.endpoint.accountactivity.activity;
+using System.Diagnostics.CodeAnalysis;
 
 namespace IGApi.Model
 {
@@ -15,17 +14,12 @@ ActivityHistory
         public
         ActivityHistory()
         {
-            DealId = string.Format(Constants.InvalidEntry, nameof(Activity));
-            ActionStatus = string.Format(Constants.InvalidEntry, nameof(Activity));
-            Activity = string.Format(Constants.InvalidEntry, nameof(Activity));
-            ActivityHistoryId = string.Format(Constants.InvalidEntry, nameof(Activity));
-            Channel = string.Format(Constants.InvalidEntry, nameof(Activity));
-            Currency = string.Format(Constants.InvalidEntry, nameof(Activity));
-            Epic = string.Format(Constants.InvalidEntry, nameof(Activity));
-            MarketName = string.Format(Constants.InvalidEntry, nameof(Activity));
-            Result = string.Format(Constants.InvalidEntry, nameof(Activity));
-            Size = string.Format(Constants.InvalidEntry, nameof(Activity));
-            Reference = string.Format(Constants.InvalidEntry, nameof(Activity));
+            DealId = string.Format(Constants.InvalidEntry, nameof(Activity_v3));
+            Status = string.Format(Constants.InvalidEntry, nameof(Activity_v3));
+            Channel = string.Format(Constants.InvalidEntry, nameof(Activity_v3));
+            Epic = string.Format(Constants.InvalidEntry, nameof(Activity_v3));
+            Type = string.Format(Constants.InvalidEntry, nameof(Activity_v3));
+            Description = string.Format(Constants.InvalidEntry, nameof(Activity_v3));
         }
 
         /// <summary>
@@ -35,23 +29,18 @@ ActivityHistory
         /// <param name="accountId"></param>
         /// <exception cref="PrimaryKeyNullReferenceException"></exception>
         /// <exception cref="EssentialPropertyNullReferenceException"></exception>
-        public
-        ActivityHistory(
-            [NotNullAttribute] Activity activity
+        public ActivityHistory(
+            [NotNullAttribute] Activity_v3 activity
             )
         {
             MapProperties(activity);
 
             _ = DealId ?? throw new PrimaryKeyNullReferenceException(nameof(DealId));
-            _ = ActionStatus ?? throw new EssentialPropertyNullReferenceException(nameof(ActionStatus));
-            _ = Activity ?? throw new EssentialPropertyNullReferenceException(nameof(Activity));
-            _ = ActivityHistoryId ?? throw new EssentialPropertyNullReferenceException(nameof(ActivityHistoryId));
+            _ = Status ?? throw new EssentialPropertyNullReferenceException(nameof(Status));
             _ = Channel ?? throw new EssentialPropertyNullReferenceException(nameof(Channel));
-            _ = Currency ?? throw new EssentialPropertyNullReferenceException(nameof(Currency));
             _ = Epic ?? throw new EssentialPropertyNullReferenceException(nameof(Epic));
-            _ = MarketName ?? throw new EssentialPropertyNullReferenceException(nameof(MarketName));
-            _ = Result ?? throw new EssentialPropertyNullReferenceException(nameof(Result));
-            _ = Size ?? throw new EssentialPropertyNullReferenceException(nameof(Size));
+            _ = Type ?? throw new EssentialPropertyNullReferenceException(nameof(Type));
+            _ = Description ?? throw new EssentialPropertyNullReferenceException(nameof(Description));
         }
     }
 }
